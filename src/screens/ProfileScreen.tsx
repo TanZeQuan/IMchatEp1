@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import useUserStore from '../store/userStore';
 
 interface MenuItem {
   icon: keyof typeof Ionicons.glyphMap;
@@ -28,7 +29,7 @@ const ProfileMenu: React.FC = () => {
     { icon: 'star-outline', label: '我的收藏' },
     { icon: 'person-outline', label: '联系客服' },
     { icon: 'help-circle-outline', label: '帮助中心' },
-    { icon: 'settings-outline', label: '设置', navigateTo: 'Settings' },
+    { icon: 'settings-outline', label: '设置', navigateTo: 'Setting' },
     { icon: 'people-outline', label: '会议' },
   ];
 
@@ -86,15 +87,9 @@ const ProfileMenu: React.FC = () => {
     }
   };
 
+  const { setUserToken } = useUserStore();
   const handleLogout = async () => {
-    // 清除登录状态，例如 AsyncStorage 中 token
-    await AsyncStorage.removeItem('userToken');
-
-    // 跳转到 Login 页面，并清空导航历史
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' as never }],
-    });
+    setUserToken(null);
   };
 
   return (
