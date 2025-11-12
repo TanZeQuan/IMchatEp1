@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useUserStore from '../store/userStore';
+import { useUserStore } from '../store/userStore';
 
 interface MenuItem {
   icon: keyof typeof Ionicons.glyphMap;

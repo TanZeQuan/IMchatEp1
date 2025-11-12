@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useUserStore } from '../store/userStore';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // Define your navigation stack types
@@ -11,13 +12,13 @@ type RootStackParamList = {
   ForgotPassword: undefined;
   Home: undefined;
   PrivacyPolicy: undefined;
-  MainTab: undefined; // Add this line
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { setUserToken } = useUserStore();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,11 +30,13 @@ export default function LoginScreen() {
       return;
     }
     
-    // TODO: Replace with actual API call
+    // TODO: Replace with actual API call. 
+    // This is a placeholder for the login functionality.
+    // Currently, it navigates to the main screen without any authentication.
     console.log('Login attempt:', { username, password, rememberMe });
     
     // Navigate to Home on successful login
-    navigation.navigate('MainTab');
+    setUserToken('dummy-token');
   };
 
   const handleRegister = () => {

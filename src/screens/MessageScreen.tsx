@@ -85,6 +85,8 @@ interface ChatItemType {
     avatars: string[];
 }
 
+import { useNavigation } from '@react-navigation/native';
+
 // --- 聊天项组件 ---
 const ChatItem = ({ item, navigation }: { item: ChatItemType, navigation: any }) => {
     const renderAvatar = () => {
@@ -114,7 +116,7 @@ const ChatItem = ({ item, navigation }: { item: ChatItemType, navigation: any })
     };
 
     return (
-        <TouchableOpacity activeOpacity={0.7}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Chat', { chatName: item.name })}>
             <View style={styles.chatItemContainer}>
                 <View style={styles.avatarWrapper}>
                     {renderAvatar()}
@@ -136,6 +138,7 @@ const ChatItem = ({ item, navigation }: { item: ChatItemType, navigation: any })
 
 // --- 页面主组件 ---
 export default function ChatListScreen() {
+    const navigation = useNavigation();
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             {/* Header */}
@@ -159,7 +162,7 @@ export default function ChatListScreen() {
             <FlatList
                 data={DUMMY_DATA}
                 keyExtractor={(item) => item.id}
-                 renderItem={({ item }) => <ChatItem item={item} navigation={navigator} />}
+                 renderItem={({ item }) => <ChatItem item={item} navigation={navigation} />}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
             />

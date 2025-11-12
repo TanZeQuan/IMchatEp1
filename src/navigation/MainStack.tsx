@@ -16,8 +16,15 @@ export default function MainStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={MainTab} options={{ headerShown: false }} />
-      <Stack.Screen name="Chat" component={ChatScreen} options={({ route }) => ({ title: route.params.chatName })} />
-      <Stack.Screen name="Setting" component={SettingScreen} />
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={({ route }) => ({
+          headerShown: false,
+          title: route.params?.chatName || 'Chat',
+        })}
+      />
+      <Stack.Screen name="Setting" component={SettingScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
