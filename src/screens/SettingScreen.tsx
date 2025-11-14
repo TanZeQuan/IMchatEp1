@@ -8,7 +8,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native'; // ✅ Import navigation hook
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { MainStackParamList } from '../navigation/MainStack';
 
 const COLORS = {
   background: '#F5F5F5',
@@ -34,7 +36,6 @@ const SettingItem: React.FC<SettingItemProps> = ({
   onPress,
 }) => {
   const [isEnabled, setIsEnabled] = useState(false);
-
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   return (
@@ -44,7 +45,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
       activeOpacity={showSwitch ? 1 : 0.6}
     >
       <Text style={styles.settingTitle}>{title}</Text>
-      {showArrow && (
+      {showArrow && !showSwitch && (
         <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
       )}
       {showSwitch && (
@@ -61,7 +62,8 @@ const SettingItem: React.FC<SettingItemProps> = ({
 };
 
 const SettingScreen: React.FC = () => {
-  const navigation = useNavigation(); // ✅ Use navigation instance
+  const navigation =
+    useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -69,7 +71,7 @@ const SettingScreen: React.FC = () => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()} // ✅ Go back
+          onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
@@ -80,12 +82,23 @@ const SettingScreen: React.FC = () => {
       {/* Content */}
       <View style={styles.content}>
         <View style={styles.settingsGroup}>
-          <SettingItem title="主页" onPress={() => console.log('主页')} />
+          {/* 🔗 点击跳转主页 */}
+          <SettingItem
+            title="主页"
+            onPress={() => navigation.navigate('SettingProfile')}
+          />
           <View style={styles.separator} />
-          <SettingItem title="更改密码" onPress={() => console.log('更改密码')} />
+
+          {/* 🔗 点击跳转更改密码页 */}
+          <SettingItem
+            title="更改密码"
+            onPress={() => navigation.navigate('ResetPassword')}
+          />
           <View style={styles.separator} />
-          <SettingItem title="通知" onPress={() => console.log('通知')} />
+
+          <SettingItem title="通知" onPress={() => navigation.navigate('Notification')} />
           <View style={styles.separator} />
+
           <SettingItem
             title='显示 "发送" 按钮'
             showArrow={false}

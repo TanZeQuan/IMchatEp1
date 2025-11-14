@@ -9,7 +9,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  ForgotPassword: undefined;
+  ForgetPassword: undefined;
   Home: undefined;
   PrivacyPolicy: undefined;
 };
@@ -44,7 +44,7 @@ export default function LoginScreen() {
   };
 
   const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword');
+    navigation.navigate('ForgetPassword');
   };
 
   const handlePrivacyPolicy = () => {

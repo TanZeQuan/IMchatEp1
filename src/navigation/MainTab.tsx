@@ -20,7 +20,7 @@ export default function MainTab() {
           borderTopWidth: 0,
           height: 80,
           paddingBottom: 8,
-          paddingTop: 8,
+          paddingTop: 3,
         },
         tabBarLabelStyle: {
           fontSize: 12,

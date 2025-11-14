@@ -22,7 +22,7 @@ interface MenuItem {
 }
 
 const ProfileMenu: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
   const menuItems: MenuItem[] = [
@@ -30,7 +30,7 @@ const ProfileMenu: React.FC = () => {
     { icon: 'person-outline', label: '联系客服' },
     { icon: 'help-circle-outline', label: '帮助中心' },
     { icon: 'settings-outline', label: '设置', navigateTo: 'Setting' },
-    { icon: 'people-outline', label: '会议' },
+    { icon: 'people-outline', label: '会议',  navigateTo: 'MeetingScreen' },
   ];
 
   const pickImage = async () => {
@@ -113,7 +113,7 @@ const ProfileMenu: React.FC = () => {
             </View>
           </View>
           <View style={styles.profileRight}>
-            <TouchableOpacity style={styles.qrButton} activeOpacity={0.7} onPress={() => console.log('QR code pressed')}>
+            <TouchableOpacity style={styles.qrButton} activeOpacity={0.7} onPress={() => navigation.navigate('QRScan')}>
               <Ionicons name="qr-code-outline" size={20} color="#9CA3AF" />
             </TouchableOpacity>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" style={styles.chevron} />

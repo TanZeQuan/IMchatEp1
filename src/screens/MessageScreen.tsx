@@ -150,10 +150,10 @@ export default function ChatListScreen() {
             <View style={styles.searchSection}>
                 <View style={styles.searchBarContainer}>
                     <Ionicons name="search" size={18} color={COLORS.textSecondary} style={styles.searchIcon} />
-                    <TextInput 
-                        placeholder="搜索" 
-                        placeholderTextColor={COLORS.textSecondary} 
-                        style={styles.searchInput} 
+                    <TextInput
+                        placeholder="搜索"
+                        placeholderTextColor={COLORS.textSecondary}
+                        style={styles.searchInput}
                     />
                 </View>
             </View>
@@ -162,7 +162,7 @@ export default function ChatListScreen() {
             <FlatList
                 data={DUMMY_DATA}
                 keyExtractor={(item) => item.id}
-                 renderItem={({ item }) => <ChatItem item={item} navigation={navigation} />}
+                renderItem={({ item }) => <ChatItem item={item} navigation={navigation} />}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
             />
@@ -172,9 +172,9 @@ export default function ChatListScreen() {
 
 // --- 样式 ---
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        backgroundColor: COLORS.background 
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.background
     },
     header: {
         backgroundColor: COLORS.header,
@@ -200,16 +200,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         height: 36,
     },
-    searchIcon: { 
-        marginRight: 8 
+    searchIcon: {
+        marginRight: 8
     },
-    searchInput: { 
-        flex: 1, 
-        fontSize: 15, 
+    searchInput: {
+        flex: 1,
+        fontSize: 15,
         color: COLORS.textPrimary,
         padding: 0,
     },
-    listContent: { 
+    listContent: {
         paddingTop: 8,
     },
     chatItemContainer: {
@@ -221,9 +221,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.5,
         borderBottomColor: '#E5E5E5',
     },
-    avatarWrapper: { 
-        marginRight: 12, 
-        position: 'relative' 
+    avatarWrapper: {
+        marginRight: 12,
+        position: 'relative'
     },
     avatarPlaceholder: {
         width: 48,
@@ -233,18 +233,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    groupAvatarContainer: { 
-        width: 48, 
-        height: 48, 
-        borderRadius: 8, 
-        flexDirection: 'row', 
-        flexWrap: 'wrap', 
+    groupAvatarContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 8,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         overflow: 'hidden',
         backgroundColor: COLORS.avatarPlaceholder,
     },
-    groupAvatarImage: { 
-        width: '50%', 
-        height: '50%' 
+    groupAvatarImage: {
+        width: '50%',
+        height: '50%'
     },
     badgeContainer: {
         position: 'absolute',
@@ -260,33 +260,33 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: COLORS.card,
     },
-    badgeText: { 
-        color: COLORS.card, 
-        fontSize: 11, 
-        fontWeight: 'bold' 
+    badgeText: {
+        color: COLORS.card,
+        fontSize: 11,
+        fontWeight: 'bold'
     },
-    textContainer: { 
-        flex: 1, 
+    textContainer: {
+        flex: 1,
         justifyContent: 'center',
     },
-    nameText: { 
-        fontSize: 16, 
-        fontWeight: '500', 
-        color: COLORS.textPrimary, 
+    nameText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: COLORS.textPrimary,
         marginBottom: 3,
     },
-    messageText: { 
-        fontSize: 14, 
+    messageText: {
+        fontSize: 14,
         color: COLORS.textSecondary,
         lineHeight: 18,
     },
-    metaContainer: { 
+    metaContainer: {
         alignItems: 'flex-end',
         justifyContent: 'flex-start',
         marginLeft: 8,
     },
-    timeText: { 
-        fontSize: 12, 
-        color: COLORS.textSecondary 
+    timeText: {
+        fontSize: 12,
+        color: COLORS.textSecondary
     },
 });

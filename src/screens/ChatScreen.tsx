@@ -9,17 +9,18 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { wsService } from '../api/WebSocketService';
 
 const COLORS = {
-  background: '#EDDAAD',
+  background: '#FEF3C7',
   header: '#F5E6C8',
   messageBubbleLeft: '#FFFFFF',
   messageBubbleRight: '#95EC69',
   textPrimary: '#000000',
-  inputBg: '#FFFFFF',
+  inputBg: '#FFD860',
   toolbarBg: '#F7F7F7',
   avatarBg: '#B0B0B0',
   iconBg: '#E8E8E8',
@@ -28,24 +29,41 @@ const COLORS = {
 interface Message {
   id: string;
   sender: 'me' | 'other';
+  senderName: string;
   text: string;
 }
 
+interface RouteParams {
+  chatName?: string;
+  userId?: string;
+}
+
 export default function ChatScreen() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const params = route.params as RouteParams;
+  
+  // Get chat partner's name from navigation params or use default
+  const chatPartnerName = params?.chatName || 'Alice';
+  
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', sender: 'other', text: '你好呀 4593年' },
-    { id: '2', sender: 'me', text: '好的内容' },
+    { id: '1', sender: 'other', senderName: chatPartnerName, text: '你好呀 4593年' },
+    { id: '2', sender: 'me', senderName: '我', text: '好的内容' },
   ]);
+
   const [inputText, setInputText] = useState('');
   const [showToolbar, setShowToolbar] = useState(false);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       sender: 'me',
-      text: inputText
+      senderName: '我',
+      text: inputText,
     };
+    
     setMessages(prevMessages => [...prevMessages, newMessage]);
     setInputText('');
   };
@@ -53,37 +71,46 @@ export default function ChatScreen() {
   const toggleToolbar = () => {
     setShowToolbar(!showToolbar);
   };
-  const navigation = useNavigation();
 
   const renderItem = ({ item }: { item: Message }) => (
-    <View
+    <TouchableOpacity
       style={[
         styles.messageRow,
-        item.sender === 'me' ? styles.messageRowRight : styles.messageRowLeft
+        item.sender === 'me' ? styles.messageRowRight : styles.messageRowLeft,
       ]}
+      onPress={() => alert(`消息来自：${item.senderName}`)}
     >
       {item.sender === 'other' && (
         <View style={styles.avatar}>
           <Ionicons name="person" size={20} color="#666" />
         </View>
       )}
+      
       <View
         style={[
           styles.bubble,
-          item.sender === 'me' ? styles.bubbleRight : styles.bubbleLeft
+          item.sender === 'me' ? styles.bubbleRight : styles.bubbleLeft,
         ]}
       >
+        <Text style={styles.senderName}>{item.senderName}</Text>
         <Text style={styles.messageText}>{item.text}</Text>
       </View>
+      
       {item.sender === 'me' && (
         <View style={styles.avatar}>
           <Ionicons name="person" size={20} color="#666" />
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 
-  const ToolbarButton = ({ icon, label }: { icon: keyof typeof Ionicons.glyphMap; label: string }) => (
+  const ToolbarButton = ({
+    icon,
+    label,
+  }: {
+    icon: keyof typeof Ionicons.glyphMap;
+    label: string;
+  }) => (
     <TouchableOpacity style={styles.toolbarButton}>
       <View style={styles.toolbarIconContainer}>
         <Ionicons name={icon} size={24} color="#333" />
@@ -96,10 +123,15 @@ export default function ChatScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
           <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>聊天详情</Text>
+        
+        <Text style={styles.headerTitle}>{chatPartnerName}</Text>
+        
         <TouchableOpacity style={styles.moreButton}>
           <Ionicons name="ellipsis-horizontal" size={24} color="#333" />
         </TouchableOpacity>
@@ -113,7 +145,7 @@ export default function ChatScreen() {
         <FlatList
           data={[...messages].reverse()}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.chatList}
           inverted
         />
@@ -121,31 +153,30 @@ export default function ChatScreen() {
         {/* Input Area */}
         <View style={styles.inputSection}>
           <View style={styles.inputContainer}>
-            <TouchableOpacity style={styles.voiceButton}>
+            <TouchableOpacity style={styles.iconButton}>
               <Ionicons name="mic" size={22} color="#333" />
             </TouchableOpacity>
+            
             <TextInput
               style={styles.input}
-              placeholder=""
+              placeholder="输入消息..."
               value={inputText}
               onChangeText={setInputText}
               multiline
             />
-            <TouchableOpacity style={styles.emojiButton}>
+            
+            <TouchableOpacity style={styles.iconButton}>
               <Ionicons name="happy-outline" size={22} color="#333" />
             </TouchableOpacity>
+            
             {inputText.trim() ? (
-              <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                <Ionicons
-                  name="send"
-                  size={22}
-                  color="#333"
-                />
+              <TouchableOpacity style={styles.iconButton} onPress={handleSend}>
+                <Ionicons name="send" size={22} color="#333" />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity style={styles.addButton} onPress={toggleToolbar}>
+              <TouchableOpacity style={styles.iconButton} onPress={toggleToolbar}>
                 <Ionicons
-                  name={showToolbar ? "close-circle-outline" : "add-circle-outline"}
+                  name={showToolbar ? 'close-circle-outline' : 'add-circle-outline'}
                   size={22}
                   color="#333"
                 />
@@ -179,7 +210,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background
+    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
@@ -243,6 +274,12 @@ const styles = StyleSheet.create({
   bubbleRight: {
     backgroundColor: COLORS.messageBubbleRight,
   },
+  senderName: {
+    fontWeight: 'bold',
+    marginBottom: 2,
+    fontSize: 14,
+    color: COLORS.textPrimary,
+  },
   messageText: {
     fontSize: 16,
     color: COLORS.textPrimary,
@@ -260,7 +297,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#D0D0D0',
   },
-  voiceButton: {
+  iconButton: {
     padding: 8,
   },
   input: {
@@ -272,15 +309,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
     color: COLORS.textPrimary,
-  },
-  emojiButton: {
-    padding: 8,
-  },
-  sendButton: {
-    padding: 8,
-  },
-  addButton: {
-    padding: 8,
   },
   toolbar: {
     backgroundColor: COLORS.toolbarBg,
