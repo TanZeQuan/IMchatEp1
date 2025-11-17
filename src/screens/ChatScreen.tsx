@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,27 +8,29 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { wsService } from '../api/WebSocketService';
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { wsService } from "../api/WebSocketService";
 
 const COLORS = {
-  background: '#FEF3C7',
-  header: '#F5E6C8',
-  messageBubbleLeft: '#FFFFFF',
-  messageBubbleRight: '#95EC69',
-  textPrimary: '#000000',
-  inputBg: '#FFD860',
-  toolbarBg: '#F7F7F7',
-  avatarBg: '#B0B0B0',
-  iconBg: '#E8E8E8',
+  background: "#FEF3C7",
+  header: "#FFD860",
+  messageBubbleLeft: "#FFFFFF",
+  messageBubbleRight: "#95EC69",
+  textPrimary: "#000000",
+  inputBg: "#FFD860",
+  toolbarBg: "#F7F7F7",
+  avatarBg: "#B0B0B0",
+  iconBg: "#E8E8E8",
+  white: "#fff",
 };
 
 interface Message {
   id: string;
-  sender: 'me' | 'other';
+  sender: "me" | "other";
   senderName: string;
   text: string;
 }
@@ -42,30 +44,35 @@ export default function ChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const params = route.params as RouteParams;
-  
+
   // Get chat partner's name from navigation params or use default
-  const chatPartnerName = params?.chatName || 'Alice';
-  
+  const chatPartnerName = params?.chatName || "Alice";
+
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', sender: 'other', senderName: chatPartnerName, text: '你好呀 4593年' },
-    { id: '2', sender: 'me', senderName: '我', text: '好的内容' },
+    {
+      id: "1",
+      sender: "other",
+      senderName: chatPartnerName,
+      text: "你好呀 4593年",
+    },
+    { id: "2", sender: "me", senderName: "我", text: "好的内容" },
   ]);
 
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
-    
+
     const newMessage: Message = {
       id: Date.now().toString(),
-      sender: 'me',
-      senderName: '我',
+      sender: "me",
+      senderName: "我",
       text: inputText,
     };
-    
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-    setInputText('');
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setInputText("");
   };
 
   const toggleToolbar = () => {
@@ -73,35 +80,35 @@ export default function ChatScreen() {
   };
 
   const renderItem = ({ item }: { item: Message }) => (
-    <TouchableOpacity
+    <View
       style={[
         styles.messageRow,
-        item.sender === 'me' ? styles.messageRowRight : styles.messageRowLeft,
+        item.sender === "me" ? styles.messageRowRight : styles.messageRowLeft,
       ]}
-      onPress={() => alert(`消息来自：${item.senderName}`)}
+      // onPress={() => alert(`消息来自：${item.senderName}`)}
     >
-      {item.sender === 'other' && (
+      {item.sender === "other" && (
         <View style={styles.avatar}>
           <Ionicons name="person" size={20} color="#666" />
         </View>
       )}
-      
+
       <View
         style={[
           styles.bubble,
-          item.sender === 'me' ? styles.bubbleRight : styles.bubbleLeft,
+          item.sender === "me" ? styles.bubbleRight : styles.bubbleLeft,
         ]}
       >
         <Text style={styles.senderName}>{item.senderName}</Text>
         <Text style={styles.messageText}>{item.text}</Text>
       </View>
-      
-      {item.sender === 'me' && (
+
+      {item.sender === "me" && (
         <View style={styles.avatar}>
           <Ionicons name="person" size={20} color="#666" />
         </View>
       )}
-    </TouchableOpacity>
+    </View>
   );
 
   const ToolbarButton = ({
@@ -120,117 +127,129 @@ export default function ChatScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="chevron-back" size={24} color="#333" />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>{chatPartnerName}</Text>
+
+          <TouchableOpacity style={styles.moreButton}>
+            <Ionicons name="ellipsis-horizontal" size={24} color="#333" />
+          </TouchableOpacity>
+        </View>
+
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoidingView}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <Ionicons name="chevron-back" size={24} color="#333" />
-        </TouchableOpacity>
-        
-        <Text style={styles.headerTitle}>{chatPartnerName}</Text>
-        
-        <TouchableOpacity style={styles.moreButton}>
-          <Ionicons name="ellipsis-horizontal" size={24} color="#333" />
-        </TouchableOpacity>
-      </View>
+          {/* Chat Messages */}
+          <FlatList
+            data={[...messages].reverse()}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.chatList}
+            inverted
+          />
 
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoidingView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        {/* Chat Messages */}
-        <FlatList
-          data={[...messages].reverse()}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.chatList}
-          inverted
-        />
+          {/* Input Area */}
+          <View style={styles.inputSection}>
+            <View style={styles.inputContainer}>
+              <TouchableOpacity style={styles.iconButton}>
+                <Ionicons name="mic" size={22} color="#333" />
+              </TouchableOpacity>
 
-        {/* Input Area */}
-        <View style={styles.inputSection}>
-          <View style={styles.inputContainer}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="mic" size={22} color="#333" />
-            </TouchableOpacity>
-            
-            <TextInput
-              style={styles.input}
-              placeholder="输入消息..."
-              value={inputText}
-              onChangeText={setInputText}
-              multiline
-            />
-            
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="happy-outline" size={22} color="#333" />
-            </TouchableOpacity>
-            
-            {inputText.trim() ? (
-              <TouchableOpacity style={styles.iconButton} onPress={handleSend}>
-                <Ionicons name="send" size={22} color="#333" />
+              <TextInput
+                style={styles.input}
+                placeholder="输入消息..."
+                value={inputText}
+                onChangeText={setInputText}
+                multiline
+              />
+
+              <TouchableOpacity style={styles.iconButton}>
+                <Ionicons name="happy-outline" size={22} color="#333" />
               </TouchableOpacity>
-            ) : (
-              <TouchableOpacity style={styles.iconButton} onPress={toggleToolbar}>
-                <Ionicons
-                  name={showToolbar ? 'close-circle-outline' : 'add-circle-outline'}
-                  size={22}
-                  color="#333"
-                />
-              </TouchableOpacity>
+
+              {inputText.trim() ? (
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={handleSend}
+                >
+                  <Ionicons name="send" size={22} color="#333" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={toggleToolbar}
+                >
+                  <Ionicons
+                    name={
+                      showToolbar
+                        ? "close-circle-outline"
+                        : "add-circle-outline"
+                    }
+                    size={22}
+                    color="#333"
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Toolbar - Collapsible */}
+            {showToolbar && (
+              <View style={styles.toolbar}>
+                <View style={styles.toolbarRow}>
+                  <ToolbarButton icon="image-outline" label="图片" />
+                  <ToolbarButton icon="play-circle-outline" label="视频" />
+                  <ToolbarButton icon="call-outline" label="通话" />
+                  <ToolbarButton icon="videocam-outline" label="视频通话" />
+                </View>
+                <View style={styles.toolbarRow}>
+                  <ToolbarButton icon="document-outline" label="文件" />
+                  <ToolbarButton icon="card-outline" label="个人名片" />
+                  <ToolbarButton icon="wallet-outline" label="群名片" />
+                  <View style={styles.toolbarButton} />
+                </View>
+              </View>
             )}
           </View>
-
-          {/* Toolbar - Collapsible */}
-          {showToolbar && (
-            <View style={styles.toolbar}>
-              <View style={styles.toolbarRow}>
-                <ToolbarButton icon="image-outline" label="图片" />
-                <ToolbarButton icon="play-circle-outline" label="视频" />
-                <ToolbarButton icon="call-outline" label="通话" />
-                <ToolbarButton icon="videocam-outline" label="视频通话" />
-              </View>
-              <View style={styles.toolbarRow}>
-                <ToolbarButton icon="document-outline" label="文件" />
-                <ToolbarButton icon="card-outline" label="个人名片" />
-                <ToolbarButton icon="wallet-outline" label="群名片" />
-                <View style={styles.toolbarButton} />
-              </View>
-            </View>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    // backgroundColor: COLORS.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: COLORS.header,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#D0D0D0',
+    // borderBottomWidth: 1,
+    borderBottomColor: "#D0D0D0",
   },
   backButton: {
     padding: 4,
   },
   headerTitle: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.textPrimary,
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
   },
   moreButton: {
     padding: 4,
@@ -243,27 +262,27 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   messageRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 6,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
   messageRowLeft: {
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   messageRowRight: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 4,
     backgroundColor: COLORS.avatarBg,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 8,
   },
   bubble: {
-    maxWidth: '60%',
+    maxWidth: "60%",
     borderRadius: 4,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -275,7 +294,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.messageBubbleRight,
   },
   senderName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 2,
     fontSize: 14,
     color: COLORS.textPrimary,
@@ -289,13 +308,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.toolbarBg,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.inputBg,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#D0D0D0',
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    // borderTopWidth: 1,
+    borderTopColor: "#D0D0D0",
   },
   iconButton: {
     padding: 8,
@@ -304,7 +323,8 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 36,
     maxHeight: 100,
-    backgroundColor: COLORS.inputBg,
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
@@ -312,25 +332,26 @@ const styles = StyleSheet.create({
   },
   toolbar: {
     backgroundColor: COLORS.toolbarBg,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 25,
+    paddingHorizontal: 15,
   },
   toolbarRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 12,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    // marginBottom: 12,
   },
   toolbarButton: {
-    alignItems: 'center',
+    alignItems: "center",
     width: 70,
+    margin: 10,
   },
   toolbarIconContainer: {
     width: 50,
     height: 50,
     borderRadius: 8,
     backgroundColor: COLORS.iconBg,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 6,
   },
   toolbarLabel: {
