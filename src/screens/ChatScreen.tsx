@@ -13,7 +13,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import EmojiSelector from "react-native-emoji-selector";
+import { Picker } from "emoji-mart-native"; // ✅ 替换 emoji selector
 
 const COLORS = {
   background: "#FEF3C7",
@@ -80,8 +80,9 @@ export default function ChatScreen() {
     if (showToolbar) setShowToolbar(false);
   };
 
-  const handleEmojiSelect = (emoji: string) => {
-    setInputText((prev) => prev + emoji);
+  const handleEmojiSelect = (emoji: any) => {
+    // emoji.native 是真正的 emoji 字符
+    setInputText((prev) => prev + emoji.native);
   };
 
   const renderItem = ({ item }: { item: Message }) => (
@@ -205,12 +206,8 @@ export default function ChatScreen() {
 
             {/* Emoji Selector */}
             {showEmojiSelector && (
-              <View style={styles.emojiSelectorContainer}>
-                <EmojiSelector
-                  onEmojiSelected={handleEmojiSelect}
-                  showSearchBar={false}
-                  columns={8}
-                />
+              <View style={{ height: 320, backgroundColor: "#fff" }}>
+                <Picker onEmojiSelected={handleEmojiSelect} />
               </View>
             )}
 
@@ -309,7 +306,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
   },
-  emojiSelectorContainer: { height: 300, backgroundColor: COLORS.white },
   toolbar: { paddingVertical: 25, paddingHorizontal: 15 },
   toolbarRow: { flexDirection: "row", justifyContent: "space-around" },
   toolbarButton: { alignItems: "center", width: 70, margin: 10 },
