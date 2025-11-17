@@ -13,7 +13,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { Picker } from "emoji-mart-native"; // ✅ 替换 emoji selector
+import EmojiPicker from "rn-emoji-keyboard";
+import { wsService } from "../api/WebSocketService";
 
 const COLORS = {
   background: "#FEF3C7",
@@ -45,16 +46,22 @@ export default function ChatScreen() {
   const route = useRoute();
   const params = route.params as RouteParams;
 
+  // Get chat partner's name from navigation params or use default
   const chatPartnerName = params?.chatName || "Alice";
 
   const [messages, setMessages] = useState<Message[]>([
-    { id: "1", sender: "other", senderName: chatPartnerName, text: "你好呀 👋" },
-    { id: "2", sender: "me", senderName: "我", text: "Hello!" },
+    {
+      id: "1",
+      sender: "other",
+      senderName: chatPartnerName,
+      text: "你好呀 4593年",
+    },
+    { id: "2", sender: "me", senderName: "我", text: "好的内容" },
   ]);
 
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
-  const [showEmojiSelector, setShowEmojiSelector] = useState(false);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -66,23 +73,22 @@ export default function ChatScreen() {
       text: inputText,
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
     setInputText("");
   };
 
   const toggleToolbar = () => {
     setShowToolbar(!showToolbar);
-    if (showEmojiSelector) setShowEmojiSelector(false);
+    if (isEmojiPickerOpen) setIsEmojiPickerOpen(false);
   };
 
-  const toggleEmojiSelector = () => {
-    setShowEmojiSelector(!showEmojiSelector);
+  const toggleEmojiPicker = () => {
+    setIsEmojiPickerOpen(!isEmojiPickerOpen);
     if (showToolbar) setShowToolbar(false);
   };
 
   const handleEmojiSelect = (emoji: any) => {
-    // emoji.native 是真正的 emoji 字符
-    setInputText((prev) => prev + emoji.native);
+    setInputText((prev) => prev + emoji.emoji);
   };
 
   const renderItem = ({ item }: { item: Message }) => (
@@ -154,6 +160,7 @@ export default function ChatScreen() {
           style={styles.keyboardAvoidingView}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
+          {/* Chat Messages */}
           <FlatList
             data={[...messages].reverse()}
             renderItem={renderItem}
@@ -162,7 +169,7 @@ export default function ChatScreen() {
             inverted
           />
 
-          {/* Input Section */}
+          {/* Input Area */}
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
               <TouchableOpacity style={styles.iconButton}>
@@ -177,20 +184,29 @@ export default function ChatScreen() {
                 multiline
               />
 
-              <TouchableOpacity style={styles.iconButton} onPress={toggleEmojiSelector}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={toggleEmojiPicker}
+              >
                 <Ionicons
-                  name={showEmojiSelector ? "close-circle" : "happy-outline"}
+                  name={isEmojiPickerOpen ? "close-circle" : "happy-outline"}
                   size={22}
                   color="#333"
                 />
               </TouchableOpacity>
 
               {inputText.trim() ? (
-                <TouchableOpacity style={styles.iconButton} onPress={handleSend}>
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={handleSend}
+                >
                   <Ionicons name="send" size={22} color="#333" />
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity style={styles.iconButton} onPress={toggleToolbar}>
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={toggleToolbar}
+                >
                   <Ionicons
                     name={
                       showToolbar
@@ -204,14 +220,7 @@ export default function ChatScreen() {
               )}
             </View>
 
-            {/* Emoji Selector */}
-            {showEmojiSelector && (
-              <View style={{ height: 320, backgroundColor: "#fff" }}>
-                <Picker onEmojiSelected={handleEmojiSelect} />
-              </View>
-            )}
-
-            {/* Toolbar */}
+            {/* Toolbar - Collapsible */}
             {showToolbar && (
               <View style={styles.toolbar}>
                 <View style={styles.toolbarRow}>
@@ -230,13 +239,49 @@ export default function ChatScreen() {
             )}
           </View>
         </KeyboardAvoidingView>
+
+        {/* Emoji Picker Modal */}
+        <EmojiPicker
+          onEmojiSelected={handleEmojiSelect}
+          open={isEmojiPickerOpen}
+          onClose={() => setIsEmojiPickerOpen(false)}
+          categoryPosition="top"
+          enableSearchBar
+          enableCategoryChangeAnimation
+          enableRecentlyUsed
+          categoryOrder={[
+            'smileys_emotion',
+            'people_body',
+            'animals_nature',
+            'food_drink',
+            'travel_places',
+            'activities',
+            'objects',
+            'symbols',
+            'flags',
+          ]}
+          theme={{
+            backdrop: '#00000080',
+            knob: '#766dfc',
+            container: '#ffffff',
+            header: '#ffffff',
+            category: {
+              icon: '#766dfc',
+              iconActive: '#766dfc',
+              container: '#e7e7e7',
+              containerActive: '#ffffff',
+            },
+          }}
+        />
       </SafeAreaView>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
+  safeArea: {
+    flex: 1,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -244,8 +289,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.header,
     paddingHorizontal: 12,
     paddingVertical: 10,
+    borderBottomColor: "#D0D0D0",
   },
-  backButton: { padding: 4 },
+  backButton: {
+    padding: 4,
+  },
   headerTitle: {
     fontSize: 16,
     fontWeight: "500",
@@ -253,12 +301,27 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
   },
-  moreButton: { padding: 4 },
-  keyboardAvoidingView: { flex: 1 },
-  chatList: { paddingHorizontal: 12, paddingVertical: 16 },
-  messageRow: { flexDirection: "row", marginVertical: 6, alignItems: "flex-start" },
-  messageRowLeft: { justifyContent: "flex-start" },
-  messageRowRight: { justifyContent: "flex-end" },
+  moreButton: {
+    padding: 4,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  chatList: {
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+  },
+  messageRow: {
+    flexDirection: "row",
+    marginVertical: 6,
+    alignItems: "flex-start",
+  },
+  messageRowLeft: {
+    justifyContent: "flex-start",
+  },
+  messageRowRight: {
+    justifyContent: "flex-end",
+  },
   avatar: {
     width: 40,
     height: 40,
@@ -274,8 +337,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  bubbleLeft: { backgroundColor: COLORS.messageBubbleLeft },
-  bubbleRight: { backgroundColor: COLORS.messageBubbleRight },
+  bubbleLeft: {
+    backgroundColor: COLORS.messageBubbleLeft,
+  },
+  bubbleRight: {
+    backgroundColor: COLORS.messageBubbleRight,
+  },
   senderName: {
     fontWeight: "bold",
     marginBottom: 2,
@@ -284,18 +351,23 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
-    lineHeight: 22,
     color: COLORS.textPrimary,
+    lineHeight: 22,
   },
-  inputSection: { backgroundColor: COLORS.toolbarBg },
+  inputSection: {
+    backgroundColor: COLORS.toolbarBg,
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.inputBg,
     paddingHorizontal: 10,
     paddingVertical: 12,
+    borderTopColor: "#D0D0D0",
   },
-  iconButton: { padding: 8 },
+  iconButton: {
+    padding: 8,
+  },
   input: {
     flex: 1,
     minHeight: 36,
@@ -305,10 +377,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
+    color: COLORS.textPrimary,
   },
-  toolbar: { paddingVertical: 25, paddingHorizontal: 15 },
-  toolbarRow: { flexDirection: "row", justifyContent: "space-around" },
-  toolbarButton: { alignItems: "center", width: 70, margin: 10 },
+  toolbar: {
+    backgroundColor: COLORS.toolbarBg,
+    paddingVertical: 25,
+    paddingHorizontal: 15,
+  },
+  toolbarRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  toolbarButton: {
+    alignItems: "center",
+    width: 70,
+    margin: 10,
+  },
   toolbarIconContainer: {
     width: 50,
     height: 50,
@@ -318,5 +402,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 6,
   },
-  toolbarLabel: { fontSize: 12, color: COLORS.textPrimary },
+  toolbarLabel: {
+    fontSize: 12,
+    color: COLORS.textPrimary,
+  },
 });
