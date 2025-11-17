@@ -243,7 +243,8 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.header,
-    paddingVertical: 12,
+    paddingTop: 16,
+    paddingBottom: 12,
     paddingHorizontal: 16,
     alignItems: "center",
   },
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
   searchSection: {
     backgroundColor: COLORS.header,
     paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingBottom: 16,
   },
   searchBarContainer: {
     flexDirection: "row",

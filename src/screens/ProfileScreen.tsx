@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   chevron: { marginLeft: 4 },
-  menuContainer: { gap: 12, paddingHorizontal: 16 },
+  menuContainer: { gap: 12, paddingHorizontal: 16, marginBottom: 60 },
   menuItem: {
     backgroundColor: "#fff",
     borderRadius: 20,
@@ -245,6 +245,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+
+    // iOS Shadow
+    shadowColor: "#898989",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+
+    // Android Shadow
+    elevation: 5,
   },
   menuItemLeft: { flexDirection: "row", alignItems: "center" },
   iconContainer: {
