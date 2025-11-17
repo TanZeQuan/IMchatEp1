@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#F4D03F',
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 16,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     textAlign: 'center',
-    color: '#374151',
+    color: '#232323',
     marginBottom: 12,
   },
   searchContainer: {
@@ -168,8 +168,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 3,
   },
   searchIcon: {
     marginRight: 8,
@@ -183,8 +183,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
   },
   actionButton: {
     alignItems: 'center',
@@ -213,8 +213,7 @@ const styles = StyleSheet.create({
   },
   sectionHeaderText: {
     fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '500',
+    color: '#232323',
   },
   scrollView: {
     flex: 1,
