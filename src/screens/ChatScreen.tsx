@@ -14,7 +14,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import EmojiSelector from "react-native-emoji-selector";
-import { wsService } from "../api/WebSocketService";
 
 const COLORS = {
   background: "#FEF3C7",
@@ -46,17 +45,11 @@ export default function ChatScreen() {
   const route = useRoute();
   const params = route.params as RouteParams;
 
-  // Get chat partner's name from navigation params or use default
   const chatPartnerName = params?.chatName || "Alice";
 
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      sender: "other",
-      senderName: chatPartnerName,
-      text: "你好呀 4593年",
-    },
-    { id: "2", sender: "me", senderName: "我", text: "好的内容" },
+    { id: "1", sender: "other", senderName: chatPartnerName, text: "你好呀 👋" },
+    { id: "2", sender: "me", senderName: "我", text: "Hello!" },
   ]);
 
   const [inputText, setInputText] = useState("");
@@ -73,7 +66,7 @@ export default function ChatScreen() {
       text: inputText,
     };
 
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setInputText("");
   };
 
@@ -160,7 +153,6 @@ export default function ChatScreen() {
           style={styles.keyboardAvoidingView}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          {/* Chat Messages */}
           <FlatList
             data={[...messages].reverse()}
             renderItem={renderItem}
@@ -169,7 +161,7 @@ export default function ChatScreen() {
             inverted
           />
 
-          {/* Input Area */}
+          {/* Input Section */}
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
               <TouchableOpacity style={styles.iconButton}>
@@ -184,10 +176,7 @@ export default function ChatScreen() {
                 multiline
               />
 
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={toggleEmojiSelector}
-              >
+              <TouchableOpacity style={styles.iconButton} onPress={toggleEmojiSelector}>
                 <Ionicons
                   name={showEmojiSelector ? "close-circle" : "happy-outline"}
                   size={22}
@@ -196,17 +185,11 @@ export default function ChatScreen() {
               </TouchableOpacity>
 
               {inputText.trim() ? (
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={handleSend}
-                >
+                <TouchableOpacity style={styles.iconButton} onPress={handleSend}>
                   <Ionicons name="send" size={22} color="#333" />
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={toggleToolbar}
-                >
+                <TouchableOpacity style={styles.iconButton} onPress={toggleToolbar}>
                   <Ionicons
                     name={
                       showToolbar
@@ -224,15 +207,14 @@ export default function ChatScreen() {
             {showEmojiSelector && (
               <View style={styles.emojiSelectorContainer}>
                 <EmojiSelector
-                    onEmojiSelected={handleEmojiSelect}
-                    showSearchBar={false}
-                    columns={8}
-                    category={undefined}
-                  />
+                  onEmojiSelected={handleEmojiSelect}
+                  showSearchBar={false}
+                  columns={8}
+                />
               </View>
             )}
 
-            {/* Toolbar - Collapsible */}
+            {/* Toolbar */}
             {showToolbar && (
               <View style={styles.toolbar}>
                 <View style={styles.toolbarRow}>
@@ -257,9 +239,7 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
+  safeArea: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -267,11 +247,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.header,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    borderBottomColor: "#D0D0D0",
   },
-  backButton: {
-    padding: 4,
-  },
+  backButton: { padding: 4 },
   headerTitle: {
     fontSize: 16,
     fontWeight: "500",
@@ -279,27 +256,12 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
   },
-  moreButton: {
-    padding: 4,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  chatList: {
-    paddingHorizontal: 12,
-    paddingVertical: 16,
-  },
-  messageRow: {
-    flexDirection: "row",
-    marginVertical: 6,
-    alignItems: "flex-start",
-  },
-  messageRowLeft: {
-    justifyContent: "flex-start",
-  },
-  messageRowRight: {
-    justifyContent: "flex-end",
-  },
+  moreButton: { padding: 4 },
+  keyboardAvoidingView: { flex: 1 },
+  chatList: { paddingHorizontal: 12, paddingVertical: 16 },
+  messageRow: { flexDirection: "row", marginVertical: 6, alignItems: "flex-start" },
+  messageRowLeft: { justifyContent: "flex-start" },
+  messageRowRight: { justifyContent: "flex-end" },
   avatar: {
     width: 40,
     height: 40,
@@ -315,12 +277,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  bubbleLeft: {
-    backgroundColor: COLORS.messageBubbleLeft,
-  },
-  bubbleRight: {
-    backgroundColor: COLORS.messageBubbleRight,
-  },
+  bubbleLeft: { backgroundColor: COLORS.messageBubbleLeft },
+  bubbleRight: { backgroundColor: COLORS.messageBubbleRight },
   senderName: {
     fontWeight: "bold",
     marginBottom: 2,
@@ -329,23 +287,18 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
-    color: COLORS.textPrimary,
     lineHeight: 22,
+    color: COLORS.textPrimary,
   },
-  inputSection: {
-    backgroundColor: COLORS.toolbarBg,
-  },
+  inputSection: { backgroundColor: COLORS.toolbarBg },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.inputBg,
     paddingHorizontal: 10,
     paddingVertical: 12,
-    borderTopColor: "#D0D0D0",
   },
-  iconButton: {
-    padding: 8,
-  },
+  iconButton: { padding: 8 },
   input: {
     flex: 1,
     minHeight: 36,
@@ -355,26 +308,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
-    color: COLORS.textPrimary,
   },
-  emojiSelectorContainer: {
-    height: 300,
-    backgroundColor: COLORS.white,
-  },
-  toolbar: {
-    backgroundColor: COLORS.toolbarBg,
-    paddingVertical: 25,
-    paddingHorizontal: 15,
-  },
-  toolbarRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  toolbarButton: {
-    alignItems: "center",
-    width: 70,
-    margin: 10,
-  },
+  emojiSelectorContainer: { height: 300, backgroundColor: COLORS.white },
+  toolbar: { paddingVertical: 25, paddingHorizontal: 15 },
+  toolbarRow: { flexDirection: "row", justifyContent: "space-around" },
+  toolbarButton: { alignItems: "center", width: 70, margin: 10 },
   toolbarIconContainer: {
     width: 50,
     height: 50,
@@ -384,12 +322,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 6,
   },
-  toolbarLabel: {
-    fontSize: 12,
-    color: COLORS.textPrimary,
-  },
-  emojiSelector: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
+  toolbarLabel: { fontSize: 12, color: COLORS.textPrimary },
 });
