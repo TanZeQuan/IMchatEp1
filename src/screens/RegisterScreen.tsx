@@ -1,261 +1,359 @@
-import React, { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useState } from "react";
 import {
-  View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-interface FormData {
-  phone: string;
-  password: string;
-  confirmPassword: string;
-}
+// Define your navigation stack types from AuthStack
+type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+};
 
-export default function RegisterScreen() {
-  const navigation = useNavigation();
-  const [formData, setFormData] = useState<FormData>({
-    phone: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
-  const handleRegister = () => {
-    if (!agreedToTerms) {
-      Alert.alert('提示', '请同意隐私政策和服务协议');
+const RegisterScreen = () => {
+  const navigation = useNavigation<NavigationProp>();
+  const [nickname, setNickname] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleRegister = async () => {
+    if (!isChecked) {
+      Alert.alert("提示", "请先阅读并同意隐私政策和服务协议");
       return;
     }
-    if (formData.password !== formData.confirmPassword) {
-      Alert.alert('提示', '两次密码输入不一致');
+    if (!nickname || !username || !password || !confirmPassword) {
+      Alert.alert("错误", "请填写所有必填项");
       return;
     }
-    console.log('注册信息:', formData);
-    // TODO: Add registration API call here
+    if (password !== confirmPassword) {
+      Alert.alert("错误", "两次输入的密码不一致");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      console.log("Register attempt with:", nickname, username, password);
+      // In a real app, you'd call your API here.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      Alert.alert("成功", "注册成功！", [
+        { text: "OK", onPress: () => navigation.navigate("Login") },
+      ]);
+    } catch (error) {
+      console.error("Register error:", error);
+      Alert.alert("错误", "注册失败");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const isButtonDisabled =
+    isLoading ||
+    !nickname ||
+    !username ||
+    !password ||
+    !confirmPassword ||
+    !isChecked;
+
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-    >
-      {/* Logo */}
-      <View style={styles.logoContainer}>
-        <View style={styles.logoCard}>
-          <Image 
-            source={require('../../assets/images/sentalk-logo.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
-        </View>
-        <Text style={styles.title}>注册</Text>
-      </View>
+    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.bgShape1} />
+        <View style={styles.bgShape2} />
 
-      {/* Form */}
-      <View style={styles.formContainer}>
-        {/* Phone Input */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="请输入电话号/手机号码"
-            placeholderTextColor="#999"
-            value={formData.phone}
-            onChangeText={(text) => setFormData({ ...formData, phone: text })}
-            style={styles.input}
-            keyboardType="phone-pad"
-          />
-        </View>
-
-        {/* Password Input */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="请输入密码"
-            placeholderTextColor="#999"
-            value={formData.password}
-            onChangeText={(text) => setFormData({ ...formData, password: text })}
-            secureTextEntry={!showPassword}
-            style={[styles.input, styles.inputWithIcon]}
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Ionicons
-              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color="#999"
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Confirm Password Input */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="请再次确认密码"
-            placeholderTextColor="#999"
-            value={formData.confirmPassword}
-            onChangeText={(text) =>
-              setFormData({ ...formData, confirmPassword: text })
-            }
-            secureTextEntry={!showConfirmPassword}
-            style={[styles.input, styles.inputWithIcon]}
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
-            <Ionicons
-              name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color="#999"
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Register Button */}
-        <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-          <Text style={styles.registerButtonText}>注册</Text>
-        </TouchableOpacity>
-
-        {/* Terms Checkbox */}
-        <View style={styles.termsContainer}>
-          <TouchableOpacity
-            style={styles.checkbox}
-            onPress={() => setAgreedToTerms(!agreedToTerms)}
-          >
-            <Ionicons
-              name={agreedToTerms ? 'checkbox' : 'square-outline'}
-              size={20}
-              color={agreedToTerms ? '#E8C66A' : '#999'}
-            />
-          </TouchableOpacity>
-          <Text style={styles.termsText}>
-            我已阅读并同意{' '}
-            <Text style={styles.termsLink}>《隐私政策和服务协议》</Text>
-          </Text>
-        </View>
-
-        {/* Already Registered Link */}
-        <TouchableOpacity
-          style={styles.loginLinkContainer}
-          onPress={() => navigation.navigate('Login' as never)}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
         >
-          <Text style={styles.loginLink}>已有账号？返回登录</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          {/* Using the logo from the IM project for consistency on the register page */}
+          <View style={styles.logoContainer}>
+            <View style={styles.logoCard}>
+              <Image
+                source={require("../../assets/images/sentalk-logo.png")}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
+            </View>
+          </View>
+
+          <Text style={styles.title}>注册</Text>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputField}
+              placeholder="请输入昵称"
+              value={nickname}
+              onChangeText={setNickname}
+              autoCapitalize="none"
+              editable={!isLoading}
+              placeholderTextColor="#999"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputField}
+              placeholder="请输入用户名/手机号码"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              editable={!isLoading}
+              placeholderTextColor="#999"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputField}
+              placeholder="请输入密码"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!isPasswordVisible}
+              editable={!isLoading}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+              <Ionicons
+                name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#888"
+                style={styles.icon}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputField}
+              placeholder="请再次输入密码"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!isConfirmPasswordVisible}
+              editable={!isLoading}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity
+              onPress={() =>
+                setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+              }
+            >
+              <Ionicons
+                name={
+                  isConfirmPasswordVisible ? "eye-off-outline" : "eye-outline"
+                }
+                size={22}
+                color="#888"
+                style={styles.icon}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.linksContainer}>
+            <View />
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.linkText}>已有户口</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            onPress={handleRegister}
+            disabled={isButtonDisabled}
+            style={[
+              styles.loginButtonWrapper,
+              isButtonDisabled && styles.disabledButton,
+            ]}
+          >
+            <LinearGradient
+              colors={["#FDFDFD", "#EAEAEA"]}
+              style={styles.loginButtonGradient}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? "注册中..." : "注册"}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <View style={styles.agreementContainer}>
+            <TouchableOpacity
+              onPress={() => setIsChecked(!isChecked)}
+              style={styles.checkbox}
+            >
+              <Ionicons
+                name={isChecked ? "checkbox" : "square-outline"}
+                size={18}
+                color={isChecked ? "#007AFF" : "#888"}
+              />
+            </TouchableOpacity>
+            <Text style={styles.agreementText}>
+              我已阅读并同意
+              <Text style={styles.agreementLink}>《隐私政策和服务协议》</Text>
+            </Text>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: '#F5E6B3',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-  },
   logoContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 20, // Adjusted margin
   },
   logoCard: {
-    width: 100,
-    height: 100,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    width: 128,
+    height: 128,
+    backgroundColor: "#fff",
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: 12,
+    elevation: 5,
   },
   logoImage: {
-    width: 100,
-    height: 100,
+    width: 130,
+    height: 130,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  bgShape1: {
+    position: "absolute",
+    width: 350,
+    height: 350,
+    borderRadius: 60,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    top: -100,
+    right: -120,
+    transform: [{ rotate: "45deg" }],
+  },
+  bgShape2: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 60,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    top: 50,
+    left: -150,
+    transform: [{ rotate: "30deg" }],
+  },
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    padding: 25,
+    paddingTop: 40,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '500',
-    color: '#333',
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 30,
+    color: "#333",
   },
-  formContainer: {
-    width: '100%',
-    maxWidth: 400,
-  },
-  inputWrapper: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  input: {
-    backgroundColor: '#fff',
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    height: 55,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 30,
+    marginBottom: 20,
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 50,
-    fontSize: 14,
-    color: '#333',
+    shadowColor: "#B0C0E0",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
-  inputWithIcon: {
-    paddingRight: 50,
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 20,
-    top: '50%',
-    transform: [{ translateY: -10 }],
-  },
-  registerButton: {
-    backgroundColor: '#E8C66A',
-    paddingVertical: 16,
-    borderRadius: 50,
-    alignItems: 'center',
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  registerButtonText: {
+  inputField: {
+    flex: 1,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    color: "#333",
+    height: "100%",
   },
-  termsContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 16,
+  icon: {
+    marginLeft: 10,
+  },
+  linksContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 30,
+    paddingHorizontal: 15,
+  },
+  linkText: {
+    color: "#555",
+    fontSize: 14,
+  },
+  loginButtonWrapper: {
+    width: "100%",
+    height: 55,
+    borderRadius: 30,
+    shadowColor: "#B0C0E0",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+    marginTop: 10,
+    overflow: "hidden",
+  },
+  loginButtonGradient: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
+  },
+  loginButtonText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  agreementContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 25,
+    width: "100%",
+    justifyContent: "center",
   },
   checkbox: {
-    marginRight: 8,
-    marginTop: 2,
+    padding: 5,
   },
-  termsText: {
-    flex: 1,
+  agreementText: {
+    marginLeft: 8,
+    color: "#888",
     fontSize: 13,
-    color: '#666',
-    lineHeight: 20,
   },
-  termsLink: {
-    color: '#3B82F6',
-  },
-  loginLinkContainer: {
-    alignItems: 'center',
-    marginTop: 24,
-  },
-  loginLink: {
-    fontSize: 14,
-    color: '#666',
+  agreementLink: {
+    color: "#007AFF",
   },
 });
+
+export default RegisterScreen;
