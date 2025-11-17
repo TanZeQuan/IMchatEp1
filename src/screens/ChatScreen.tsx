@@ -13,6 +13,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import EmojiSelector from "react-native-emoji-selector";
 import { wsService } from "../api/WebSocketService";
 
 const COLORS = {
@@ -60,6 +61,7 @@ export default function ChatScreen() {
 
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
+  const [showEmojiSelector, setShowEmojiSelector] = useState(false);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -77,6 +79,16 @@ export default function ChatScreen() {
 
   const toggleToolbar = () => {
     setShowToolbar(!showToolbar);
+    if (showEmojiSelector) setShowEmojiSelector(false);
+  };
+
+  const toggleEmojiSelector = () => {
+    setShowEmojiSelector(!showEmojiSelector);
+    if (showToolbar) setShowToolbar(false);
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setInputText((prev) => prev + emoji);
   };
 
   const renderItem = ({ item }: { item: Message }) => (
@@ -85,7 +97,6 @@ export default function ChatScreen() {
         styles.messageRow,
         item.sender === "me" ? styles.messageRowRight : styles.messageRowLeft,
       ]}
-      // onPress={() => alert(`消息来自：${item.senderName}`)}
     >
       {item.sender === "other" && (
         <View style={styles.avatar}>
@@ -173,8 +184,15 @@ export default function ChatScreen() {
                 multiline
               />
 
-              <TouchableOpacity style={styles.iconButton}>
-                <Ionicons name="happy-outline" size={22} color="#333" />
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={toggleEmojiSelector}
+              >
+                <Ionicons
+                  name={showEmojiSelector ? "close-circle" : "happy-outline"}
+                  size={22}
+                  color="#333"
+                />
               </TouchableOpacity>
 
               {inputText.trim() ? (
@@ -201,6 +219,18 @@ export default function ChatScreen() {
                 </TouchableOpacity>
               )}
             </View>
+
+            {/* Emoji Selector */}
+            {showEmojiSelector && (
+              <View style={styles.emojiSelectorContainer}>
+                <EmojiSelector
+                    onEmojiSelected={handleEmojiSelect}
+                    showSearchBar={false}
+                    columns={8}
+                    category={undefined}
+                  />
+              </View>
+            )}
 
             {/* Toolbar - Collapsible */}
             {showToolbar && (
@@ -229,7 +259,6 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    // backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: "row",
@@ -238,7 +267,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.header,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    // borderBottomWidth: 1,
     borderBottomColor: "#D0D0D0",
   },
   backButton: {
@@ -313,7 +341,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.inputBg,
     paddingHorizontal: 10,
     paddingVertical: 12,
-    // borderTopWidth: 1,
     borderTopColor: "#D0D0D0",
   },
   iconButton: {
@@ -330,6 +357,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.textPrimary,
   },
+  emojiSelectorContainer: {
+    height: 300,
+    backgroundColor: COLORS.white,
+  },
   toolbar: {
     backgroundColor: COLORS.toolbarBg,
     paddingVertical: 25,
@@ -338,7 +369,6 @@ const styles = StyleSheet.create({
   toolbarRow: {
     flexDirection: "row",
     justifyContent: "space-around",
-    // marginBottom: 12,
   },
   toolbarButton: {
     alignItems: "center",
@@ -357,5 +387,9 @@ const styles = StyleSheet.create({
   toolbarLabel: {
     fontSize: 12,
     color: COLORS.textPrimary,
+  },
+  emojiSelector: {
+    flex: 1,
+    backgroundColor: COLORS.white,
   },
 });
