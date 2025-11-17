@@ -15,12 +15,52 @@ interface Contact {
   name: string;
 }
 
+interface ContactsByLetter {
+  [key: string]: Contact[];
+}
+
 const ContactsLayout: React.FC = () => {
-  const contacts: Contact[] = Array(15)
-    .fill(null)
-    .map((_, i) => ({ id: i, name: '用友' }));
-  
+  // Sample contacts grouped by first letter
+  const contactsData: ContactsByLetter = {
+    'A': [
+      { id: 1, name: 'Anna' },
+      { id: 2, name: 'Andrew' },
+      { id: 3, name: 'Alice' }
+    ],
+    'B': [
+      { id: 4, name: 'Bob' },
+      { id: 5, name: 'Betty' }
+    ],
+    'C': [
+      { id: 6, name: 'Charlie' },
+      { id: 7, name: 'Carol' },
+      { id: 8, name: 'Chris' }
+    ],
+    'D': [
+      { id: 9, name: 'David' },
+      { id: 10, name: 'Diana' }
+    ],
+    'E': [
+      { id: 11, name: 'Edward' },
+      { id: 12, name: 'Emily' }
+    ],
+    'J': [
+      { id: 13, name: 'John' },
+      { id: 14, name: 'Jane' }
+    ],
+    'M': [
+      { id: 15, name: 'Michael' },
+      { id: 16, name: 'Mary' },
+      { id: 17, name: 'Mark' }
+    ],
+    'S': [
+      { id: 18, name: 'Sarah' },
+      { id: 19, name: 'Steve' }
+    ]
+  };
+
   const alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
+  const sortedLetters = Object.keys(contactsData).sort();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -65,25 +105,30 @@ const ContactsLayout: React.FC = () => {
         
       {/* Contacts List */}
       <View style={styles.listContainer}>
-        {/* Section Header */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionHeaderText}>通讯</Text>
-        </View>
-
         <ScrollView style={styles.scrollView}>
-          {contacts.map((contact, index) => (
-            <TouchableOpacity
-              key={contact.id}
-              style={[
-                styles.contactItem,
-                index % 4 === 0 ? {} : {},
-              ]}
-            >
-              <View style={styles.avatar}>
-                <Ionicons name="people" size={20} color="#fff" />
+          {sortedLetters.map((letter) => (
+            <View key={letter}>
+              {/* Section Header */}
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>{letter}</Text>
               </View>
-              <Text style={styles.contactName}>{contact.name}</Text>
-            </TouchableOpacity>
+              
+              {/* Contacts under this letter */}
+              {contactsData[letter].map((contact, index) => (
+                <TouchableOpacity
+                  key={contact.id}
+                  style={[
+                    styles.contactItem,
+                    index % 2 === 0 ? styles.contactItemYellow : styles.contactItemWhite
+                  ]}
+                >
+                  <View style={styles.avatar}>
+                    <Ionicons name="person" size={20} color="#fff" />
+                  </View>
+                  <Text style={styles.contactName}>{contact.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           ))}
         </ScrollView>
 
@@ -153,9 +198,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
-  iconText: {
-    fontSize: 24,
-  },
   actionLabel: {
     fontSize: 12,
     color: '#374151',
@@ -165,13 +207,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   sectionHeader: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#FEF3C7',
     paddingHorizontal: 16,
     paddingVertical: 4,
   },
   sectionHeaderText: {
     fontSize: 12,
     color: '#6B7280',
+    fontWeight: '500',
   },
   scrollView: {
     flex: 1,
@@ -181,9 +224,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
+  },
+  contactItemYellow: {
+    backgroundColor: '#fff',
+  },
+  contactItemWhite: {
+    backgroundColor: '#fff',
   },
   avatar: {
     width: 40,
@@ -194,9 +242,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
-  avatarText: {
-    fontSize: 20,
-  },
   contactName: {
     fontSize: 16,
     color: '#374151',
@@ -204,7 +249,7 @@ const styles = StyleSheet.create({
   alphabetIndex: {
     position: 'absolute',
     right: 4,
-    top: '13%',
+    top: '10%',
     alignItems: 'center',
   },
   alphabetItem: {
@@ -214,6 +259,7 @@ const styles = StyleSheet.create({
   alphabetText: {
     fontSize: 10,
     color: '#9CA3AF',
+    fontWeight: '500',
   },
 });
 

@@ -52,6 +52,9 @@ const CreateMeetingScreen: React.FC = () => {
         '11月11日 14:00',
         '11月12日 10:00',
         '11月12日 15:30',
+        '11月13日 12:30',
+        '11月13日 14:30',
+        '11月14日 10:30',
     ];
 
     const durationOptions = [
