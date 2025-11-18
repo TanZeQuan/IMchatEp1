@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import EmojiPicker from "rn-emoji-keyboard";
+import { useSettingsStore } from "../store/settingsStore";
 import { wsService } from "../api/WebSocketService";
 
 const COLORS = {
@@ -45,6 +46,7 @@ export default function ChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const params = route.params as RouteParams;
+  const { showSendButton } = useSettingsStore();
 
   // Get chat partner's name from navigation params or use default
   const chatPartnerName = params?.chatName || "Alice";
@@ -195,29 +197,29 @@ export default function ChatScreen() {
                 />
               </TouchableOpacity>
 
-              {inputText.trim() ? (
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={handleSend}
-                >
-                  <Ionicons name="send" size={22} color="#333" />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={toggleToolbar}
-                >
-                  <Ionicons
-                    name={
-                      showToolbar
-                        ? "close-circle-outline"
-                        : "add-circle-outline"
-                    }
-                    size={22}
-                    color="#333"
-                  />
-                </TouchableOpacity>
-              )}
+              {(() => {
+                if (showSendButton) {
+                  if (inputText.trim()) {
+                    return (
+                      <TouchableOpacity style={styles.iconButton} onPress={handleSend}>
+                        <Ionicons name="send" size={22} color="#333" />
+                      </TouchableOpacity>
+                    );
+                  } else {
+                    return (
+                      <TouchableOpacity style={styles.iconButton} onPress={toggleToolbar}>
+                        <Ionicons name={showToolbar ? "close-circle-outline" : "add-circle-outline"} size={22} color="#333" />
+                      </TouchableOpacity>
+                    );
+                  }
+                } else {
+                  return (
+                    <TouchableOpacity style={styles.iconButton} onPress={toggleToolbar}>
+                      <Ionicons name={showToolbar ? "close-circle-outline" : "add-circle-outline"} size={22} color="#333" />
+                    </TouchableOpacity>
+                  );
+                }
+              })()}
             </View>
 
             {/* Toolbar - Collapsible */}
@@ -238,41 +240,41 @@ export default function ChatScreen() {
               </View>
             )}
           </View>
+          {isEmojiPickerOpen && (
+            <EmojiPicker
+              onEmojiSelected={handleEmojiSelect}
+              open={isEmojiPickerOpen}
+              onClose={() => setIsEmojiPickerOpen(false)}
+              categoryPosition="top"
+              enableSearchBar
+              enableCategoryChangeAnimation
+              enableRecentlyUsed
+              categoryOrder={[
+                'smileys_emotion',
+                'people_body',
+                'animals_nature',
+                'food_drink',
+                'travel_places',
+                'activities',
+                'objects',
+                'symbols',
+                'flags',
+              ]}
+              theme={{
+                backdrop: '#00000080',
+                knob: '#766dfc',
+                container: '#ffffff',
+                header: '#ffffff',
+                category: {
+                  icon: '#766dfc',
+                  iconActive: '#766dfc',
+                  container: '#e7e7e7',
+                  containerActive: '#ffffff',
+                },
+              }}
+            />
+          )}
         </KeyboardAvoidingView>
-
-        {/* Emoji Picker Modal */}
-        <EmojiPicker
-          onEmojiSelected={handleEmojiSelect}
-          open={isEmojiPickerOpen}
-          onClose={() => setIsEmojiPickerOpen(false)}
-          categoryPosition="top"
-          enableSearchBar
-          enableCategoryChangeAnimation
-          enableRecentlyUsed
-          categoryOrder={[
-            'smileys_emotion',
-            'people_body',
-            'animals_nature',
-            'food_drink',
-            'travel_places',
-            'activities',
-            'objects',
-            'symbols',
-            'flags',
-          ]}
-          theme={{
-            backdrop: '#00000080',
-            knob: '#766dfc',
-            container: '#ffffff',
-            header: '#ffffff',
-            category: {
-              icon: '#766dfc',
-              iconActive: '#766dfc',
-              container: '#e7e7e7',
-              containerActive: '#ffffff',
-            },
-          }}
-        />
       </SafeAreaView>
     </LinearGradient>
   );

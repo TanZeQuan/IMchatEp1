@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
+import { useSettingsStore } from "../store/settingsStore";
 import { LinearGradient } from "expo-linear-gradient";
 
 const COLORS = {
@@ -22,6 +23,8 @@ interface SettingItemProps {
   showArrow?: boolean;
   showSwitch?: boolean;
   onPress?: () => void;
+  switchValue?: boolean;
+  onSwitchValueChange?: (value: boolean) => void;
 }
 
 const SettingItem: React.FC<SettingItemProps> = ({
@@ -29,10 +32,9 @@ const SettingItem: React.FC<SettingItemProps> = ({
   showArrow = true,
   showSwitch = false,
   onPress,
+  switchValue,
+  onSwitchValueChange,
 }) => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
-
   return (
     <TouchableOpacity
       style={styles.settingItem}
@@ -52,8 +54,8 @@ const SettingItem: React.FC<SettingItemProps> = ({
           trackColor={{ false: "#E5E5E5", true: COLORS.switchActive }}
           thumbColor="#FFFFFF"
           ios_backgroundColor="#E5E5E5"
-          onValueChange={toggleSwitch}
-          value={isEnabled}
+          onValueChange={onSwitchValueChange}
+          value={switchValue}
         />
       )}
     </TouchableOpacity>
@@ -63,6 +65,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
 const SettingScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+  const { showSendButton, setShowSendButton } = useSettingsStore();
 
   return (
     <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
@@ -106,6 +109,8 @@ const SettingScreen: React.FC = () => {
               title='显示 "发送" 按钮'
               showArrow={false}
               showSwitch={true}
+              switchValue={showSendButton}
+              onSwitchValueChange={setShowSendButton}
             />
           </View>
         </View>
