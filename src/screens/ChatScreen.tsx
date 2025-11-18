@@ -8,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -36,9 +37,9 @@ interface Message {
   id: string;
   sender: "me" | "other";
   senderName: string;
-  text?: string; // Make text optional
-  type: "text" | "voice"; // Add type property
-  uri?: string; // Add optional uri for voice messages
+  text?: string;
+  type: "text" | "voice";
+  uri?: string;
 }
 
 interface RouteParams {
@@ -51,10 +52,10 @@ export default function ChatScreen() {
   const route = useRoute();
   const params = route.params as RouteParams;
 
-  // Get chat partner's name from navigation params or use default
   const chatPartnerName = params?.chatName || "Alice";
-const [recording, setRecording] = useState<Audio.Recording | null>(null);
-const [isRecording, setIsRecording] = useState(false);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [permissionGranted, setPermissionGranted] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -71,68 +72,123 @@ const [isRecording, setIsRecording] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
+  // Initialize audio permissions and settings
   useEffect(() => {
-    return recording
-      ? () => {
-          console.log("Unloading recording...");
-          recording.stopAndUnloadAsync();
-        }
-      : undefined;
-  }, [recording]);
+    setupAudio();
+    
+    return () => {
+      // Cleanup on unmount - only if recording is still active
+      if (recording) {
+        console.log("Cleaning up recording on unmount...");
+        recording.getStatusAsync().then((status) => {
+          if (status.isRecording) {
+            recording.stopAndUnloadAsync().catch(err => 
+              console.error("Error cleaning up recording:", err)
+            );
+          }
+        }).catch(err => console.error("Error checking recording status:", err));
+      }
+    };
+  }, []);
 
-
-  // 开始录音
-  const startRecording = async () => {
-    if (isRecording) {
-      return;
-    }
+  const setupAudio = async () => {
     try {
-      console.log("Requesting permissions...");
+      // Request permissions
       const permission = await Audio.requestPermissionsAsync();
+      setPermissionGranted(permission.status === "granted");
+      
       if (permission.status !== "granted") {
-        alert("需要麦克风权限才能录音");
+        console.log("Microphone permission not granted");
         return;
       }
 
-      console.log("Starting recording...");
-      setIsRecording(true);
-
+      // Set audio mode once
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
       });
+      
+      console.log("Audio setup complete");
+    } catch (err) {
+      console.error("Failed to setup audio:", err);
+      Alert.alert("错误", "音频设置失败");
+    }
+  };
 
-      const { recording } = await Audio.Recording.createAsync(
+  const startRecording = async () => {
+    // Prevent multiple recordings
+    if (isRecording || recording) {
+      console.log("Already recording");
+      return;
+    }
+
+    if (!permissionGranted) {
+      Alert.alert("权限不足", "需要麦克风权限才能录音");
+      // Try to request permission again
+      const permission = await Audio.requestPermissionsAsync();
+      if (permission.status !== "granted") {
+        return;
+      }
+      setPermissionGranted(true);
+      await setupAudio();
+    }
+
+    try {
+      console.log("Starting recording...");
+      setIsRecording(true);
+
+      const { recording: newRecording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
 
-      setRecording(recording);
+      setRecording(newRecording);
+      console.log("Recording started successfully");
     } catch (err) {
-      console.error("录音启动失败:", err);
+      console.error("Failed to start recording:", err);
+      setIsRecording(false);
+      Alert.alert("错误", "录音启动失败，请重试");
     }
   };
 
-  // 停止录音
   const stopRecording = async () => {
     if (!recording) {
+      console.log("No recording to stop");
+      setIsRecording(false);
       return;
     }
-    console.log("Stopping recording...");
-    setIsRecording(false);
+
     try {
+      console.log("Stopping recording...");
+      
+      // Stop and unload the recording
       await recording.stopAndUnloadAsync();
+      
+      // Get the URI
       const uri = recording.getURI();
-      console.log('Recorded URI:', uri);
+      console.log('Recording URI:', uri);
+      
+      // Reset states
+      setIsRecording(false);
+      setRecording(null);
+      
+      // Send the voice message if URI exists
       if (uri) {
         sendVoiceMessage(uri);
+      } else {
+        console.error("No URI found for recording");
+        Alert.alert("错误", "录音保存失败");
       }
     } catch (err) {
-      console.error("停止录音失败:", err);
+      console.error("Failed to stop recording:", err);
+      setIsRecording(false);
+      setRecording(null);
+      Alert.alert("错误", "停止录音失败");
     }
-    setRecording(null);
   };
 
-  // 发送语音信息
   const sendVoiceMessage = (uri: string) => {
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -143,6 +199,7 @@ const [isRecording, setIsRecording] = useState(false);
     };
 
     setMessages((prev) => [...prev, newMessage]);
+    console.log("Voice message sent:", uri);
   };
 
   const handleSend = () => {
@@ -260,17 +317,20 @@ const [isRecording, setIsRecording] = useState(false);
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
               <TouchableOpacity
-                style={styles.iconButton}
+                style={[
+                  styles.iconButton,
+                  isRecording && styles.recordingButton
+                ]}
                 onPressIn={startRecording}
                 onPressOut={stopRecording}
+                activeOpacity={0.7}
               >
                 <Ionicons
                   name={isRecording ? "stop-circle" : "mic"}
                   size={22}
-                  color={isRecording ? "red" : "#333"}
+                  color={isRecording ? "#FF0000" : "#333"}
                 />
               </TouchableOpacity>
-
 
               <TextInput
                 style={styles.input}
@@ -278,16 +338,18 @@ const [isRecording, setIsRecording] = useState(false);
                 value={inputText}
                 onChangeText={setInputText}
                 multiline
+                editable={!isRecording}
               />
 
               <TouchableOpacity
                 style={styles.iconButton}
                 onPress={toggleEmojiPicker}
+                disabled={isRecording}
               >
                 <Ionicons
                   name={isEmojiPickerOpen ? "close-circle" : "happy-outline"}
                   size={22}
-                  color="#333"
+                  color={isRecording ? "#999" : "#333"}
                 />
               </TouchableOpacity>
 
@@ -295,13 +357,19 @@ const [isRecording, setIsRecording] = useState(false);
                 <TouchableOpacity
                   style={styles.iconButton}
                   onPress={handleSend}
+                  disabled={isRecording}
                 >
-                  <Ionicons name="send" size={22} color="#333" />
+                  <Ionicons 
+                    name="send" 
+                    size={22} 
+                    color={isRecording ? "#999" : "#333"} 
+                  />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.iconButton}
                   onPress={toggleToolbar}
+                  disabled={isRecording}
                 >
                   <Ionicons
                     name={
@@ -310,14 +378,22 @@ const [isRecording, setIsRecording] = useState(false);
                         : "add-circle-outline"
                     }
                     size={22}
-                    color="#333"
+                    color={isRecording ? "#999" : "#333"}
                   />
                 </TouchableOpacity>
               )}
             </View>
 
+            {/* Recording Indicator */}
+            {isRecording && (
+              <View style={styles.recordingIndicator}>
+                <View style={styles.recordingDot} />
+                <Text style={styles.recordingText}>正在录音...</Text>
+              </View>
+            )}
+
             {/* Toolbar - Collapsible */}
-            {showToolbar && (
+            {showToolbar && !isRecording && (
               <View style={styles.toolbar}>
                 <View style={styles.toolbarRow}>
                   <ToolbarButton icon="image-outline" label="图片" />
@@ -464,6 +540,10 @@ const styles = StyleSheet.create({
   iconButton: {
     padding: 8,
   },
+  recordingButton: {
+    backgroundColor: "#FFE5E5",
+    borderRadius: 20,
+  },
   input: {
     flex: 1,
     minHeight: 36,
@@ -474,6 +554,25 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
     color: COLORS.textPrimary,
+  },
+  recordingIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    backgroundColor: "#FFE5E5",
+  },
+  recordingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#FF0000",
+    marginRight: 8,
+  },
+  recordingText: {
+    fontSize: 14,
+    color: "#FF0000",
+    fontWeight: "500",
   },
   toolbar: {
     backgroundColor: COLORS.toolbarBg,
