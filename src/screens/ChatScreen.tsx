@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import EmojiPicker from "rn-emoji-keyboard";
 import { wsService } from "../api/WebSocketService";
+import { Audio } from "expo-av";
+import VoiceMessage from '../components/VoiceMessage';
+
 
 const COLORS = {
   background: "#FEF3C7",
@@ -33,7 +36,9 @@ interface Message {
   id: string;
   sender: "me" | "other";
   senderName: string;
-  text: string;
+  text?: string; // Make text optional
+  type: "text" | "voice"; // Add type property
+  uri?: string; // Add optional uri for voice messages
 }
 
 interface RouteParams {
@@ -48,6 +53,8 @@ export default function ChatScreen() {
 
   // Get chat partner's name from navigation params or use default
   const chatPartnerName = params?.chatName || "Alice";
+const [recording, setRecording] = useState<Audio.Recording | null>(null);
+const [isRecording, setIsRecording] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -55,13 +62,88 @@ export default function ChatScreen() {
       sender: "other",
       senderName: chatPartnerName,
       text: "你好呀 4593年",
+      type: "text",
     },
-    { id: "2", sender: "me", senderName: "我", text: "好的内容" },
+    { id: "2", sender: "me", senderName: "我", text: "好的内容", type: "text" },
   ]);
 
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+
+  useEffect(() => {
+    return recording
+      ? () => {
+          console.log("Unloading recording...");
+          recording.stopAndUnloadAsync();
+        }
+      : undefined;
+  }, [recording]);
+
+
+  // 开始录音
+  const startRecording = async () => {
+    if (isRecording) {
+      return;
+    }
+    try {
+      console.log("Requesting permissions...");
+      const permission = await Audio.requestPermissionsAsync();
+      if (permission.status !== "granted") {
+        alert("需要麦克风权限才能录音");
+        return;
+      }
+
+      console.log("Starting recording...");
+      setIsRecording(true);
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+
+      setRecording(recording);
+    } catch (err) {
+      console.error("录音启动失败:", err);
+    }
+  };
+
+  // 停止录音
+  const stopRecording = async () => {
+    if (!recording) {
+      return;
+    }
+    console.log("Stopping recording...");
+    setIsRecording(false);
+    try {
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+      console.log('Recorded URI:', uri);
+      if (uri) {
+        sendVoiceMessage(uri);
+      }
+    } catch (err) {
+      console.error("停止录音失败:", err);
+    }
+    setRecording(null);
+  };
+
+  // 发送语音信息
+  const sendVoiceMessage = (uri: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      sender: "me",
+      senderName: "我",
+      type: "voice",
+      uri: uri,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+  };
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -71,6 +153,7 @@ export default function ChatScreen() {
       sender: "me",
       senderName: "我",
       text: inputText,
+      type: "text",
     };
 
     setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -111,7 +194,11 @@ export default function ChatScreen() {
         ]}
       >
         <Text style={styles.senderName}>{item.senderName}</Text>
-        <Text style={styles.messageText}>{item.text}</Text>
+        {item.type === "text" ? (
+          <Text style={styles.messageText}>{item.text}</Text>
+        ) : (
+          <VoiceMessage uri={item.uri!} />
+        )}
       </View>
 
       {item.sender === "me" && (
@@ -172,9 +259,18 @@ export default function ChatScreen() {
           {/* Input Area */}
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
-              <TouchableOpacity style={styles.iconButton}>
-                <Ionicons name="mic" size={22} color="#333" />
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPressIn={startRecording}
+                onPressOut={stopRecording}
+              >
+                <Ionicons
+                  name={isRecording ? "stop-circle" : "mic"}
+                  size={22}
+                  color={isRecording ? "red" : "#333"}
+                />
               </TouchableOpacity>
+
 
               <TextInput
                 style={styles.input}
@@ -250,26 +346,26 @@ export default function ChatScreen() {
           enableCategoryChangeAnimation
           enableRecentlyUsed
           categoryOrder={[
-            'smileys_emotion',
-            'people_body',
-            'animals_nature',
-            'food_drink',
-            'travel_places',
-            'activities',
-            'objects',
-            'symbols',
-            'flags',
+            "smileys_emotion",
+            "people_body",
+            "animals_nature",
+            "food_drink",
+            "travel_places",
+            "activities",
+            "objects",
+            "symbols",
+            "flags",
           ]}
           theme={{
-            backdrop: '#00000080',
-            knob: '#766dfc',
-            container: '#ffffff',
-            header: '#ffffff',
+            backdrop: "#00000080",
+            knob: "#766dfc",
+            container: "#ffffff",
+            header: "#ffffff",
             category: {
-              icon: '#766dfc',
-              iconActive: '#766dfc',
-              container: '#e7e7e7',
-              containerActive: '#ffffff',
+              icon: "#766dfc",
+              iconActive: "#766dfc",
+              container: "#e7e7e7",
+              containerActive: "#ffffff",
             },
           }}
         />
