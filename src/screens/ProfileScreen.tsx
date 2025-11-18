@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     alignItems: "center",
   },
-  logoutButtonText: { fontSize: 16, fontWeight: "600", color: "#1F2937" },
+  logoutButtonText: { fontSize: 16, fontWeight: "500", color: "#1F2937" },
 });
 
 export default ProfileMenu;

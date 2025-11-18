@@ -127,9 +127,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#F4D03F",
+    backgroundColor: "#FFD860",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   backButton: {
     width: 40,
@@ -199,18 +199,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   joinButton: {
-    backgroundColor: "#F4D03F",
+    backgroundColor: "#FCD34D",
     borderRadius: 30,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: "auto",
+    marginTop: 100,
     marginBottom: 60,
     marginHorizontal: 16,
   },
   joinButtonText: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
     color: "#333",
   },
 });

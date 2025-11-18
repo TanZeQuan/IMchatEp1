@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from '@react-navigation/native'; // ✅ Import navigation hook
 
 interface NotificationItemProps {
@@ -45,7 +46,8 @@ const NotificationSettingsScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+        <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
@@ -74,21 +76,22 @@ const NotificationSettingsScreen: React.FC = () => {
         />
       </View>
     </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5E6B3',
+    // backgroundColor: '#F5E6B3',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFD860",
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#F5D76E',
+    paddingVertical: 16,
   },
   backButton: {
     width: 40,
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#333',
   },
   placeholder: {

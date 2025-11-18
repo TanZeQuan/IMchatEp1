@@ -50,14 +50,14 @@ const CreateMeetingScreen: React.FC = () => {
   const [audioEnabled, setAudioEnabled] = useState("开启");
 
   const timeOptions = [
-    '11月10日 12:10',
-    '11月11日 09:00',
-    '11月11日 14:00',
-    '11月12日 10:00',
-    '11月12日 15:30',
-    '11月13日 12:30',
-    '11月13日 14:30',
-    '11月14日 10:30',
+    "11月10日 12:10",
+    "11月11日 09:00",
+    "11月11日 14:00",
+    "11月12日 10:00",
+    "11月12日 15:30",
+    "11月13日 12:30",
+    "11月13日 14:30",
+    "11月14日 10:30",
   ];
 
   const durationOptions = [
@@ -273,9 +273,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#F4D03F",
+    backgroundColor: "#FFD860",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   backButton: {
     width: 40,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  headerTitle: { fontSize: 17, fontWeight: "600", color: "#333" },
+  headerTitle: { fontSize: 16, fontWeight: "600", color: "#333" },
   placeholder: { width: 40 },
   content: { flex: 1, paddingTop: 16 },
   inputContainer: {
@@ -320,16 +320,16 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   completeButton: {
-    backgroundColor: "#F4D03F",
+    backgroundColor: "#FCD34D",
     borderRadius: 30,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: "auto",
+    marginTop: 100,
     marginBottom: 60,
     marginHorizontal: 16,
   },
-  completeButtonText: { fontSize: 16, fontWeight: "600", color: "#333" },
+  completeButtonText: { fontSize: 16, fontWeight: "500", color: "#333" },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
