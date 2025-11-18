@@ -16,6 +16,11 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface ResetPayload {
+  phone: string;
+  password: string;
+}
+
 // 注册 API
 export const register = async (payload: RegisterPayload) => {
   try {
@@ -37,4 +42,14 @@ export const login = async (payload: LoginPayload) => {
     console.error("Login error:", error.response?.data || error.message);
     throw error.response?.data || error;
   }
+};
+
+export const ResetPassword = async (payload: ResetPayload) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/users/reset-password`, payload);
+    return res.data;
+  } catch (error: any) {
+    console.error("Reset password error:", error.response?.data || error.message);
+    throw error.response?.data || error;
+  } 
 };

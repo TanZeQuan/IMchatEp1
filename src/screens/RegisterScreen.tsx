@@ -21,6 +21,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 type RegisterPayload = {
   name: string;   // 昵称
   phone: string;  // 手机号
+  email: string;  // 邮箱
   password: string;
 };
 
@@ -35,6 +36,7 @@ const RegisterScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const [nickname, setNickname] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -43,13 +45,22 @@ const RegisterScreen = () => {
     useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleRegister = async () => {
     if (!isChecked) {
       Alert.alert("提示", "请先阅读并同意隐私政策和服务协议");
       return;
     }
-    if (!nickname || !phone || !password || !confirmPassword) {
+    if (!nickname || !phone || !email || !password || !confirmPassword) {
       Alert.alert("错误", "请填写所有必填项");
+      return;
+    }
+    if (!validateEmail(email)) {
+      Alert.alert("错误", "请输入有效的邮箱地址");
       return;
     }
     if (password !== confirmPassword) {
@@ -62,6 +73,7 @@ const RegisterScreen = () => {
       const payload: RegisterPayload = {
         name: nickname,
         phone: phone,
+        email: email,
         password: password,
       };
 
@@ -80,7 +92,7 @@ const RegisterScreen = () => {
   };
 
   const isButtonDisabled =
-    isLoading || !nickname || !phone || !password || !confirmPassword || !isChecked;
+    isLoading || !nickname || !phone || !email || !password || !confirmPassword || !isChecked;
 
   return (
     <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
@@ -126,6 +138,21 @@ const RegisterScreen = () => {
               onChangeText={setPhone}
               keyboardType="phone-pad"
               autoCapitalize="none"
+              editable={!isLoading}
+              placeholderTextColor="#999"
+            />
+          </View>
+
+          {/* 邮箱 */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputField}
+              placeholder="请输入邮箱"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
               editable={!isLoading}
               placeholderTextColor="#999"
             />

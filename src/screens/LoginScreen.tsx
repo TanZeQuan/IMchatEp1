@@ -17,7 +17,9 @@ import { useNavigation } from "@react-navigation/native";
 import { useUserStore } from "../store/userStore";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// Define your navigation stack types from AuthStack
+import { login } from "../api/UserApi";   // ⬅️ 关键：从 API 导入 login()
+
+// Define your navigation stack types
 type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -29,7 +31,8 @@ type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { setUserToken } = useUserStore();
-  const [username, setUsername] = useState("");
+
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -40,26 +43,33 @@ const LoginScreen = () => {
       Alert.alert("提示", "请先阅读并同意隐私政策和服务协议");
       return;
     }
-    if (!username || !password) {
-      Alert.alert("错误", "请输入用户名和密码");
+    if (!phone || !password) {
+      Alert.alert("错误", "请输入手机号和密码");
       return;
     }
+
     setIsLoading(true);
+
     try {
-      console.log("Login attempt with:", username, password);
-      // In a real app, you'd call your API here.
-      // For this project, we'll simulate a successful login and set the user token.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setUserToken("dummy-token"); // This will trigger the navigation switch in AppNavigator
+      // 🔹 模拟登录成功，不调用真实 API
+      console.log("Bypass login payload:", { phone, password });
+
+      // 模拟 token
+      const fakeToken = "bypass-token";
+      setUserToken(fakeToken);
+
+      console.log("Login bypass success, token:", fakeToken);
+      // 这里前端的导航逻辑会自动跳转 Home
+
     } catch (error) {
-      console.error("Login error:", error);
-      Alert.alert("错误", "登录失败");
+      console.log("Login bypass error:", error);
+      Alert.alert("登录失败", "前端模拟异常");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const isButtonDisabled = isLoading || !username || !password || !isChecked;
+  const isButtonDisabled = isLoading || !phone || !password || !isChecked;
 
   return (
     <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
@@ -71,7 +81,6 @@ const LoginScreen = () => {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.container}
         >
-          {/* Logo from IMchatEp1 */}
           <View style={styles.logoContainer}>
             <View style={styles.logoCard}>
               <Image
@@ -84,18 +93,21 @@ const LoginScreen = () => {
 
           <Text style={styles.title}>登录</Text>
 
+          {/* Phone number input */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.inputField}
-              placeholder="请输入用户名/手机号码"
-              value={username}
-              onChangeText={setUsername}
+              placeholder="请输入手机号"
+              value={phone}
+              onChangeText={setPhone}
               autoCapitalize="none"
               editable={!isLoading}
               placeholderTextColor="#999"
+              keyboardType="phone-pad"
             />
           </View>
 
+          {/* Password input */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.inputField}
@@ -129,6 +141,7 @@ const LoginScreen = () => {
             </TouchableOpacity>
           </View>
 
+          {/* Login button */}
           <TouchableOpacity
             onPress={handleLogin}
             disabled={isButtonDisabled}
@@ -147,6 +160,7 @@ const LoginScreen = () => {
             </LinearGradient>
           </TouchableOpacity>
 
+          {/* Agreement */}
           <View style={styles.agreementContainer}>
             <TouchableOpacity
               onPress={() => setIsChecked(!isChecked)}
@@ -169,10 +183,12 @@ const LoginScreen = () => {
   );
 };
 
+export default LoginScreen;
+
+/* --- styles (unchanged) --- */
 const styles = StyleSheet.create({
-  // IMchatEp1 Logo Styles
   logoContainer: {
-    marginBottom: 20, // Adjusted margin
+    marginBottom: 20,
   },
   logoCard: {
     width: 128,
@@ -191,7 +207,6 @@ const styles = StyleSheet.create({
     width: 130,
     height: 130,
   },
-  // Styles from IM project
   safeArea: {
     flex: 1,
   },
@@ -220,12 +235,12 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     padding: 25,
-    paddingTop: 40, // Adjusted padding
+    paddingTop: 40,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 30, // Adjusted margin
+    marginBottom: 30,
     color: "#333",
   },
   inputContainer: {
@@ -311,5 +326,3 @@ const styles = StyleSheet.create({
     color: "#007AFF",
   },
 });
-
-export default LoginScreen;

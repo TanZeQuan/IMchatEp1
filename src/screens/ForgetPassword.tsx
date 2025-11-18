@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native'; // ✅ Navigation hook
 const ForgetPasswordScreen: React.FC = () => {
     const navigation = useNavigation(); // ✅ Get navigation instance
 
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [email, setEmail] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -57,11 +57,13 @@ const ForgetPasswordScreen: React.FC = () => {
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
-                        placeholder="请输入手机号码"
+                        placeholder="请输入邮箱地址"
                         placeholderTextColor="#B8B8B8"
-                        value={phoneNumber}
-                        onChangeText={setPhoneNumber}
-                        keyboardType="phone-pad"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoCorrect={false}
                     />
                 </View>
 
