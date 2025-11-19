@@ -10,8 +10,10 @@ import CreateMeeting from '../screens/CreateMeeting';
 import JoinMeeting from '../screens/JoinMeeting';
 import MeetingScreen from '../screens/MeetingScreen';
 import EditName from '../screens/EditName';
-import EditPhone from '../screens/EditPhone'; 
+import EditPhone from '../screens/EditPhone';
 import QRScan from '../screens/QRScreen';
+import ResetEmail from '../screens/ResetEmail';
+
 
 export type MainStackParamList = {
   Home: undefined;
@@ -26,6 +28,7 @@ export type MainStackParamList = {
   EditName: undefined;
   EditPhone: undefined;
   QRScan: undefined;
+  ResetEmail: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -52,6 +55,7 @@ export default function MainStack() {
       <Stack.Screen name="EditName" component={EditName} options={{ headerShown: false }} />
       <Stack.Screen name="EditPhone" component={EditPhone} options={{ headerShown: false }} />
       <Stack.Screen name="QRScan" component={QRScan} options={{ headerShown: false }} />
+      <Stack.Screen name="ResetEmail" component={ResetEmail} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }

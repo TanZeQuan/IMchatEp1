@@ -16,15 +16,25 @@ export interface LoginPayload {
   password: string;
 }
 
-export interface ResetPayload {
-  phone: string;
+// 👉 1. 发送 OTP Payload
+export interface SendOTPPayload {
+  email: string;
+}
+
+// 👉 2. 验证 OTP Payload
+export interface VerifyOTPPayload {
+  email: string;
+  otp: string;
+}
+
+// 👉 3. 重设密码 Payload
+export interface ResetPasswordPayload {
   password: string;
 }
 
 // 注册 API
 export const register = async (payload: RegisterPayload) => {
   try {
-    
     const res = await axios.post(`${BASE_URL}/users/new`, payload);
     return res.data;
   } catch (error: any) {
@@ -44,12 +54,38 @@ export const login = async (payload: LoginPayload) => {
   }
 };
 
-export const ResetPassword = async (payload: ResetPayload) => {
+export const sendOTP = async (payload: SendOTPPayload) => {
   try {
-    const res = await axios.post(`${BASE_URL}/users/reset-password`, payload);
+    const res = await axios.post(`${BASE_URL}/forget/otp/send`, payload);
     return res.data;
   } catch (error: any) {
-    console.error("Reset password error:", error.response?.data || error.message);
+    console.error("Send OTP error:", error.response?.data || error.message);
     throw error.response?.data || error;
-  } 
+  }
+};
+
+// =============================
+// 2) 验证 OTP
+// =============================
+export const verifyOTP = async (payload: VerifyOTPPayload) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/forget/otp/verify`, payload);
+    return res.data;
+  } catch (error: any) {
+    console.error("Verify OTP error:", error.response?.data || error.message);
+    throw error.response?.data || error;
+  }
+};
+
+// =============================
+// 3) 重设密码
+// =============================
+export const resetPassword = async (payload: ResetPasswordPayload) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/forget/password/reset`, payload);
+    return res.data;
+  } catch (error: any) {
+    console.error("Reset Password error:", error.response?.data || error.message);
+    throw error.response?.data || error;
+  }
 };

@@ -98,7 +98,13 @@ const SettingScreen: React.FC = () => {
               onPress={() => navigation.navigate("ResetPassword")}
             />
             <View style={styles.separator} />
-
+            {/* 🔗 点击跳转更改邮箱页 */}
+            <SettingItem
+              title="更改邮箱"
+              onPress={() => navigation.navigate("ResetEmail")}
+            />
+            <View style={styles.separator} />
+            
             <SettingItem
               title="通知"
               onPress={() => navigation.navigate("Notification")}
