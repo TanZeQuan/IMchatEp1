@@ -51,19 +51,22 @@ const LoginScreen = () => {
     setIsLoading(true);
 
     try {
-      // 🔹 模拟登录成功，不调用真实 API
-      console.log("Bypass login payload:", { phone, password });
+      // 调用真实 API 但不依赖 token
+      const res = await login({ phone, password });
+      console.log("API response:", res);
 
-      // 模拟 token
+      // 模拟 token，保持前端状态一致
       const fakeToken = "bypass-token";
       setUserToken(fakeToken);
 
-      console.log("Login bypass success, token:", fakeToken);
-      // 这里前端的导航逻辑会自动跳转 Home
+      console.log("Login success, fake token set:", fakeToken);
 
-    } catch (error) {
-      console.log("Login bypass error:", error);
-      Alert.alert("登录失败", "前端模拟异常");
+      // 导航到 Home 页面
+      // navigation.replace("Home");
+
+    } catch (error: any) {
+      console.log("Login error:", error);
+      Alert.alert("登录失败", error?.message || "请检查手机号或密码");
     } finally {
       setIsLoading(false);
     }

@@ -8,6 +8,7 @@ import type { MainStackParamList } from "../navigation/MainStack";
 import { useSettingsStore } from "../store/settingsStore";
 import { LinearGradient } from "expo-linear-gradient";
 
+
 const COLORS = {
   background: "#F5F5F5",
   header: "#FFD860",

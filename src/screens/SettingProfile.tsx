@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { updateProfile } from '../api/UserApi';
 import { MainStackParamList } from "../navigation/MainStack"; // adjust path
 
 interface ProfileItemProps {
@@ -65,10 +66,9 @@ const ProfileScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
   const handlePickAvatar = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      Alert.alert("权限被拒绝", "需要访问相册权限以更换头像");
+      Alert.alert('权限被拒绝', '需要访问相册权限以更换头像');
       return;
     }
 
@@ -80,7 +80,20 @@ const ProfileScreen: React.FC = () => {
     });
 
     if (!result.canceled) {
-      setAvatarUri(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      setAvatarUri(uri); // 本地显示
+
+      try {
+        const response = await updateProfile({
+          user_id: '12345678', // 替换为实际用户ID
+          image: { uri, name: 'avatar.jpg', type: 'image/jpeg' },
+        });
+        console.log('上传成功', response);
+        Alert.alert('成功', '头像已更新');
+      } catch (err) {
+        console.error(err);
+        Alert.alert('失败', '头像上传失败');
+      }
     }
   };
 
@@ -121,7 +134,7 @@ const ProfileScreen: React.FC = () => {
           <ProfileItem
             label="QR"
             value=""
-            // onPress={() => navigation.navigate('QRScreen')} // navigate to QR screen
+          // onPress={() => navigation.navigate('QRScreen')} // navigate to QR screen
           />
         </View>
       </SafeAreaView>

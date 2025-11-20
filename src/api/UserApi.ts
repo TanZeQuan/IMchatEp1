@@ -32,6 +32,21 @@ export interface ResetPasswordPayload {
   password: string;
 }
 
+export interface ChangeEmailPayload {
+  email: string;
+}
+
+export interface UpdateProfilePayload {
+  user_id: string;  // 必填
+  name?: string;    // 可选
+  about?: string;   // 可选
+  image?: {
+    uri: string;
+    name?: string;
+    type?: string;
+  };                // 可选
+}
+
 // 注册 API
 export const register = async (payload: RegisterPayload) => {
   try {
@@ -87,5 +102,58 @@ export const resetPassword = async (payload: ResetPasswordPayload) => {
   } catch (error: any) {
     console.error("Reset Password error:", error.response?.data || error.message);
     throw error.response?.data || error;
+  }
+};
+
+export const changeEmail = async (payload: ChangeEmailPayload) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/users/email/change`, payload);
+    return res.data;
+  } catch (error: any) {
+    console.error("Change Email Error:", error.response?.data || error.message);
+    throw error.response?.data || error;
+  }
+};
+
+export const updateProfile = async (payload: UpdateProfilePayload) => {
+  try {
+    const formData = new FormData();
+
+    formData.append(
+      'data',
+      JSON.stringify({
+        user_id: payload.user_id,
+        name: payload.name,
+        about: payload.about,
+      })
+    );
+
+    if (payload.image) {
+      formData.append('image', {
+        uri: payload.image.uri,
+        name: payload.image.name || 'avatar.jpg',
+        type: payload.image.type || 'image/jpeg',
+      } as any);
+    }
+
+    const res = await fetch('https://your-api.com/api/users/info/update', {
+      method: 'POST',
+      headers: {
+        // 如果后端需要 token：
+        // Authorization: `Bearer ${token}`,
+        // 注意不要手动设置 Content-Type
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || '更新失败');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('Update profile error:', error);
+    throw error;
   }
 };

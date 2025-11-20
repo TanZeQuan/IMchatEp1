@@ -5,21 +5,55 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Alert,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { changeEmail } from "../api/UserApi"; // axios 函数
 
 const ResetEmailScreen: React.FC = () => {
   const navigation = useNavigation();
-
   const [currentEmail, setCurrentEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [confirmEmail, setConfirmEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    console.log("Reset email submitted");
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSubmit = async () => {
+    if (!currentEmail || !newEmail || !confirmEmail) {
+      return Alert.alert("提示", "请填写所有邮箱信息");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(currentEmail) || !emailRegex.test(newEmail)) {
+      return Alert.alert("提示", "请输入有效的邮箱地址");
+    }
+
+    if (newEmail !== confirmEmail) {
+      return Alert.alert("提示", "新邮箱与确认邮箱不匹配");
+    }
+
+    setLoading(true);
+    try {
+      // 调用最新的 changeEmail API
+      await changeEmail({ email: newEmail }); // 注意后端只需要 newEmail
+      Alert.alert("成功", "邮箱修改成功", [
+        { text: "确定", onPress: () => navigation.goBack() },
+      ]);
+    } catch (error: any) {
+      Alert.alert("失败", error?.message || "邮箱修改失败");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,7 +72,10 @@ const ResetEmailScreen: React.FC = () => {
         </View>
 
         {/* Content */}
-        <View style={styles.content}>
+        <KeyboardAvoidingView
+          style={styles.content}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
           {/* Current Email Input */}
           <View style={styles.inputContainer}>
             <Ionicons
@@ -55,6 +92,7 @@ const ResetEmailScreen: React.FC = () => {
               onChangeText={setCurrentEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading}
             />
           </View>
 
@@ -74,6 +112,7 @@ const ResetEmailScreen: React.FC = () => {
               onChangeText={setNewEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading}
             />
           </View>
 
@@ -93,14 +132,23 @@ const ResetEmailScreen: React.FC = () => {
               onChangeText={setConfirmEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading}
             />
           </View>
 
           {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>提交</Text>
+          <TouchableOpacity
+            style={[styles.submitButton, loading && { opacity: 0.6 }]}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#333" />
+            ) : (
+              <Text style={styles.submitButtonText}>提交</Text>
+            )}
           </TouchableOpacity>
-        </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );
