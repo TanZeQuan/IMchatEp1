@@ -22,7 +22,7 @@ const AddFriend: React.FC = () => {
 
   const menuItems: MenuItem[] = [
     { icon: "scan-outline", label: "扫描名片" },
-    { icon: "person-add-outline", label: "好友请求" },
+    { icon: "person-add-outline", label: "好友请求", navigateTo: "FriendReq" },
   ];
 
   const handleMenuPress = (item: MenuItem) => {
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   searchSection: {
     alignItems: "center",
     marginVertical: 30,
-    marginBottom:35,
+    marginBottom: 35,
   },
   searchContainer: {
     flexDirection: "row",

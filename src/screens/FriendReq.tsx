@@ -41,7 +41,9 @@ const SettingScreen: React.FC = () => {
 
         <View style={styles.content}>
           <View style={styles.friendRequestBox}>
-            <Text style={styles.friendRequestTitle}>朋友请求添加我为好友：</Text>
+            <Text style={styles.friendRequestTitle}>
+              朋友请求添加我为好友：
+            </Text>
 
             {friendRequests.length === 0 ? (
               <Text style={styles.friendRequestDesc}>目前没有好友请求～</Text>
@@ -50,10 +52,10 @@ const SettingScreen: React.FC = () => {
                 <View key={req.id} style={styles.requestItem}>
                   <View style={styles.userInfo}>
                     <View style={styles.avatarWrapper}>
-                    <Image
-  source={{ uri: "https://i.pravatar.cc/150?img=19" }}
-  style={styles.avatar}
-/>
+                      <Image
+                        source={{ uri: "https://i.pravatar.cc/150?img=19" }}
+                        style={styles.avatar}
+                      />
                     </View>
                     <Text style={styles.userName}>{req.name}</Text>
                   </View>
@@ -177,7 +179,7 @@ const styles = StyleSheet.create({
   rejectBtn: {
     backgroundColor: "#E5E5E5",
   },
-btnText: {
+  btnText: {
     color: "#232323",
     fontSize: 14,
     fontWeight: "500",

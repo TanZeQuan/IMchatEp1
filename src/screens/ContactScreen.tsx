@@ -24,55 +24,55 @@ interface ContactsByLetter {
 
 const ContactsLayout: React.FC = () => {
   const navigation =
-      useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+    useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
-    const AddFriend = () => {
-      navigation.navigate("AddFriend");
-    };
+  const AddFriend = () => {
+    navigation.navigate("AddFriend");
+  };
 
-    const FriendReq = () => {
-      navigation.navigate("FriendReq");
-    };
+  const FriendReq = () => {
+    navigation.navigate("FriendReq");
+  };
   // Sample contacts grouped by first letter
   const contactsData: ContactsByLetter = {
-    'A': [
-      { id: 1, name: 'Anna' },
-      { id: 2, name: 'Andrew' },
-      { id: 3, name: 'Alice' }
+    A: [
+      { id: 1, name: "Anna" },
+      { id: 2, name: "Andrew" },
+      { id: 3, name: "Alice" },
     ],
-    'B': [
-      { id: 4, name: 'Bob' },
-      { id: 5, name: 'Betty' }
+    B: [
+      { id: 4, name: "Bob" },
+      { id: 5, name: "Betty" },
     ],
-    'C': [
-      { id: 6, name: 'Charlie' },
-      { id: 7, name: 'Carol' },
-      { id: 8, name: 'Chris' }
+    C: [
+      { id: 6, name: "Charlie" },
+      { id: 7, name: "Carol" },
+      { id: 8, name: "Chris" },
     ],
-    'D': [
-      { id: 9, name: 'David' },
-      { id: 10, name: 'Diana' }
+    D: [
+      { id: 9, name: "David" },
+      { id: 10, name: "Diana" },
     ],
-    'E': [
-      { id: 11, name: 'Edward' },
-      { id: 12, name: 'Emily' }
+    E: [
+      { id: 11, name: "Edward" },
+      { id: 12, name: "Emily" },
     ],
-    'J': [
-      { id: 13, name: 'John' },
-      { id: 14, name: 'Jane' }
+    J: [
+      { id: 13, name: "John" },
+      { id: 14, name: "Jane" },
     ],
-    'M': [
-      { id: 15, name: 'Michael' },
-      { id: 16, name: 'Mary' },
-      { id: 17, name: 'Mark' }
+    M: [
+      { id: 15, name: "Michael" },
+      { id: 16, name: "Mary" },
+      { id: 17, name: "Mark" },
     ],
-    'S': [
-      { id: 18, name: 'Sarah' },
-      { id: 19, name: 'Steve' }
-    ]
+    S: [
+      { id: 18, name: "Sarah" },
+      { id: 19, name: "Steve" },
+    ],
   };
- 
-  const alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
+
+  const alphabet: string[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#".split("");
   const sortedLetters = Object.keys(contactsData).sort();
 
   return (
@@ -92,25 +92,25 @@ const ContactsLayout: React.FC = () => {
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
-          <View style={styles.actionIcon}>
-            <Ionicons name="person-add" size={24} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>添加好友</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton} onPress={FriendReq}>
-          <View style={styles.actionIcon}>
-            <Ionicons name="people" size={24} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>好友请求</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.actionButton}>
           <View style={styles.actionIcon}>
             <Ionicons name="chatbubbles" size={24} color="#666" />
           </View>
           <Text style={styles.actionLabel}>发起群聊</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton}>
+          <View style={styles.actionIcon}>
+            <Ionicons name="people" size={24} color="#666" />
+          </View>
+          <Text style={styles.actionLabel}>加入群聊</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
+          <View style={styles.actionIcon}>
+            <Ionicons name="person-add" size={24} color="#666" />
+          </View>
+          <Text style={styles.actionLabel}>添加好友</Text>
         </TouchableOpacity>
       </View>
 
@@ -123,14 +123,16 @@ const ContactsLayout: React.FC = () => {
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionHeaderText}>{letter}</Text>
               </View>
-              
+
               {/* Contacts under this letter */}
               {contactsData[letter].map((contact, index) => (
                 <TouchableOpacity
                   key={contact.id}
                   style={[
                     styles.contactItem,
-                    index % 2 === 0 ? styles.contactItemYellow : styles.contactItemWhite
+                    index % 2 === 0
+                      ? styles.contactItemYellow
+                      : styles.contactItemWhite,
                   ]}
                 >
                   <View style={styles.avatar}>
@@ -224,7 +226,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   sectionHeader: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: "#FEF3C7",
     paddingHorizontal: 16,
     paddingVertical: 4,
   },
@@ -244,10 +246,10 @@ const styles = StyleSheet.create({
     borderBottomColor: "#F3F4F6",
   },
   contactItemYellow: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   contactItemWhite: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   avatar: {
     width: 40,
@@ -265,8 +267,8 @@ const styles = StyleSheet.create({
   alphabetIndex: {
     position: "absolute",
     right: 4,
-    top: '10%',
-    alignItems: 'center',
+    top: "10%",
+    alignItems: "center",
   },
   alphabetItem: {
     paddingVertical: 2,
@@ -274,8 +276,8 @@ const styles = StyleSheet.create({
   },
   alphabetText: {
     fontSize: 10,
-    color: '#9CA3AF',
-    fontWeight: '500',
+    color: "#9CA3AF",
+    fontWeight: "500",
   },
 });
 
