@@ -14,7 +14,7 @@ import EditPhone from '../screens/EditPhone';
 import QRScan from '../screens/QRScreen';
 import ResetEmail from '../screens/ResetEmail';
 import AddFriend from '../screens/AddFriend';
-
+import FriendReq from '../screens/FriendReq';
 
 export type MainStackParamList = {
   Home: undefined;
@@ -31,6 +31,7 @@ export type MainStackParamList = {
   QRScan: undefined;
   ResetEmail: undefined;
   AddFriend:undefined;
+  FriendReq:undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -59,6 +60,7 @@ export default function MainStack() {
       <Stack.Screen name="QRScan" component={QRScan} options={{ headerShown: false }} />
       <Stack.Screen name="ResetEmail" component={ResetEmail} options={{ headerShown: false }} />
       <Stack.Screen name="AddFriend" component={AddFriend} options={{ headerShown: false }} />
+      <Stack.Screen name="FriendReq" component={FriendReq} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }

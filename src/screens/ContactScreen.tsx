@@ -29,6 +29,10 @@ const ContactsLayout: React.FC = () => {
     const AddFriend = () => {
       navigation.navigate("AddFriend");
     };
+
+    const FriendReq = () => {
+      navigation.navigate("FriendReq");
+    };
   // Sample contacts grouped by first letter
   const contactsData: ContactsByLetter = {
     'A': [
@@ -95,7 +99,7 @@ const ContactsLayout: React.FC = () => {
           <Text style={styles.actionLabel}>添加好友</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={FriendReq}>
           <View style={styles.actionIcon}>
             <Ionicons name="people" size={24} color="#666" />
           </View>
