@@ -21,7 +21,7 @@ const AddFriend: React.FC = () => {
   const navigation = useNavigation(); // ✅ 导航实例
 
   const menuItems: MenuItem[] = [
-    { icon: "scan-outline", label: "扫描名片" },
+    { icon: "scan-outline", label: "扫描名片", navigateTo: "FriendScan" },
     { icon: "person-add-outline", label: "好友请求", navigateTo: "FriendReq" },
   ];
 
