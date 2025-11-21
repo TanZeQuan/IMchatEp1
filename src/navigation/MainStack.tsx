@@ -13,6 +13,8 @@ import EditName from '../screens/EditName';
 import EditPhone from '../screens/EditPhone';
 import QRScan from '../screens/QRScreen';
 import ResetEmail from '../screens/ResetEmail';
+import UserDetail from '../screens/UserDetail';
+import ChatHistory from '../screens/ChatHistory';
 
 
 export type MainStackParamList = {
@@ -29,6 +31,8 @@ export type MainStackParamList = {
   EditPhone: undefined;
   QRScan: undefined;
   ResetEmail: undefined;
+  UserDetail: { userId: string};
+  ChatHistory: undefined; 
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -56,6 +60,8 @@ export default function MainStack() {
       <Stack.Screen name="EditPhone" component={EditPhone} options={{ headerShown: false }} />
       <Stack.Screen name="QRScan" component={QRScan} options={{ headerShown: false }} />
       <Stack.Screen name="ResetEmail" component={ResetEmail} options={{ headerShown: false }} />
+      <Stack.Screen name="UserDetail" component={UserDetail} options={{ headerShown: false }} />
+      <Stack.Screen name="ChatHistory" component={ChatHistory} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
