@@ -122,7 +122,7 @@ const ResetPasswordScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5E6B3",
+    // backgroundColor: "#F5E6B3",
   },
   header: {
     flexDirection: "row",

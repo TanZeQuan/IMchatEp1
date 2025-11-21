@@ -9,6 +9,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MainStackParamList } from "../navigation/MainStack"; // adjust path
 
 interface Contact {
   id: number;
@@ -20,6 +23,12 @@ interface ContactsByLetter {
 }
 
 const ContactsLayout: React.FC = () => {
+  const navigation =
+      useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+
+    const AddFriend = () => {
+      navigation.navigate("AddFriend");
+    };
   // Sample contacts grouped by first letter
   const contactsData: ContactsByLetter = {
     'A': [
@@ -58,7 +67,7 @@ const ContactsLayout: React.FC = () => {
       { id: 19, name: 'Steve' }
     ]
   };
-
+ 
   const alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
   const sortedLetters = Object.keys(contactsData).sort();
 
@@ -79,25 +88,25 @@ const ContactsLayout: React.FC = () => {
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
           <View style={styles.actionIcon}>
             <Ionicons name="person-add" size={24} color="#666" />
           </View>
-          <Text style={styles.actionLabel}>新的朋友</Text>
+          <Text style={styles.actionLabel}>添加好友</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton}>
           <View style={styles.actionIcon}>
             <Ionicons name="people" size={24} color="#666" />
           </View>
-          <Text style={styles.actionLabel}>仅人群聊</Text>
+          <Text style={styles.actionLabel}>好友请求</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton}>
           <View style={styles.actionIcon}>
             <Ionicons name="chatbubbles" size={24} color="#666" />
           </View>
-          <Text style={styles.actionLabel}>我的好友</Text>
+          <Text style={styles.actionLabel}>发起群聊</Text>
         </TouchableOpacity>
       </View>
 

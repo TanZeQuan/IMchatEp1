@@ -13,7 +13,7 @@ const COLORS = {
   background: "#F5F5F5",
   header: "#FFD860",
   white: "#FFFFFF",
-  textPrimary: "#000000",
+  textPrimary: "#232323",
   textSecondary: "#999999",
   border: "#E5E5E5",
   switchActive: "#4CD964",
