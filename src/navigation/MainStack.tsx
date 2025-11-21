@@ -1,21 +1,23 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import MainTab from './MainTab';
-import ChatScreen from '../screens/ChatScreen';
-import SettingScreen from '../screens/SettingScreen';
-import SettingProfile from '../screens/SettingProfile';
-import ResetPassword from '../screens/ResetPassword';
-import Notification from '../screens/Notification';
-import CreateMeeting from '../screens/CreateMeeting';
-import JoinMeeting from '../screens/JoinMeeting';
-import MeetingScreen from '../screens/MeetingScreen';
-import EditName from '../screens/EditName';
-import EditPhone from '../screens/EditPhone';
-import QRScan from '../screens/QRScreen';
-import ResetEmail from '../screens/ResetEmail';
-import UserDetail from '../screens/UserDetail';
-import ChatHistory from '../screens/ChatHistory';
-
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import MainTab from "./MainTab";
+import ChatScreen from "../screens/ChatScreen";
+import SettingScreen from "../screens/SettingScreen";
+import SettingProfile from "../screens/SettingProfile";
+import ResetPassword from "../screens/ResetPassword";
+import Notification from "../screens/Notification";
+import CreateMeeting from "../screens/CreateMeeting";
+import JoinMeeting from "../screens/JoinMeeting";
+import MeetingScreen from "../screens/MeetingScreen";
+import EditName from "../screens/EditName";
+import EditPhone from "../screens/EditPhone";
+import FriendScan from "../screens/FriendScan";
+import QRScan from "../screens/QRScreen";
+import ResetEmail from "../screens/ResetEmail";
+import AddFriend from "../screens/AddFriend";
+import FriendReq from "../screens/FriendReq";
+import UserDetail from "../screens/UserDetail";
+import ChatHistory from "../screens/ChatHistory";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -31,8 +33,11 @@ export type MainStackParamList = {
   EditPhone: undefined;
   QRScan: undefined;
   ResetEmail: undefined;
+  AddFriend: undefined;
+  FriendReq: undefined;
+  FriendScan: undefined;
+  ChatHistory: { chatName: string; userId: string };
   UserDetail: { userId: string};
-  ChatHistory: undefined; 
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -40,28 +45,99 @@ const Stack = createNativeStackNavigator<MainStackParamList>();
 export default function MainStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={MainTab} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="Home"
+        component={MainTab}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Chat"
         component={ChatScreen}
         options={({ route }) => ({
           headerShown: false,
-          title: route.params?.chatName || 'Chat',
+          title: route.params?.chatName || "Chat",
         })}
       />
-      <Stack.Screen name="Setting" component={SettingScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="SettingProfile" component={SettingProfile} options={{ headerShown: false }} />
-      <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />
-      <Stack.Screen name="Notification" component={Notification} options={{ headerShown: false }} />
-      <Stack.Screen name="CreateMeeting" component={CreateMeeting} options={{ headerShown: false }} />
-      <Stack.Screen name="JoinMeeting" component={JoinMeeting} options={{ headerShown: false }} />
-      <Stack.Screen name="MeetingScreen" component={MeetingScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="EditName" component={EditName} options={{ headerShown: false }} />
-      <Stack.Screen name="EditPhone" component={EditPhone} options={{ headerShown: false }} />
-      <Stack.Screen name="QRScan" component={QRScan} options={{ headerShown: false }} />
-      <Stack.Screen name="ResetEmail" component={ResetEmail} options={{ headerShown: false }} />
-      <Stack.Screen name="UserDetail" component={UserDetail} options={{ headerShown: false }} />
-      <Stack.Screen name="ChatHistory" component={ChatHistory} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="Setting"
+        component={SettingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SettingProfile"
+        component={SettingProfile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPassword}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Notification"
+        component={Notification}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CreateMeeting"
+        component={CreateMeeting}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="JoinMeeting"
+        component={JoinMeeting}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MeetingScreen"
+        component={MeetingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditName"
+        component={EditName}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditPhone"
+        component={EditPhone}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="QRScan"
+        component={QRScan}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ResetEmail"
+        component={ResetEmail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddFriend"
+        component={AddFriend}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FriendReq"
+        component={FriendReq}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FriendScan"
+        component={FriendScan}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
+        name="ChatHistory"
+        component={ChatHistory}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
+        name="UserDetail"
+        component={UserDetail}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
