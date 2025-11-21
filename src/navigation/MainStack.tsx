@@ -12,6 +12,7 @@ import MeetingScreen from "../screens/MeetingScreen";
 import EditName from "../screens/EditName";
 import EditPhone from "../screens/EditPhone";
 import FriendScan from "../screens/FriendScan";
+import QRScan from "../screens/QRScreen";
 import ResetEmail from "../screens/ResetEmail";
 import AddFriend from "../screens/AddFriend";
 import FriendReq from "../screens/FriendReq";
@@ -28,6 +29,7 @@ export type MainStackParamList = {
   MeetingScreen: undefined;
   EditName: undefined;
   EditPhone: undefined;
+  QRScan: undefined;
   ResetEmail: undefined;
   AddFriend: undefined;
   FriendReq: undefined;
@@ -95,6 +97,11 @@ export default function MainStack() {
       <Stack.Screen
         name="EditPhone"
         component={EditPhone}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="QRScan"
+        component={QRScan}
         options={{ headerShown: false }}
       />
       <Stack.Screen

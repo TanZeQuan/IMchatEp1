@@ -66,9 +66,10 @@ const FriendScan: React.FC = () => {
     );
   }
 
-const offset = 100; // 想往上移动 100px
-const verticalOverlayHeightTop = (screenHeight - SCAN_BOX_SIZE)/2 - offset;
-const verticalOverlayHeightBottom = (screenHeight - SCAN_BOX_SIZE)/2 + offset;
+  const offset = 100; // 想往上移动 100px
+  const verticalOverlayHeightTop = (screenHeight - SCAN_BOX_SIZE) / 2 - offset;
+  const verticalOverlayHeightBottom =
+    (screenHeight - SCAN_BOX_SIZE) / 2 + offset;
   const horizontalOverlayWidth = (screenWidth - SCAN_BOX_SIZE) / 2;
 
   return (
@@ -93,7 +94,7 @@ const verticalOverlayHeightBottom = (screenHeight - SCAN_BOX_SIZE)/2 + offset;
             backgroundColor: OVERLAY_COLOR,
           }}
         />
-        {/* Middle row */} 
+        {/* Middle row */}
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
@@ -103,7 +104,14 @@ const verticalOverlayHeightBottom = (screenHeight - SCAN_BOX_SIZE)/2 + offset;
             }}
           />
           {/* 扫描区域 */}
-          <View style={{ width: SCAN_BOX_SIZE, height: SCAN_BOX_SIZE }} />
+          <View
+            style={{
+              width: SCAN_BOX_SIZE,
+              height: SCAN_BOX_SIZE,
+              borderWidth: 2,
+              borderColor: "#fff",
+            }}
+          />
           <View
             style={{
               width: horizontalOverlayWidth,
