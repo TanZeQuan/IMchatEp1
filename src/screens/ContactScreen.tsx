@@ -115,28 +115,7 @@ const ContactsLayout: React.FC = () => {
       </View>
 
       {/* Action Buttons */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.actionButton}>
-          <View style={styles.actionIcon}>
-            <Ionicons name="chatbubbles" size={f(18)} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>发起群聊</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton}>
-          <View style={styles.actionIcon}>
-            <Ionicons name="people" size={f(18)} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>加入群聊</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
-          <View style={styles.actionIcon}>
-            <Ionicons name="person-add" size={f(18)} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>添加好友</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Moved into SectionList's ListHeaderComponent */}
 
       {/* SectionList */}
       <View style={styles.listContainer}>
@@ -144,6 +123,30 @@ const ContactsLayout: React.FC = () => {
           ref={sectionListRef}
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={
+            <View style={styles.actionButtons}>
+              <TouchableOpacity style={styles.actionButton}>
+                <View style={styles.actionIcon}>
+                  <Ionicons name="chatbubbles" size={f(18)} color="#666" />
+                </View>
+                <Text style={styles.actionLabel}>发起群聊</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.actionButton}>
+                <View style={styles.actionIcon}>
+                  <Ionicons name="people" size={f(18)} color="#666" />
+                </View>
+                <Text style={styles.actionLabel}>加入群聊</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
+                <View style={styles.actionIcon}>
+                  <Ionicons name="person-add" size={f(18)} color="#666" />
+                </View>
+                <Text style={styles.actionLabel}>添加好友</Text>
+              </TouchableOpacity>
+            </View>
+          }
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>{section.title}</Text>
@@ -291,7 +294,7 @@ const styles = StyleSheet.create({
   alphabetIndex: {
     position: "absolute",
     right: w(8),
-    top: h(0),
+    top: h(150),
     alignItems: "center",
   },
   alphabetItem: { 
