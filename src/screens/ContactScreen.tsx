@@ -292,12 +292,12 @@ const styles = StyleSheet.create({
   /** ALPHABET LIST */
   alphabetIndex: {
     position: "absolute",
-    right: w(4),
-    top: h(140),
+    right: w(8),
+    top: h(0),
     alignItems: "center",
   },
   alphabetItem: { 
-    paddingVertical: h(4), 
+    paddingVertical: h(2), 
     paddingHorizontal: w(4) 
   },
   alphabetText: {
