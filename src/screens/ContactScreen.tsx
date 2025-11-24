@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: w(4) 
   },
   alphabetText: {
-    fontSize: f(10),
+    fontSize: f(12),
     color: "#9CA3AF",
     fontWeight: "600",
   },
