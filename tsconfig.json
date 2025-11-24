@@ -2,6 +2,9 @@
   "extends": "./node_modules/expo/tsconfig.base.json",
   "compilerOptions": {
     "strict": true,
-    "typeRoots": ["./src/types", "./node_modules/@types"]
-  }
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules", "**/__tests__/*"]
 }

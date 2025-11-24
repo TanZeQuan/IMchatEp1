@@ -11,9 +11,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-
-// 👉 API
 import { sendOTP, verifyOTP, resetPassword } from "../api/UserApi";
+import responsive from "../utils/responsive";
 
 const ForgetPasswordScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -26,9 +25,6 @@ const ForgetPasswordScreen: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
-  // ===========================
-  // 发送验证码
-  // ===========================
   const handleSendCode = async () => {
     if (!email) {
       Alert.alert("提示", "请输入邮箱地址");
@@ -54,9 +50,6 @@ const ForgetPasswordScreen: React.FC = () => {
     }
   };
 
-  // ===========================
-  // 提交密码重置
-  // ===========================
   const handleSubmit = async () => {
     if (!email || !verificationCode || !newPassword || !confirmPassword) {
       Alert.alert("提示", "请填写完整信息");
@@ -69,13 +62,8 @@ const ForgetPasswordScreen: React.FC = () => {
     }
 
     try {
-      // 1️⃣ 验证 OTP
       await verifyOTP({ email, otp: verificationCode });
-
-      // 2️⃣ 重设密码
-      await resetPassword({
-        password: newPassword,
-      });
+      await resetPassword({ password: newPassword });
 
       Alert.alert("成功", "密码已重设，请返回登录", [
         { text: "确定", onPress: () => navigation.goBack() },
@@ -94,7 +82,7 @@ const ForgetPasswordScreen: React.FC = () => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color="#333" />
+            <Ionicons name="arrow-back" size={responsive.f(24)} color="#333" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>找回密码</Text>
           <View style={styles.placeholder} />
@@ -157,7 +145,7 @@ const ForgetPasswordScreen: React.FC = () => {
             >
               <Ionicons
                 name={showNewPassword ? "eye-outline" : "eye-off-outline"}
-                size={22}
+                size={responsive.f(22)}
                 color="#999"
               />
             </TouchableOpacity>
@@ -179,13 +167,13 @@ const ForgetPasswordScreen: React.FC = () => {
             >
               <Ionicons
                 name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
-                size={22}
+                size={responsive.f(22)}
                 color="#999"
               />
             </TouchableOpacity>
           </View>
 
-          {/* 按钮 */}
+          {/* 提交按钮 */}
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>提交</Text>
           </TouchableOpacity>
@@ -196,68 +184,65 @@ const ForgetPasswordScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // backgroundColor: '#F5E6B3'
-  },
+  container: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#FFD860",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: responsive.s(16),
+    paddingVertical: responsive.h(8),
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: responsive.w(40),
+    height: responsive.w(40),
     alignItems: "center",
     justifyContent: "center",
   },
-  headerTitle: { fontSize: 16, fontWeight: "600", color: "#333" },
-  placeholder: { width: 40 },
-  content: { paddingHorizontal: 20, paddingTop: 32 },
+  headerTitle: { fontSize: responsive.f(16), fontWeight: "600", color: "#333" },
+  placeholder: { width: responsive.w(40) },
+  content: { paddingHorizontal: responsive.s(20), paddingTop: responsive.h(32) },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    marginBottom: 18,
-    height: 50,
+    borderRadius: responsive.w(30),
+    paddingHorizontal: responsive.s(20),
+    marginBottom: responsive.h(18),
+    height: responsive.h(50),
   },
-  input: { flex: 1, fontSize: 15, color: "#333" },
-  eyeIcon: { padding: 8 },
+  input: { flex: 1, fontSize: responsive.f(15), color: "#333" },
+  eyeIcon: { padding: responsive.w(8) },
   verificationRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 0,
-    gap: 12,
+    marginBottom: responsive.h(0),
+    gap: responsive.w(12),
   },
   verificationInput: { flex: 1 },
   sendCodeButton: {
     backgroundColor: "#FCD34D",
-    borderRadius: 30,
-    paddingHorizontal: 22,
-    paddingVertical: 15,
-    minWidth: 120,
-    marginBottom: 20,
+    borderRadius: responsive.w(30),
+    paddingHorizontal: responsive.s(22),
+    paddingVertical: responsive.h(15),
+    minWidth: responsive.w(120),
+    marginBottom: responsive.h(20),
     justifyContent: "center",
     alignItems: "center",
   },
   sendCodeButtonDisabled: { backgroundColor: "#E8DCA8", opacity: 0.6 },
-  sendCodeButtonText: { color: "#D32F2F", fontWeight: "600" },
+  sendCodeButtonText: { color: "#D32F2F", fontWeight: "600", fontSize: responsive.f(14) },
   submitButton: {
     backgroundColor: "#FCD34D",
-    borderRadius: 30,
-    paddingVertical: 15,
+    borderRadius: responsive.w(30),
+    paddingVertical: responsive.h(15),
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 100,
-    marginBottom: 60,
-    marginHorizontal: 16,
+    marginTop: responsive.h(40),
+    marginBottom: responsive.h(60),
+    marginHorizontal: responsive.s(16),
   },
-  submitButtonText: { fontSize: 16, fontWeight: "600", color: "#333" },
+  submitButtonText: { fontSize: responsive.f(16), fontWeight: "600", color: "#333" },
 });
 
 export default ForgetPasswordScreen;

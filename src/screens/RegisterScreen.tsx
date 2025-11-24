@@ -14,14 +14,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { register } from "../api/UserApi"; // 你的 API 文件
+import { register } from "../api/UserApi";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import responsive from "../utils/responsive";
 
-// 注册 payload 类型
 type RegisterPayload = {
-  name: string;   // 昵称
-  phone: string;  // 手机号
-  email: string;  // 邮箱
+  name: string;
+  phone: string;
+  email: string;
   password: string;
 };
 
@@ -72,14 +72,12 @@ const RegisterScreen = () => {
     try {
       const payload: RegisterPayload = {
         name: nickname,
-        phone: phone,
-        email: email,
-        password: password,
+        phone,
+        email,
+        password,
       };
-
-      const response = await register(payload); // 调用 API
+      const response = await register(payload);
       console.log("Register success:", response);
-
       Alert.alert("成功", "注册成功！", [
         { text: "OK", onPress: () => navigation.navigate("Login") },
       ]);
@@ -92,10 +90,16 @@ const RegisterScreen = () => {
   };
 
   const isButtonDisabled =
-    isLoading || !nickname || !phone || !email || !password || !confirmPassword || !isChecked;
+    isLoading ||
+    !nickname ||
+    !phone ||
+    !email ||
+    !password ||
+    !confirmPassword ||
+    !isChecked;
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={["#FFEFB0", "#FFF9E5"]} style={styles.safeArea}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.bgShape1} />
         <View style={styles.bgShape2} />
@@ -174,7 +178,7 @@ const RegisterScreen = () => {
             >
               <Ionicons
                 name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
-                size={22}
+                size={responsive.f(22)}
                 color="#888"
                 style={styles.icon}
               />
@@ -201,7 +205,7 @@ const RegisterScreen = () => {
                 name={
                   isConfirmPasswordVisible ? "eye-off-outline" : "eye-outline"
                 }
-                size={22}
+                size={responsive.f(22)}
                 color="#888"
                 style={styles.icon}
               />
@@ -240,7 +244,7 @@ const RegisterScreen = () => {
             >
               <Ionicons
                 name={isChecked ? "checkbox" : "square-outline"}
-                size={18}
+                size={responsive.f(18)}
                 color={isChecked ? "#007AFF" : "#888"}
               />
             </TouchableOpacity>
@@ -256,26 +260,107 @@ const RegisterScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  logoContainer: { marginBottom: 20 },
-  logoCard: { width: 128, height: 128, backgroundColor: "#fff", borderRadius: 24, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 5 },
-  logoImage: { width: 130, height: 130 },
   safeArea: { flex: 1 },
-  bgShape1: { position: "absolute", width: 350, height: 350, borderRadius: 60, backgroundColor: "rgba(255, 255, 255, 0.5)", top: -100, right: -120, transform: [{ rotate: "45deg" }] },
-  bgShape2: { position: "absolute", width: 300, height: 300, borderRadius: 60, backgroundColor: "rgba(255, 255, 255, 0.7)", top: 50, left: -150, transform: [{ rotate: "30deg" }] },
-  container: { flex: 1, justifyContent: "flex-start", alignItems: "center", padding: 25, paddingTop: 40 },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 30, color: "#333" },
-  inputContainer: { flexDirection: "row", alignItems: "center", width: "100%", height: 55, backgroundColor: "#FFFFFF", borderRadius: 30, marginBottom: 20, paddingHorizontal: 20, shadowColor: "#B0C0E0", shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 },
-  inputField: { flex: 1, fontSize: 16, color: "#333", height: "100%" },
-  icon: { marginLeft: 10 },
-  linksContainer: { flexDirection: "row", justifyContent: "space-between", width: "100%", marginBottom: 30, paddingHorizontal: 15 },
-  linkText: { color: "#555", fontSize: 14 },
-  loginButtonWrapper: { width: "100%", height: 55, borderRadius: 30, shadowColor: "#B0C0E0", shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5, marginTop: 10, overflow: "hidden" },
-  loginButtonGradient: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", borderRadius: 30, borderWidth: 1, borderColor: "#FFFFFF" },
-  loginButtonText: { color: "#333", fontSize: 16, fontWeight: "bold" },
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingHorizontal: responsive.s(25),
+    paddingTop: responsive.h(40),
+  },
+  logoContainer: { marginBottom: responsive.h(20) },
+  logoCard: {
+    width: responsive.w(128),
+    height: responsive.w(128),
+    backgroundColor: "#fff",
+    borderRadius: responsive.w(24),
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  logoImage: { width: responsive.w(130), height: responsive.w(130) },
+  bgShape1: {
+    position: "absolute",
+    width: responsive.w(350),
+    height: responsive.w(350),
+    borderRadius: responsive.w(60),
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    top: responsive.h(-100),
+    right: responsive.w(-120),
+    transform: [{ rotate: "45deg" }],
+  },
+  bgShape2: {
+    position: "absolute",
+    width: responsive.w(300),
+    height: responsive.w(300),
+    borderRadius: responsive.w(60),
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    top: responsive.h(50),
+    left: responsive.w(-150),
+    transform: [{ rotate: "30deg" }],
+  },
+  title: { fontSize: responsive.f(28), fontWeight: "bold", marginBottom: responsive.h(30), color: "#333" },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    height: responsive.h(55),
+    backgroundColor: "#FFF",
+    borderRadius: responsive.w(30),
+    marginBottom: responsive.h(20),
+    paddingHorizontal: responsive.s(20),
+    shadowColor: "#B0C0E0",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  inputField: { flex: 1, fontSize: responsive.f(16), color: "#333", height: "100%" },
+  icon: { marginLeft: responsive.w(10) },
+  linksContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: responsive.h(30),
+    paddingHorizontal: responsive.s(15),
+  },
+  linkText: { color: "#555", fontSize: responsive.f(14) },
+  loginButtonWrapper: {
+    width: "100%",
+    height: responsive.h(55),
+    borderRadius: responsive.w(30),
+    shadowColor: "#B0C0E0",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+    marginTop: responsive.h(-10),
+    overflow: "hidden",
+  },
+  loginButtonGradient: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: responsive.w(30),
+    borderWidth: 1,
+    borderColor: "#FFF",
+  },
+  loginButtonText: { color: "#333", fontSize: responsive.f(16), fontWeight: "bold" },
   disabledButton: { opacity: 0.6 },
-  agreementContainer: { flexDirection: "row", alignItems: "center", marginTop: 25, width: "100%", justifyContent: "center" },
-  checkbox: { padding: 5 },
-  agreementText: { marginLeft: 8, color: "#888", fontSize: 13 },
+  agreementContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: responsive.h(25),
+    width: "100%",
+    justifyContent: "center",
+  },
+  checkbox: { padding: responsive.w(5) },
+  agreementText: { marginLeft: responsive.w(8), color: "#888", fontSize: responsive.f(13) },
   agreementLink: { color: "#007AFF" },
 });
 
