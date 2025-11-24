@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MainStackParamList } from "../navigation/MainStack"; // adjust path
+import { MainStackParamList } from "../navigation/MainStack";
 
 interface Contact {
   id: number;
@@ -33,6 +33,7 @@ const ContactsLayout: React.FC = () => {
   const FriendReq = () => {
     navigation.navigate("FriendReq");
   };
+
   // Sample contacts grouped by first letter
   const contactsData: ContactsByLetter = {
     A: [
@@ -73,7 +74,32 @@ const ContactsLayout: React.FC = () => {
   };
 
   const alphabet: string[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#".split("");
-  const sortedLetters = Object.keys(contactsData).sort();
+  const [searchText, setSearchText] = React.useState("");
+
+  const getFilteredContacts = () => {
+    if (!searchText.trim()) return contactsData;
+
+    // flatten all contacts
+    const allContacts = Object.values(contactsData).flat();
+
+    // filter
+    const filtered = allContacts.filter((item) =>
+      item.name.toLowerCase().startsWith(searchText.toLowerCase())
+    );
+
+    // re-group by first letter
+    const grouped: ContactsByLetter = {};
+    filtered.forEach((contact) => {
+      const letter = contact.name[0].toUpperCase();
+      if (!grouped[letter]) grouped[letter] = [];
+      grouped[letter].push(contact);
+    });
+
+    return grouped;
+  };
+
+  const filteredContacts = getFilteredContacts();
+  const filteredLetters = Object.keys(filteredContacts).sort();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,7 +111,12 @@ const ContactsLayout: React.FC = () => {
         <View style={styles.searchSection}>
           <View style={styles.searchContainer}>
             <Ionicons name="search" size={18} style={styles.searchIcon} />
-            <TextInput placeholder="搜索" style={styles.searchInput} />
+            <TextInput
+              placeholder="搜索"
+              style={styles.searchInput}
+              value={searchText}
+              onChangeText={setSearchText}
+            />
           </View>
         </View>
       </View>
@@ -117,7 +148,7 @@ const ContactsLayout: React.FC = () => {
       {/* Contacts List */}
       <View style={styles.listContainer}>
         <ScrollView style={styles.scrollView}>
-          {sortedLetters.map((letter) => (
+          {filteredLetters.map((letter) => (
             <View key={letter}>
               {/* Section Header */}
               <View style={styles.sectionHeader}>
@@ -125,7 +156,7 @@ const ContactsLayout: React.FC = () => {
               </View>
 
               {/* Contacts under this letter */}
-              {contactsData[letter].map((contact, index) => (
+              {filteredContacts[letter].map((contact, index) => (
                 <TouchableOpacity
                   key={contact.id}
                   style={[
@@ -176,7 +207,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   searchSection: {
-    // backgroundColor: COLORS.header,
     paddingHorizontal: 0,
   },
   searchContainer: {
@@ -185,7 +215,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 0,
     height: 45,
   },
   searchIcon: {
