@@ -24,12 +24,8 @@
     "expo-image-picker": "^17.0.8",
     "expo-linear-gradient": "~15.0.7",
     "expo-status-bar": "~3.0.8",
-<<<<<<< HEAD
-    "react": "19.1.0",
-=======
     "pinyin": "^4.0.0",
-    "react": "^19.1.0",
->>>>>>> 291272ccebe662f43e80812d9195b5d3a79633f6
+    "react": "19.1.0",
     "react-native": "^0.81.5",
     "react-native-emoji-selector": "^0.2.0",
     "react-native-gesture-handler": "~2.28.0",

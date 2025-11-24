@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   SectionList,
-  SectionListData,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,8 +13,10 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 
-// 中文名拼音库（可选）
 import pinyin from "pinyin";
+
+// 导入 responsive
+import { scaleWidth as w, scaleHeight as h, scaleFont as f } from "../utils/responsive";
 
 interface Contact {
   id: number;
@@ -27,7 +28,6 @@ interface Section {
   data: Contact[];
 }
 
-// ------------------ 联系人数据 ------------------
 const contactsData: Contact[] = [
   { id: 1, name: "Alice" },
   { id: 2, name: "Anna" },
@@ -52,26 +52,19 @@ const ContactsLayout: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
-  const AddFriend = () => {
-    navigation.navigate("AddFriend");
-  };
+  const AddFriend = () => navigation.navigate("AddFriend");
+  const FriendReq = () => navigation.navigate("FriendReq");
 
-  const FriendReq = () => {
-    navigation.navigate("FriendReq");
-  };
   const [searchText, setSearchText] = React.useState("");
 
-  // SectionList ref
   const sectionListRef = React.useRef<SectionList>(null);
 
-  // ------------------ 分组函数 ------------------
   const groupContacts = (contacts: Contact[]): Section[] => {
-    const grouped: { [key: string]: Contact[] } = {};
+    const grouped: Record<string, Contact[]> = {};
 
     contacts.forEach((contact) => {
       let firstChar = contact.name[0];
 
-      // 中文名转拼音首字母
       if (/[\u4e00-\u9fa5]/.test(firstChar)) {
         firstChar = pinyin(firstChar, { style: "first_letter" })[0][0];
       }
@@ -82,21 +75,17 @@ const ContactsLayout: React.FC = () => {
       grouped[letter].push(contact);
     });
 
-    // 转成 SectionList 可用格式，并按字母排序
-    const sections: Section[] = Object.keys(grouped)
+    return Object.keys(grouped)
       .sort()
       .map((key) => ({ title: key, data: grouped[key] }));
-
-    return sections;
   };
 
-  // ------------------ 搜索过滤 ------------------
   const filteredContacts = contactsData.filter((c) =>
     c.name.toLowerCase().includes(searchText.toLowerCase())
   );
+
   const sections = groupContacts(filteredContacts);
 
-  // ------------------ 点击字母跳转 ------------------
   const handleLetterPress = (letter: string) => {
     const index = sections.findIndex((s) => s.title === letter);
     if (index !== -1 && sectionListRef.current) {
@@ -113,8 +102,9 @@ const ContactsLayout: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>通讯录</Text>
+
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={18} style={styles.searchIcon} />
+          <Ionicons name="search" size={f(14)} style={styles.searchIcon} />
           <TextInput
             placeholder="搜索"
             style={styles.searchInput}
@@ -128,21 +118,21 @@ const ContactsLayout: React.FC = () => {
       <View style={styles.actionButtons}>
         <TouchableOpacity style={styles.actionButton}>
           <View style={styles.actionIcon}>
-            <Ionicons name="chatbubbles" size={24} color="#666" />
+            <Ionicons name="chatbubbles" size={f(18)} color="#666" />
           </View>
           <Text style={styles.actionLabel}>发起群聊</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton}>
           <View style={styles.actionIcon}>
-            <Ionicons name="people" size={24} color="#666" />
+            <Ionicons name="people" size={f(18)} color="#666" />
           </View>
           <Text style={styles.actionLabel}>加入群聊</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
           <View style={styles.actionIcon}>
-            <Ionicons name="person-add" size={24} color="#666" />
+            <Ionicons name="person-add" size={f(18)} color="#666" />
           </View>
           <Text style={styles.actionLabel}>添加好友</Text>
         </TouchableOpacity>
@@ -160,16 +150,9 @@ const ContactsLayout: React.FC = () => {
             </View>
           )}
           renderItem={({ item, index }) => (
-            <TouchableOpacity
-              style={[
-                styles.contactItem,
-                index % 2 === 0
-                  ? styles.contactItemYellow
-                  : styles.contactItemWhite,
-              ]}
-            >
+            <TouchableOpacity style={styles.contactItem}>
               <View style={styles.avatar}>
-                <Ionicons name="person" size={20} color="#fff" />
+                <Ionicons name="person" size={f(16)} color="#fff" />
               </View>
               <Text style={styles.contactName}>{item.name}</Text>
             </TouchableOpacity>
@@ -193,90 +176,135 @@ const ContactsLayout: React.FC = () => {
   );
 };
 
-// ------------------ 样式 ------------------
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+
+  /** HEADER */
   header: {
     backgroundColor: "#F4D03F",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: w(18),
+    paddingVertical: h(18),
+    paddingTop: h(45),
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: f(18),
+    fontWeight: "600",
     textAlign: "center",
-    color: "#232323",
-    marginBottom: 12,
+    color: "#1F2937",
+    marginBottom: h(14),
   },
+
+  /** SEARCH */
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 45,
-    marginBottom: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: w(12),
+    paddingHorizontal: w(14),
+    height: h(48),
+    marginBottom: h(12),
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
+  searchIcon: {
+    marginRight: w(8),
+    color: "#9CA3AF",
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: f(15),
+    color: "#6B7280",
+    padding: 0,
+  },
+
+  /** QUICK ACTION BUTTONS */
   actionButtons: {
-    backgroundColor: "#FEF3C7",
     flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: 15,
-    paddingVertical: 15,
+    justifyContent: "space-between",
+    paddingHorizontal: w(20),
+    paddingVertical: h(18),
   },
-  actionButton: {
+  actionButton: { 
     alignItems: "center",
+    width: w(70),
   },
+
   actionIcon: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#fff",
-    borderRadius: 24,
+    width: w(50),
+    height: h(50),
+    backgroundColor: "#F3F4F6",
+    borderRadius: w(25),
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: h(6),
   },
   actionLabel: {
-    fontSize: 12,
+    fontSize: f(12),
     color: "#374151",
+    textAlign: "center",
   },
-  searchIcon: { marginRight: 8, color: "#999999" },
-  searchInput: { flex: 1, fontSize: 15, color: "#999999", padding: 0 },
-  listContainer: { flex: 1, position: "relative" },
+
+  /** CONTACT LIST */
+  listContainer: { 
+    flex: 1, 
+    position: "relative",
+    backgroundColor: "#FFFFFF",
+  },
+
   sectionHeader: {
-    backgroundColor: "#FEF3C7",
-    paddingHorizontal: 16,
-    paddingVertical: 4,
+    backgroundColor: "#FFF7D6",
+    paddingHorizontal: w(16),
+    paddingVertical: h(6),
   },
-  sectionHeaderText: { fontSize: 12, color: "#232323" },
+  sectionHeaderText: {
+    fontSize: f(12),
+    color: "#4B5563",
+    fontWeight: "500",
+  },
+
   contactItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: w(18),
+    paddingVertical: h(14),
     borderBottomWidth: 1,
     borderBottomColor: "#F3F4F6",
   },
-  contactItemYellow: { backgroundColor: "#fff" },
-  contactItemWhite: { backgroundColor: "#fff" },
+
   avatar: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#9CA3AF",
-    borderRadius: 4,
+    width: w(42),
+    height: h(42),
+    backgroundColor: "#D1D5DB",
+    borderRadius: w(6),
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: w(14),
   },
-  contactName: { fontSize: 16, color: "#374151" },
+  contactName: { 
+    fontSize: f(16), 
+    color: "#111827",
+    fontWeight: "500",
+  },
+
+  /** ALPHABET LIST */
   alphabetIndex: {
     position: "absolute",
-    right: 4,
-    top: "10%",
+    right: w(4),
+    top: h(140),
     alignItems: "center",
   },
-  alphabetItem: { paddingVertical: 2, paddingHorizontal: 4 },
-  alphabetText: { fontSize: 10, color: "#9CA3AF", fontWeight: "500" },
+  alphabetItem: { 
+    paddingVertical: h(4), 
+    paddingHorizontal: w(4) 
+  },
+  alphabetText: {
+    fontSize: f(10),
+    color: "#9CA3AF",
+    fontWeight: "600",
+  },
 });
 
 export default ContactsLayout;
