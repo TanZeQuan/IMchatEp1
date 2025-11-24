@@ -106,7 +106,8 @@ const AddFriend: React.FC = () => {
                         returnKeyType="search"
                       />
                     </View>
-                  </View>          {foundUser && (
+                  </View>
+          {foundUser && (
             <View style={styles.searchResult}>
               <Image source={{ uri: foundUser.avatar }} style={styles.avatar} />
               <View style={styles.userInfoContainer}>
