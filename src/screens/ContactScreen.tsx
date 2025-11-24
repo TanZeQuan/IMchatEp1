@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
     right: w(8),
     top: h(150),
     alignItems: "center",
+    zIndex: 1,
   },
   alphabetItem: { 
     paddingVertical: h(2), 
