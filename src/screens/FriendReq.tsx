@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,14 +16,35 @@ const COLORS = {
   border: "#E5E5E5",
 };
 
-const friendRequests = [
-  { id: "1", name: "Alice", avatar: "https://i.pravatar.cc/100?img=1" },
-  { id: "2", name: "Ben", avatar: "https://i.pravatar.cc/100?img=2" },
-];
-
 const SettingScreen: React.FC = () => {
+  const [friendRequests, setFriendRequests] = useState([
+    { id: "1", userId: "user_A001", name: "Alice", avatar: "https://i.pravatar.cc/100?img=1", status: 'pending' },
+    { id: "2", userId: "user_B002", name: "Ben", avatar: "https://i.pravatar.cc/100?img=2", status: 'pending' },
+    { id: "3", userId: "user_C003", name: "Charlie", avatar: "https://i.pravatar.cc/100?img=3", status: 'pending' },
+  ]);
+
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+
+  const handleAccept = (requestId: string, name: string, userId: string) => {
+    alert(`你接受了来自 ${name} (ID: ${userId}) 的好友请求！`);
+    setFriendRequests(currentRequests =>
+      currentRequests.map(req =>
+        req.id === requestId ? { ...req, status: 'accepted' } : req
+      )
+    );
+    // 实际应用中，这里会发送请求到后端
+  };
+
+  const handleReject = (requestId: string, name: string, userId: string) => {
+    alert(`你拒绝了来自 ${name} (ID: ${userId}) 的好友请求。`);
+    setFriendRequests(currentRequests =>
+      currentRequests.map(req =>
+        req.id === requestId ? { ...req, status: 'rejected' } : req
+      )
+    );
+    // 实际应用中，这里会发送请求到后端
+  };
 
   return (
     <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
@@ -53,27 +75,38 @@ const SettingScreen: React.FC = () => {
                   <View style={styles.userInfo}>
                     <View style={styles.avatarWrapper}>
                       <Image
-                        source={{ uri: "https://i.pravatar.cc/150?img=19" }}
+                        source={{ uri: req.avatar }}
                         style={styles.avatar}
                       />
                     </View>
-                    <Text style={styles.userName}>{req.name}</Text>
+                    <View>
+                        <Text style={styles.userName}>{req.name}</Text>
+                        <Text style={styles.userIdText}>ID: {req.userId}</Text>
+                    </View>
                   </View>
 
                   <View style={styles.actionButtons}>
-                    <TouchableOpacity
-                      style={[styles.btn, styles.acceptBtn]}
-                      onPress={() => console.log("接受：", req.id)}
-                    >
-                      <Text style={styles.btnText}>接受</Text>
-                    </TouchableOpacity>
+                    {req.status === 'pending' ? (
+                        <>
+                            <TouchableOpacity
+                                style={[styles.btn, styles.acceptBtn]}
+                                onPress={() => handleAccept(req.id, req.name, req.userId)}
+                            >
+                                <Text style={styles.btnText}>接受</Text>
+                            </TouchableOpacity>
 
-                    <TouchableOpacity
-                      style={[styles.btn, styles.rejectBtn]}
-                      onPress={() => console.log("拒绝：", req.id)}
-                    >
-                      <Text style={styles.btnText}>拒绝</Text>
-                    </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.btn, styles.rejectBtn]}
+                                onPress={() => handleReject(req.id, req.name, req.userId)}
+                            >
+                                <Text style={styles.btnText}>拒绝</Text>
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <Text style={styles.statusText}>
+                            {req.status === 'accepted' ? '已接受' : '已拒绝'}
+                        </Text>
+                    )}
                   </View>
                 </View>
               ))
@@ -163,10 +196,21 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: "500",
   },
+  userIdText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
   actionButtons: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+  },
+  statusText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontWeight: "500",
+    minWidth: 60,
+    textAlign: 'center',
   },
   btn: {
     paddingVertical: 6,
