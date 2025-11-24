@@ -135,7 +135,7 @@ const ProfileMenu: React.FC = () => {
               <TouchableOpacity
                 style={styles.qrButton}
                 activeOpacity={0.7}
-                onPress={() => navigation.navigate("QRScan")}
+                onPress={() => navigation.navigate("MyQRCode")}
               >
                 <Ionicons name="qr-code-outline" size={20} color="#9CA3AF" />
               </TouchableOpacity>

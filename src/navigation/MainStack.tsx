@@ -11,13 +11,13 @@ import JoinMeeting from "../screens/JoinMeeting";
 import MeetingScreen from "../screens/MeetingScreen";
 import EditName from "../screens/EditName";
 import EditPhone from "../screens/EditPhone";
-import FriendScan from "../screens/FriendScan";
-import QRScan from "../screens/QRScreen";
 import ResetEmail from "../screens/ResetEmail";
 import AddFriend from "../screens/AddFriend";
 import FriendReq from "../screens/FriendReq";
 import UserDetail from "../screens/UserDetail";
 import ChatHistory from "../screens/ChatHistory";
+import MyQRCode from "../screens/QRScreen";
+import ScanQRCode from "../screens/QRScreen2";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -37,7 +37,9 @@ export type MainStackParamList = {
   FriendReq: undefined;
   FriendScan: undefined;
   ChatHistory: { chatName: string; userId: string };
-  UserDetail: { userId: string};
+  UserDetail: { userId: string };
+  MyQRCode: undefined;
+  ScanQRCode: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -104,11 +106,6 @@ export default function MainStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="QRScan"
-        component={QRScan}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
         name="ResetEmail"
         component={ResetEmail}
         options={{ headerShown: false }}
@@ -124,18 +121,23 @@ export default function MainStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="FriendScan"
-        component={FriendScan}
-        options={{ headerShown: false }}
-      />
-       <Stack.Screen
         name="ChatHistory"
         component={ChatHistory}
         options={{ headerShown: false }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="UserDetail"
         component={UserDetail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MyQRCode"
+        component={MyQRCode}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ScanQRCode"
+        component={ScanQRCode}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
