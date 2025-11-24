@@ -24,7 +24,7 @@ const COLORS = {
 };
 
 // --- 模拟数据 ---
-const DUMMY_DATA: ChatItemType[] = [
+const messageData: ChatItemType[] = [
   {
     id: "1",
     name: "妈妈",
@@ -192,6 +192,25 @@ const ChatItem = ({
 // --- 页面主组件 ---
 export default function ChatListScreen() {
   const navigation = useNavigation();
+  const [searchText, setSearchText] = React.useState("");
+  const [debouncedText, setDebouncedText] = React.useState("");
+
+  // 防抖逻辑
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedText(searchText);
+    }, 300); // 300ms 延迟
+    return () => clearTimeout(handler); // 清理上一次定时器
+  }, [searchText]);
+
+  // 根据 debouncedText 过滤聊天列表
+  const filteredData = React.useMemo(() => {
+    if (!debouncedText.trim()) return messageData;
+    return messageData.filter((item) =>
+      item.name.toLowerCase().startsWith(debouncedText.toLowerCase())
+    );
+  }, [debouncedText]);
+
   return (
     <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
       <SafeAreaView style={styles.container} edges={["top"]}>
@@ -213,13 +232,15 @@ export default function ChatListScreen() {
               placeholder="搜索"
               placeholderTextColor={COLORS.textSecondary}
               style={styles.searchInput}
+              value={searchText}
+              onChangeText={setSearchText}
             />
           </View>
         </View>
 
         {/* Chat List */}
         <FlatList
-          data={DUMMY_DATA}
+          data={filteredData}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <ChatItem item={item} navigation={navigation} />

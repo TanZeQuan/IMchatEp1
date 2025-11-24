@@ -11,15 +11,19 @@ import { CameraView, Camera, BarcodeScanningResult } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList } from '../navigation/MainStack';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const SCAN_BOX_SIZE = 250;
 const OVERLAY_COLOR = "rgba(0,0,0,0.6)";
 
-const FriendScan: React.FC = () => {
-  const navigation = useNavigation();
+const QRScreen2: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
+  const [flash, setFlash] = useState<"off" | "torch">("off");
+
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
   useEffect(() => {
     (async () => {
@@ -48,7 +52,11 @@ const FriendScan: React.FC = () => {
   };
 
   const handleMyQRCode = () => {
-    Alert.alert("我的二维码", "跳转到显示自己的二维码页面");
+    navigation.replace("MyQRCode");
+  };
+
+  const toggleFlash = () => {
+    setFlash(flash === "off" ? "torch" : "off");
   };
 
   if (hasPermission === null) {
@@ -66,7 +74,7 @@ const FriendScan: React.FC = () => {
     );
   }
 
-  const offset = 100; // 想往上移动 100px
+  const offset = 100;
   const verticalOverlayHeightTop = (screenHeight - SCAN_BOX_SIZE) / 2 - offset;
   const verticalOverlayHeightBottom =
     (screenHeight - SCAN_BOX_SIZE) / 2 + offset;
@@ -78,6 +86,7 @@ const FriendScan: React.FC = () => {
       <CameraView
         style={StyleSheet.absoluteFillObject}
         facing="back"
+        enableTorch={flash === "torch"}
         barcodeScannerSettings={{
           barcodeTypes: ["qr"],
         }}
@@ -144,6 +153,14 @@ const FriendScan: React.FC = () => {
 
       {/* Footer */}
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={toggleFlash}>
+          <Ionicons
+            name="flashlight"
+            size={28}
+            color={flash === "torch" ? "#FFD700" : "white"}
+          />
+          <Text style={styles.footerButtonText}>手电筒</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.footerButton} onPress={handleMyQRCode}>
           <Ionicons name="qr-code-outline" size={28} color="white" />
           <Text style={styles.footerButtonText}>我的二维码</Text>
@@ -184,4 +201,4 @@ const styles = StyleSheet.create({
   permissionText: { color: "#fff", textAlign: "center", marginTop: 20 },
 });
 
-export default FriendScan;
+export default QRScreen2;

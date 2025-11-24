@@ -115,8 +115,12 @@ const ProfileMenu: React.FC = () => {
               </View>
             </View>
             <View style={styles.profileRight}>
-              <TouchableOpacity style={styles.qrButton} activeOpacity={0.7} onPress={() => navigation.navigate('QRScan')}>
-                <Ionicons name="qr-code-outline" size={responsive.f(20)} color="#6B7280" />
+              <TouchableOpacity
+                style={styles.qrButton}
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate("MyQRCode")}
+              >
+                <Ionicons name="qr-code-outline" size={20} color="#9CA3AF" />
               </TouchableOpacity>
               <Ionicons name="chevron-forward" size={responsive.f(20)} color="#6B7280" style={{ marginLeft: responsive.w(4) }} />
             </View>
