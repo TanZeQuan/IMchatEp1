@@ -1,9 +1,5 @@
 import colors from "../styles/color";
+import theme from "../styles/theme";
 import typography from "../styles/typography";
 
-const theme = {
-  colors,
-  typography,
-};
-
-export default theme;
+export { colors, typography, theme };
