@@ -1,10 +1,14 @@
 // src/navigation/MainTab.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Image } from 'react-native'; // ✅ 导入 Image
 import MessageScreen from '../screens/MessageScreen';
 import ContactScreen from '../screens/ContactScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import { Ionicons } from '@expo/vector-icons';
+
+const messageIcon = require('../../assets/images/chat.png'); 
+const contactIcon = require('../../assets/images/contact.png');
+const profileIcon = require('../../assets/images/user.png');
 
 const Tab = createBottomTabNavigator();
 
@@ -13,8 +17,8 @@ export default function MainTab() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#ffffffff',
-        tabBarInactiveTintColor: '#000000ff',
+        tabBarActiveTintColor: '#000000ff',
+        tabBarInactiveTintColor: '#888888',
         tabBarStyle: {
           backgroundColor: '#FFD860',
           borderTopWidth: 0,
@@ -25,6 +29,7 @@ export default function MainTab() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
+          paddingTop: 4,
         },
       }}
     >
@@ -33,8 +38,14 @@ export default function MainTab() {
         component={MessageScreen}
         options={{
           tabBarLabel: '消息',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubble-outline" size={size} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={messageIcon}
+              style={{
+                width: 30,
+                height: 30,
+              }}
+            />
           ),
         }}
       />
@@ -43,8 +54,14 @@ export default function MainTab() {
         component={ContactScreen}
         options={{
           tabBarLabel: '通讯录',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="book-outline" size={size} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={contactIcon}
+              style={{
+                width: 30,
+                height: 30,
+              }}
+            />
           ),
         }}
       />
@@ -53,8 +70,14 @@ export default function MainTab() {
         component={ProfileScreen}
         options={{
           tabBarLabel: '我的',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={profileIcon}
+              style={{
+                width: 30,
+                height: 30,
+              }}
+            />
           ),
         }}
       />
