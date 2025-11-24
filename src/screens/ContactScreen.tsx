@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   SectionList,
-  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -57,7 +56,6 @@ const ContactsLayout: React.FC = () => {
   const FriendReq = () => navigation.navigate("FriendReq");
 
   const [searchText, setSearchText] = React.useState("");
-  const [activeAlphabet, setActiveAlphabet] = React.useState<string | null>(null);
 
   const sectionListRef = React.useRef<SectionList>(null);
 
@@ -91,28 +89,24 @@ const ContactsLayout: React.FC = () => {
   const handleLetterPress = (letter: string) => {
     const index = sections.findIndex((s) => s.title === letter);
     if (index !== -1 && sectionListRef.current) {
-      setActiveAlphabet(letter);
       sectionListRef.current.scrollToLocation({
         sectionIndex: index,
         itemIndex: 0,
         animated: true,
-        viewPosition: 0,
       });
-      setTimeout(() => setActiveAlphabet(null), 300);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>通讯录</Text>
 
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={f(16)} style={styles.searchIcon} />
+          <Ionicons name="search" size={f(14)} style={styles.searchIcon} />
           <TextInput
             placeholder="搜索"
-            placeholderTextColor="#9CA3AF"
             style={styles.searchInput}
             value={searchText}
             onChangeText={setSearchText}
@@ -121,38 +115,7 @@ const ContactsLayout: React.FC = () => {
       </View>
 
       {/* Action Buttons */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity 
-          style={styles.actionButton}
-          activeOpacity={0.7}
-        >
-          <View style={styles.actionIcon}>
-            <Ionicons name="chatbubbles" size={f(20)} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>发起群聊</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.actionButton}
-          activeOpacity={0.7}
-        >
-          <View style={styles.actionIcon}>
-            <Ionicons name="people" size={f(20)} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>加入群聊</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.actionButton} 
-          onPress={AddFriend}
-          activeOpacity={0.7}
-        >
-          <View style={styles.actionIcon}>
-            <Ionicons name="person-add" size={f(20)} color="#666" />
-          </View>
-          <Text style={styles.actionLabel}>添加好友</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Moved into SectionList's ListHeaderComponent */}
 
       {/* SectionList */}
       <View style={styles.listContainer}>
@@ -160,62 +123,57 @@ const ContactsLayout: React.FC = () => {
           ref={sectionListRef}
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
-          stickySectionHeadersEnabled={true}
-          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View style={styles.actionButtons}>
+              <TouchableOpacity style={styles.actionButton}>
+                <View style={styles.actionIcon}>
+                  <Ionicons name="chatbubbles" size={f(18)} color="#666" />
+                </View>
+                <Text style={styles.actionLabel}>发起群聊</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.actionButton}>
+                <View style={styles.actionIcon}>
+                  <Ionicons name="people" size={f(18)} color="#666" />
+                </View>
+                <Text style={styles.actionLabel}>加入群聊</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
+                <View style={styles.actionIcon}>
+                  <Ionicons name="person-add" size={f(18)} color="#666" />
+                </View>
+                <Text style={styles.actionLabel}>添加好友</Text>
+              </TouchableOpacity>
+            </View>
+          }
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>{section.title}</Text>
             </View>
           )}
-          renderItem={({ item }) => (
-            <TouchableOpacity 
-              style={styles.contactItem}
-              activeOpacity={0.6}
-            >
+          renderItem={({ item, index }) => (
+            <TouchableOpacity style={styles.contactItem}>
               <View style={styles.avatar}>
-                <Ionicons name="person" size={f(18)} color="#fff" />
+                <Ionicons name="person" size={f(16)} color="#fff" />
               </View>
               <Text style={styles.contactName}>{item.name}</Text>
             </TouchableOpacity>
           )}
-          contentContainerStyle={styles.listContent}
         />
 
         {/* Alphabet Index */}
         <View style={styles.alphabetIndex}>
-          {alphabet.map((letter) => {
-            const hasSection = sections.some(s => s.title === letter);
-            return (
-              <TouchableOpacity
-                key={letter}
-                style={[
-                  styles.alphabetItem,
-                  !hasSection && styles.alphabetItemDisabled
-                ]}
-                onPress={() => hasSection && handleLetterPress(letter)}
-                activeOpacity={0.5}
-                disabled={!hasSection}
-              >
-                <Text 
-                  style={[
-                    styles.alphabetText,
-                    !hasSection && styles.alphabetTextDisabled,
-                    activeAlphabet === letter && styles.alphabetTextActive
-                  ]}
-                >
-                  {letter}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+          {alphabet.map((letter) => (
+            <TouchableOpacity
+              key={letter}
+              style={styles.alphabetItem}
+              onPress={() => handleLetterPress(letter)}
+            >
+              <Text style={styles.alphabetText}>{letter}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
-
-        {/* Active Letter Indicator */}
-        {activeAlphabet && (
-          <View style={styles.letterIndicator}>
-            <Text style={styles.letterIndicatorText}>{activeAlphabet}</Text>
-          </View>
-        )}
       </View>
     </SafeAreaView>
   );
@@ -230,51 +188,26 @@ const styles = StyleSheet.create({
   /** HEADER */
   header: {
     backgroundColor: "#F4D03F",
-    paddingHorizontal: w(16),
-    paddingBottom: h(16),
-    paddingTop: h(12),
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    paddingHorizontal: w(18),
+    paddingVertical: h(18),
+    paddingTop: h(16),
   },
   headerTitle: {
-    fontSize: f(20),
-    fontWeight: "700",
+    fontSize: f(15),
+    fontWeight: "600",
     textAlign: "center",
     color: "#1F2937",
     marginBottom: h(12),
-    letterSpacing: 0.3,
   },
 
   /** SEARCH */
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: w(10),
-    paddingHorizontal: w(12),
-    height: h(44),
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 1,
-      },
-    }),
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 45,
   },
   searchIcon: {
     fontSize: f(17),
@@ -283,43 +216,36 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: f(15),
-    color: "#1F2937",
+    fontSize: f(14),
+    color: "#6B7280",
     padding: 0,
-    height: h(44),
   },
 
   /** QUICK ACTION BUTTONS */
   actionButtons: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: w(16),
-    paddingVertical: h(20),
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    justifyContent: "space-between",
+    paddingHorizontal: w(20),
+    paddingVertical: h(18),
   },
   actionButton: { 
     alignItems: "center",
-    minWidth: w(80),
+    width: w(70),
   },
 
   actionIcon: {
-    width: w(56),
-    height: w(56),
-    backgroundColor: "#F9FAFB",
-    borderRadius: w(28),
+    width: w(50),
+    height: h(50),
+    backgroundColor: "#F3F4F6",
+    borderRadius: w(25),
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: h(8),
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    marginBottom: h(6),
   },
   actionLabel: {
-    fontSize: f(13),
-    color: "#4B5563",
+    fontSize: f(12),
+    color: "#374151",
     textAlign: "center",
-    fontWeight: "500",
   },
 
   /** CONTACT LIST */
@@ -328,111 +254,57 @@ const styles = StyleSheet.create({
     position: "relative",
     backgroundColor: "#FFFFFF",
   },
-  listContent: {
-    paddingBottom: h(20),
-  },
 
   sectionHeader: {
-    backgroundColor: "#FFF9E6",
+    backgroundColor: "#FFF7D6",
     paddingHorizontal: w(16),
-    paddingVertical: h(8),
-    borderBottomWidth: 1,
-    borderBottomColor: "#FEF3C7",
+    paddingVertical: h(6),
   },
   sectionHeaderText: {
-    fontSize: f(13),
-    color: "#92400E",
-    fontWeight: "600",
-    letterSpacing: 0.5,
+    fontSize: f(12),
+    color: "#4B5563",
+    fontWeight: "500",
   },
 
   contactItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: w(16),
-    paddingVertical: h(12),
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#E5E7EB",
-    minHeight: h(64),
+    paddingHorizontal: w(18),
+    paddingVertical: h(14),
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
   },
 
   avatar: {
-    width: w(48),
-    height: w(48),
+    width: w(42),
+    height: h(42),
     backgroundColor: "#D1D5DB",
-    borderRadius: w(8),
+    borderRadius: w(6),
     justifyContent: "center",
     alignItems: "center",
-    marginRight: w(12),
+    marginRight: w(14),
   },
   contactName: { 
     fontSize: f(16), 
     color: "#111827",
     fontWeight: "500",
-    flex: 1,
   },
 
-  /** ALPHABET INDEX */
+  /** ALPHABET LIST */
   alphabetIndex: {
     position: "absolute",
-    right: w(2),
-    top: h(10),
-    bottom: h(10),
-    justifyContent: "center",
-    paddingVertical: h(4),
+    right: w(8),
+    top: h(150),
+    alignItems: "center",
   },
   alphabetItem: { 
-    paddingVertical: h(1.5), 
-    paddingHorizontal: w(8),
-    minHeight: h(16),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  alphabetItemDisabled: {
-    opacity: 0.3,
+    paddingVertical: h(2), 
+    paddingHorizontal: w(4) 
   },
   alphabetText: {
-    fontSize: f(11),
-    color: "#bebebeff",
-    fontWeight: "700",
-  },
-  alphabetTextDisabled: {
-    color: "#D1D5DB",
-  },
-  alphabetTextActive: {
-    color: "#1D4ED8",
-    fontSize: f(13),
-  },
-
-  /** LETTER INDICATOR */
-  letterIndicator: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -w(40) }, { translateY: -h(40) }],
-    width: w(80),
-    height: w(80),
-    backgroundColor: "rgba(183, 183, 184, 0.95)",
-    borderRadius: w(16),
-    justifyContent: "center",
-    alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  letterIndicatorText: {
-    fontSize: f(32),
-    color: "#FFFFFF",
-    fontWeight: "700",
+    fontSize: f(10),
+    color: "#9CA3AF",
+    fontWeight: "600",
   },
 });
 
