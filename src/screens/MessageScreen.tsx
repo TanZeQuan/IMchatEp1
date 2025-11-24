@@ -192,16 +192,24 @@ const ChatItem = ({
 // --- 页面主组件 ---
 export default function ChatListScreen() {
   const navigation = useNavigation();
-
   const [searchText, setSearchText] = React.useState("");
+  const [debouncedText, setDebouncedText] = React.useState("");
 
-  // 根据 searchText 过滤聊天列表
-  const filteredData = React.useMemo(() => {
-    if (!searchText.trim()) return messageData;
-    return messageData.filter((item) =>
-      item.name.toLowerCase().startsWith(searchText.toLowerCase())
-    );
+  // 防抖逻辑
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedText(searchText);
+    }, 300); // 300ms 延迟
+    return () => clearTimeout(handler); // 清理上一次定时器
   }, [searchText]);
+
+  // 根据 debouncedText 过滤聊天列表
+  const filteredData = React.useMemo(() => {
+    if (!debouncedText.trim()) return messageData;
+    return messageData.filter((item) =>
+      item.name.toLowerCase().startsWith(debouncedText.toLowerCase())
+    );
+  }, [debouncedText]);
 
   return (
     <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
