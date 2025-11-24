@@ -92,7 +92,7 @@ const ContactsLayout: React.FC = () => {
 
   // ------------------ 搜索过滤 ------------------
   const filteredContacts = contactsData.filter((c) =>
-    c.name.toLowerCase().includes(searchText.toLowerCase())
+    c.name.toLowerCase().startsWith(searchText.toLowerCase())
   );
   const sections = groupContacts(filteredContacts);
 
