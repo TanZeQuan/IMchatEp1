@@ -161,19 +161,19 @@ const ContactsLayout: React.FC = () => {
             </TouchableOpacity>
           )}
         />
+      </View>
 
-        {/* Alphabet Index */}
-        <View style={styles.alphabetIndex}>
-          {alphabet.map((letter) => (
-            <TouchableOpacity
-              key={letter}
-              style={styles.alphabetItem}
-              onPress={() => handleLetterPress(letter)}
-            >
-              <Text style={styles.alphabetText}>{letter}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+      {/* Alphabet Index */}
+      <View style={styles.alphabetIndex}>
+        {alphabet.map((letter) => (
+          <TouchableOpacity
+            key={letter}
+            style={styles.alphabetItem}
+            onPress={() => handleLetterPress(letter)}
+          >
+            <Text style={styles.alphabetText}>{letter}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
     </SafeAreaView>
   );
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   alphabetIndex: {
     position: "absolute",
     right: w(8),
-    top: h(150),
+    top: h(290),
     alignItems: "center",
     zIndex: 1,
   },
