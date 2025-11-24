@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -11,206 +11,92 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { CameraView, Camera, BarcodeScanningResult } from 'expo-camera';
-import * as ImagePicker from 'expo-image-picker';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList } from '../navigation/MainStack';
+import ViewShot from 'react-native-view-shot';
+import * as MediaLibrary from 'expo-media-library';
 
 const { width } = Dimensions.get('window');
-const screenHeight = Dimensions.get('window').height;
-
-const SCAN_BOX_SIZE = width * 0.65;
-const OVERLAY_COLOR = 'rgba(0,0,0,0.6)';
 
 const QRScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState<'myQR' | 'scan'>('myQR');
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
-  const [torch, setTorch] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+  const viewShotRef = useRef<any>(null);
 
-  useEffect(() => {
-    const getCameraPermissions = async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-
-    getCameraPermissions();
-  }, []);
-
-  const handleBarCodeScanned = ({ type, data }: BarcodeScanningResult) => {
-    setScanned(true);
-    Alert.alert('扫描成功', `类型: ${type}\n内容: ${data}`, [
-      { text: '确定', onPress: () => setScanned(false) },
-    ]);
-  };
-
-  const handlePickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      Alert.alert('图片选择', '真实扫码需要额外库处理图片，这里仅作示例');
-    }
-  };
-
-  const renderScanContent = () => {
-    if (hasPermission === null) {
-      return <Text style={styles.permissionText}>请求相机权限中...</Text>;
-    }
-    if (hasPermission === false) {
-      return <Text style={styles.permissionText}>没有相机权限</Text>;
+  const handleDownload = async () => {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('权限不足', '需要相册访问权限才能保存图片。');
+      return;
     }
 
-    const offset = 100; // Offset to move the box up
-    const verticalOverlayHeightTop =
-      (screenHeight - SCAN_BOX_SIZE) / 2 - offset;
-    const verticalOverlayHeightBottom =
-      (screenHeight - SCAN_BOX_SIZE) / 2 + offset;
-    const horizontalOverlayWidth = (width - SCAN_BOX_SIZE) / 2;
-
-    return (
-      <View style={styles.scanPanel}>
-        <CameraView
-          style={StyleSheet.absoluteFillObject}
-          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-          barcodeScannerSettings={{
-            barcodeTypes: ['qr'],
-          }}
-          enableTorch={torch}
-        />
-
-        {/* Overlay */}
-        <View style={StyleSheet.absoluteFillObject}>
-          <View
-            style={{
-              height: verticalOverlayHeightTop,
-              backgroundColor: OVERLAY_COLOR,
-            }}
-          />
-          <View style={{ flexDirection: 'row' }}>
-            <View
-              style={{
-                width: horizontalOverlayWidth,
-                height: SCAN_BOX_SIZE,
-                backgroundColor: OVERLAY_COLOR,
-              }}
-            />
-            <View style={styles.scanBox} />
-            <View
-              style={{
-                width: horizontalOverlayWidth,
-                height: SCAN_BOX_SIZE,
-                backgroundColor: OVERLAY_COLOR,
-              }}
-            />
-          </View>
-          <View
-            style={{ flex: 1, backgroundColor: OVERLAY_COLOR }}
-          />
-        </View>
-
-        <Text style={styles.scanHint}>请将二维码放于框中央</Text>
-
-        {/* Bottom Actions */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => setTorch(!torch)}
-          >
-            <View style={styles.actionIcon}>
-              <Ionicons
-                name={torch ? 'flashlight' : 'flashlight-outline'}
-                size={28}
-                color="#fff"
-              />
-            </View>
-            <Text style={styles.actionLabel}>手电筒</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handlePickImage}
-          >
-            <View style={styles.actionIcon}>
-              <Ionicons name="image-outline" size={28} color="#fff" />
-            </View>
-            <Text style={styles.actionLabel}>相册</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+    try {
+      if (!viewShotRef.current) {
+        Alert.alert('错误', '无法找到要保存的区域。');
+        return;
+      }
+      const uri = await viewShotRef.current.capture();
+      await MediaLibrary.saveToLibraryAsync(uri);
+      Alert.alert('保存成功', '二维码已成功保存到您的相册中。');
+    } catch (e: any) {
+      console.error(e);
+      Alert.alert('保存失败', `保存二维码时发生错误: ${e.message}`);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle={activeTab === 'myQR' ? 'dark-content' : 'light-content'}
-        backgroundColor="#1a1a1a"
-      />
+      <StatusBar barStyle={'dark-content'} backgroundColor="#1a1a1a" />
 
       {/* Header */}
-      <View style={styles.headerRow}>
-        {/* Back Button */}
-       <TouchableOpacity
+      <View style={styles.header}>
+        <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={{ width: 40 }}
+          style={styles.headerButton}
         >
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <View style={styles.tabRow}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'myQR' && styles.activeTab]}
-            onPress={() => setActiveTab('myQR')}
-          >
-            <Text style={[styles.tabText, activeTab === 'myQR' && { color: '#E8E9EB' }]}>
-  我的二维码
-</Text>
-
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'scan' && styles.activeTab]}
-            onPress={() => setActiveTab('scan')}
-          >
-            <Text style={[styles.tabText, activeTab === 'myQR' && { color: '#E8E9EB' }]}>
-  扫描二维码
-</Text>
-
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.headerTitle}>我的二维码</Text>
+        <View style={styles.headerButton} />
       </View>
 
       {/* Content */}
       <View style={styles.contentContainer}>
-        {activeTab === 'myQR' ? (
-          <View style={styles.qrPanel}>
+        <View style={styles.qrPanel}>
+          <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1.0 }}>
             <View style={styles.qrCard}>
-              <View style={styles.avatarContainer}>
+              {/* User Info */}
+              <View style={styles.userInfo}>
                 <View style={styles.avatar} />
+                <View>
+                  <Text style={styles.userName}>你的名字</Text>
+                </View>
               </View>
+
+              {/* QR Code Placeholder */}
               <View style={styles.qrCodePlaceholder}>
                 <Text style={styles.qrText}>QR CODE</Text>
               </View>
+
+              <Text style={styles.scanHint}>扫一扫上面的二维码，加我为好友</Text>
             </View>
-            <View style={styles.actionsContainer}>
-              <TouchableOpacity style={styles.actionButton}>
-                <View style={styles.actionIcon}>
-                  <Ionicons name="id-card-outline" size={28} color="#fff" />
-                </View>
-                <Text style={styles.actionLabel}>名片</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton}>
-                <View style={styles.actionIcon}>
-                  <Ionicons name="download-outline" size={28} color="#fff" />
-                </View>
-                <Text style={styles.actionLabel}>下载/保存</Text>
-              </TouchableOpacity>
-            </View>
+          </ViewShot>
+
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleDownload}>
+              <View style={styles.actionIcon}>
+                <Ionicons name="download-outline" size={28} color="#fff" />
+              </View>
+              <Text style={styles.actionLabel}>下载图片</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('ScanQRCode')}>
+              <View style={styles.actionIcon}>
+                <Ionicons name="scan-outline" size={28} color="#fff" />
+              </View>
+              <Text style={styles.actionLabel}>扫描二维码</Text>
+            </TouchableOpacity>
           </View>
-        ) : (
-          renderScanContent()
-        )}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -221,36 +107,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1a1a1a',
   },
-  headerRow: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 16,
     position: 'absolute',
-    top: 50,
+    top: 35,
     left: 0,
     right: 0,
     zIndex: 10,
   },
-  tabRow: {
-    flex: 1,
-    flexDirection: 'row',
-    marginLeft: 15,
+  headerButton: {
+    width: 40,
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    borderBottomWidth: 3,
-    borderBottomColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-  activeTab: {
-    borderBottomColor: '#FFE08A',
-  },
-  tabText: {
-     color: "#FFE08A", fontSize: 18, fontWeight: "bold"
+  headerTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   contentContainer: {
     flex: 1,
@@ -259,14 +134,30 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingBottom: 150,
   },
   qrCard: {
-    width: width * 0.6,
+    width: width * 0.7,
     aspectRatio: 0.7,
     backgroundColor: '#F4D03F',
     borderRadius: 32,
-    padding: 24,
+    padding: 20,
     alignItems: 'center',
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginBottom: 20,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  userLocation: {
+    fontSize: 14,
+    color: '#666',
   },
   avatarContainer: {
     width: 80,
@@ -297,31 +188,18 @@ const styles = StyleSheet.create({
     color: '#000',
     letterSpacing: 2,
   },
-  scanPanel: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scanBox: {
-    width: SCAN_BOX_SIZE,
-    height: SCAN_BOX_SIZE,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
   scanHint: {
-    color: 'white',
     fontSize: 14,
-    marginTop: 20,
-    position: 'absolute',
-    bottom: 200,
+    color: '#666',
+    marginTop:20,
   },
   actionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     width: '100%',
     paddingHorizontal: 40,
     position: 'absolute',
-    bottom: 80,
+    bottom: 150,
   },
   actionButton: {
     alignItems: 'center',
@@ -338,12 +216,6 @@ const styles = StyleSheet.create({
   actionLabel: {
     color: '#fff',
     fontSize: 12,
-  },
-  permissionText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 50,
   },
 });
 
