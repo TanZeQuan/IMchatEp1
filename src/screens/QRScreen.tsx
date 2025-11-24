@@ -34,7 +34,7 @@ const QRScreen: React.FC = () => {
         Alert.alert('错误', '无法找到要保存的区域。');
         return;
       }
-      const uri = await viewShotRef.current.capture();
+      const uri = await viewShotRef.current.capture({ format: 'png', quality: 1, result: 'tmpfile' });
       await MediaLibrary.saveToLibraryAsync(uri);
       Alert.alert('保存成功', '二维码已成功保存到您的相册中。');
     } catch (e: any) {
@@ -89,7 +89,7 @@ const QRScreen: React.FC = () => {
               <Text style={styles.actionLabel}>下载图片</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('ScanQRCode')}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => navigation.replace('ScanQRCode')}>
               <View style={styles.actionIcon}>
                 <Ionicons name="scan-outline" size={28} color="#fff" />
               </View>

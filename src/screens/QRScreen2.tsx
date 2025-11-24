@@ -52,7 +52,7 @@ const QRScreen2: React.FC = () => {
   };
 
   const handleMyQRCode = () => {
-    navigation.navigate("MyQRCode");
+    navigation.replace("MyQRCode");
   };
 
   const toggleFlash = () => {
