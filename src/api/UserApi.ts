@@ -50,28 +50,79 @@ export interface UpdateProfilePayload {
 // 注册 API
 export const register = async (payload: RegisterPayload) => {
   try {
-    const res = await axios.post(`${BASE_URL}/users/new`, payload);
+    const formData = new FormData();
+
+    // 后端要求把所有参数放在 data 字段(JSON字符串)
+    formData.append(
+      "data",
+      JSON.stringify({
+        phone: payload.phone,
+        passcode: payload.password, // 后端叫 passcode
+        roles: "user",
+        status: 1,
+        name: payload.name,
+      })
+    );
+
+    const res = await axios.post(`${BASE_URL}/users/new`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
     return res.data;
+
   } catch (error: any) {
     console.error("Register error:", error.response?.data || error.message);
     throw error.response?.data || error;
   }
 };
 
+
 // 登录 API
 export const login = async (payload: LoginPayload) => {
   try {
-    const res = await axios.post(`${BASE_URL}/login`, payload);
-    return res.data; // 假设返回 { token: "xxx" }
+    const formData = new FormData();
+
+    formData.append(
+      "data",
+      JSON.stringify({
+        phone: payload.phone,
+        passcode: payload.password,
+      })
+    );
+
+    const res = await axios.post(`${BASE_URL}/login`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res.data;
   } catch (error: any) {
     console.error("Login error:", error.response?.data || error.message);
     throw error.response?.data || error;
   }
 };
 
+
 export const sendOTP = async (payload: SendOTPPayload) => {
   try {
-    const res = await axios.post(`${BASE_URL}/forget/otp/send`, payload);
+    const formData = new FormData();
+
+    formData.append(
+      "data",
+      JSON.stringify({
+        email: payload.email,
+      })
+    );
+
+    const res = await axios.post(`${BASE_URL}/forget/otp/send`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
     return res.data;
   } catch (error: any) {
     console.error("Send OTP error:", error.response?.data || error.message);
@@ -79,11 +130,19 @@ export const sendOTP = async (payload: SendOTPPayload) => {
   }
 };
 
+
 // =============================
 // 2) 验证 OTP
 // =============================
 export const verifyOTP = async (payload: VerifyOTPPayload) => {
   try {
+    const formData = new FormData();
+
+    formData.append("data", JSON.stringify({
+      email: payload.email,
+      otp: payload.otp,
+    }));
+
     const res = await axios.post(`${BASE_URL}/forget/otp/verify`, payload);
     return res.data;
   } catch (error: any) {
