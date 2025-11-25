@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { Audio, AVPlaybackStatus } from 'expo-av';
 import { colors } from '../styles';
 
 interface VoiceMessageProps {
@@ -49,7 +49,7 @@ export default function VoiceMessage({ uri }: VoiceMessageProps) {
     }
   }
 
-  function onPlaybackStatusUpdate(status: Audio.AVPlaybackStatus) {
+  function onPlaybackStatusUpdate(status: AVPlaybackStatus) {
     if (status.isLoaded) {
       setPosition(status.positionMillis);
       if (status.didJustFinish) {

@@ -1,5 +1,5 @@
 // ChatScreen.tsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -26,7 +26,6 @@ type ChatScreenNavProp = NativeStackNavigationProp<MainStackParamList, "Chat">;
 
 interface Message {
   id: string;
-  chatId: string;
   sender: "me" | "other";
   senderName: string;
   text?: string;
@@ -37,7 +36,6 @@ interface Message {
 interface RouteParams {
   chatName?: string;
   userId?: string;
-  chatId?: string; // 当前聊天窗口ID
 }
 
 export default function ChatScreen() {
@@ -46,45 +44,17 @@ export default function ChatScreen() {
   const params = route.params as RouteParams;
 
   const chatPartnerName = params?.chatName || "Alice";
-  const currentChatId = params?.chatId || "default_chat";
-
-  const ws = useRef<WebSocket | null>(null);
 
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { id: "1", chatId: currentChatId, sender: "other", senderName: chatPartnerName, text: "你好呀 4593年", type: "text" },
-    { id: "2", chatId: currentChatId, sender: "me", senderName: "我", text: "好的内容", type: "text" },
+    { id: "1", sender: "other", senderName: chatPartnerName, text: "你好呀 4593年", type: "text" },
+    { id: "2", sender: "me", senderName: "我", text: "好的内容", type: "text" },
   ]);
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-
-  // WebSocket 初始化
-  useEffect(() => {
-    ws.current = new WebSocket("wss://your-websocket-server"); // 替换成你的WS服务器
-
-    ws.current.onopen = () => console.log("WebSocket 已连接");
-
-    ws.current.onmessage = (event) => {
-      try {
-        const incoming: Message = JSON.parse(event.data);
-
-        // 只添加当前聊天窗口消息
-        if (incoming.chatId === currentChatId) {
-          setMessages(prev => [...prev, incoming]);
-        }
-      } catch (err) {
-        console.error("WS message parse error", err);
-      }
-    };
-
-    ws.current.onerror = (err) => console.error("WebSocket 错误", err);
-    ws.current.onclose = () => console.log("WebSocket 已关闭");
-
-    return () => ws.current?.close();
-  }, [currentChatId]);
 
   useEffect(() => {
     setupAudio();
@@ -155,30 +125,14 @@ export default function ChatScreen() {
   };
 
   const sendVoiceMessage = (uri: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      chatId: currentChatId,
-      sender: "me",
-      senderName: "我",
-      type: "voice",
-      uri
-    };
+    const newMessage: Message = { id: Date.now().toString(), sender: "me", senderName: "我", type: "voice", uri };
     setMessages(prev => [...prev, newMessage]);
-    ws.current?.send(JSON.stringify(newMessage));
   };
 
   const handleSend = () => {
     if (!inputText.trim()) return;
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      chatId: currentChatId,
-      sender: "me",
-      senderName: "我",
-      text: inputText,
-      type: "text"
-    };
+    const newMessage: Message = { id: Date.now().toString(), sender: "me", senderName: "我", text: inputText, type: "text" };
     setMessages(prev => [...prev, newMessage]);
-    ws.current?.send(JSON.stringify(newMessage));
     setInputText("");
   };
 
@@ -207,6 +161,7 @@ export default function ChatScreen() {
   return (
     <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={{ flex: 1 }}>
+        {/* Header with working back button */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={24} color="#333" />
@@ -226,6 +181,7 @@ export default function ChatScreen() {
             inverted
           />
 
+          {/* Input */}
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
               <TouchableOpacity style={[styles.iconButton, isRecording && styles.recordingButton]} onPressIn={startRecording} onPressOut={stopRecording}>
@@ -272,6 +228,7 @@ export default function ChatScreen() {
           </View>
         </KeyboardAvoidingView>
 
+        {/* Emoji Picker */}
         <EmojiPicker
           onEmojiSelected={handleEmojiSelect}
           open={isEmojiPickerOpen}
@@ -288,7 +245,7 @@ export default function ChatScreen() {
   );
 }
 
-// 样式保持不变
+// Your styles remain exactly the same
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   header: {

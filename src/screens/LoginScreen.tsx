@@ -14,18 +14,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { useUserStore } from "../store/userStore";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { useUserStore } from "../store/userStore";
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
-
+import { AuthStackParamList } from "../navigation/AuthStack";
 import { login } from "../api/UserApi";
-
-type AuthStackParamList = {
-  Login: undefined;
-  Register: undefined;
-  ForgetPassword: undefined;
-};
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -39,27 +34,25 @@ const LoginScreen = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
+  // ---------------- LOGIN FUNCTION ----------------
+  // 登录函数示例
   const handleLogin = async () => {
-    if (!isChecked) {
-      Alert.alert("提示", "请先阅读并同意隐私政策和服务协议");
-      return;
-    }
-    if (!phone || !password) {
-      Alert.alert("错误", "请输入手机号和密码");
-      return;
-    }
+    if (!phone || !password) return Alert.alert("错误", "请输入手机号和密码");
 
     setIsLoading(true);
-
     try {
       const res = await login({ phone, password });
-      console.log("API response:", res);
-      const fakeToken = "bypass-token";
-      setUserToken(fakeToken);
-      console.log("Login success, fake token set:", fakeToken);
-    } catch (error: any) {
-      console.log("Login error:", error);
-      Alert.alert("登录失败", error?.message || "请检查手机号或密码");
+
+      if (!res || res.status !== "success") {
+        throw new Error(res?.message || "登录失败");
+      }
+
+      // 登录成功，设置 token
+      setUserToken(res.token);
+
+      Alert.alert("成功", "登录成功！");
+    } catch (err: any) {
+      Alert.alert("登录失败", err?.message || "服务器错误");
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +60,7 @@ const LoginScreen = () => {
 
   const isButtonDisabled = isLoading || !phone || !password || !isChecked;
 
+  // ---------------- RETURN UI ----------------
   return (
     <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.safeArea}>
@@ -179,6 +173,7 @@ const LoginScreen = () => {
 
 export default LoginScreen;
 
+// ---------------- STYLES ----------------
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   container: {
@@ -227,7 +222,7 @@ const styles = StyleSheet.create({
     fontSize: responsive.f(typography.fontSize28),
     fontWeight: typography.fontWeightBold,
     marginBottom: responsive.h(30),
-    color: colors.text.primary
+    color: colors.text.primary,
   },
   inputContainer: {
     flexDirection: "row",
@@ -248,7 +243,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: responsive.f(typography.fontSize16),
     color: colors.text.blackMedium,
-    height: "100%"
+    height: "100%",
   },
   icon: { marginLeft: responsive.w(10) },
   linksContainer: {
@@ -260,7 +255,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: colors.text.veryDarkGray,
-    fontSize: responsive.f(typography.fontSize14)
+    fontSize: responsive.f(typography.fontSize14),
   },
   loginButtonWrapper: {
     width: "100%",
@@ -286,7 +281,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: colors.text.blackMedium,
     fontSize: responsive.f(typography.fontSize16),
-    fontWeight: typography.fontWeightBold
+    fontWeight: typography.fontWeightBold,
   },
   disabledButton: { opacity: 0.6 },
   agreementContainer: {
@@ -300,7 +295,7 @@ const styles = StyleSheet.create({
   agreementText: {
     marginLeft: responsive.w(8),
     color: colors.text.grayMedium,
-    fontSize: responsive.f(typography.fontSize13)
+    fontSize: responsive.f(typography.fontSize13),
   },
   agreementLink: { color: colors.functional.blue },
 });
