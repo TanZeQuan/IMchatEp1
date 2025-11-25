@@ -13,6 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../navigation/MainStack';
+import { colors, borders, typography } from "../styles";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const SCAN_BOX_SIZE = 250;
@@ -118,7 +119,7 @@ const QRScreen2: React.FC = () => {
               width: SCAN_BOX_SIZE,
               height: SCAN_BOX_SIZE,
               borderWidth: 2,
-              borderColor: "#fff",
+              borderColor: colors.background.white,
             }}
           />
           <View
@@ -175,7 +176,7 @@ const QRScreen2: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#232323" },
+  container: { flex: 1, backgroundColor: colors.text.primary },
   header: {
     position: "absolute",
     top: 50,
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
   },
-  headerText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  headerText: { color: colors.background.white, fontSize: typography.fontSize18, fontWeight: typography.fontWeightBold },
   footer: {
     position: "absolute",
     bottom: 200,
@@ -197,8 +198,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerButton: { alignItems: "center" },
-  footerButtonText: { color: "#fff", fontSize: 14, marginTop: 5 },
-  permissionText: { color: "#fff", textAlign: "center", marginTop: 20 },
+  footerButtonText: { color: colors.background.white, fontSize: typography.fontSize14, marginTop: 5 },
+  permissionText: { color: colors.background.white, textAlign: "center", marginTop: 20 },
 });
 
 export default QRScreen2;

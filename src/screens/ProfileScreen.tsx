@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserStore } from '../store/userStore';
 import responsive from '../utils/responsive';
+import { colors, borders, typography } from '../styles';
 
 interface MenuItem {
   icon: keyof typeof Ionicons.glyphMap;
@@ -94,7 +95,7 @@ const ProfileMenu: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={['#FFEFB0', '#FFF9E5']} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {/* Profile Card */}
@@ -105,7 +106,7 @@ const ProfileMenu: React.FC = () => {
                   <Image source={{ uri: avatarUri }} style={styles.avatar} />
                 ) : (
                   <View style={styles.avatarPlaceholder}>
-                    <Ionicons name="person" size={responsive.f(32)} color="#fff" />
+                    <Ionicons name="person" size={responsive.f(32)} color={colors.text.white} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -120,9 +121,9 @@ const ProfileMenu: React.FC = () => {
                 activeOpacity={0.7}
                 onPress={() => navigation.navigate("MyQRCode")}
               >
-                <Ionicons name="qr-code-outline" size={20} color="#9CA3AF" />
+                <Ionicons name="qr-code-outline" size={20} color={colors.text.grayLight} />
               </TouchableOpacity>
-              <Ionicons name="chevron-forward" size={responsive.f(20)} color="#6B7280" style={{ marginLeft: responsive.w(4) }} />
+              <Ionicons name="chevron-forward" size={responsive.f(20)} color={colors.text.gray} style={{ marginLeft: responsive.w(4) }} />
             </View>
           </TouchableOpacity>
 
@@ -132,18 +133,18 @@ const ProfileMenu: React.FC = () => {
               <TouchableOpacity key={index} style={styles.menuItem} activeOpacity={0.7} onPress={() => handleMenuPress(item)}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View style={{ width: responsive.w(32), height: responsive.w(32), justifyContent: 'center', alignItems: 'center' }}>
-                    <Ionicons name={item.icon} size={responsive.f(20)} color="#1F2937" />
+                    <Ionicons name={item.icon} size={responsive.f(20)} color={colors.text.dark} />
                   </View>
-                  <Text style={{ fontSize: responsive.f(15), fontWeight: '400', marginLeft: responsive.w(12), color: '#1F2937' }}>{item.label}</Text>
+                  <Text style={{ fontSize: responsive.f(15), fontWeight: typography.fontWeight400, marginLeft: responsive.w(12), color: colors.text.dark }}>{item.label}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={responsive.f(20)} color="#6B7280" />
+                <Ionicons name="chevron-forward" size={responsive.f(20)} color={colors.text.gray} />
               </TouchableOpacity>
             ))}
           </View>
 
           {/* Logout Button */}
           <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8} onPress={handleLogout}>
-            <Text style={{ fontSize: responsive.f(16), fontWeight: '500', color: '#1F2937' }}>退出</Text>
+            <Text style={{ fontSize: responsive.f(16), fontWeight: typography.fontWeight500, color: colors.text.dark }}>退出</Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollView: { flex: 1 },
   profileCard: {
-    backgroundColor: '#FCD34D',
+    backgroundColor: colors.background.yellowLight,
     paddingTop: responsive.h(60),
     paddingBottom: responsive.h(20),
     paddingHorizontal: responsive.s(20),
@@ -168,27 +169,27 @@ const styles = StyleSheet.create({
   profileLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   avatarContainer: { width: responsive.w(56), height: responsive.w(56), borderRadius: responsive.w(16), overflow: 'hidden' },
   avatar: { width: responsive.w(56), height: responsive.w(56), borderRadius: responsive.w(16) },
-  avatarPlaceholder: { width: responsive.w(56), height: responsive.w(56), backgroundColor: '#1F2937', borderRadius: responsive.w(16), justifyContent: 'center', alignItems: 'center' },
+  avatarPlaceholder: { width: responsive.w(56), height: responsive.w(56), backgroundColor: colors.text.dark, borderRadius: responsive.w(16), justifyContent: 'center', alignItems: 'center' },
   profileInfo: { marginLeft: responsive.w(12), flex: 1 },
-  profileName: { fontSize: responsive.f(18), fontWeight: '600', color: '#1F2937', marginBottom: responsive.h(2) },
-  profileId: { fontSize: responsive.f(13), color: '#6B7280' },
+  profileName: { fontSize: responsive.f(18), fontWeight: typography.fontWeight600, color: colors.text.dark, marginBottom: responsive.h(2) },
+  profileId: { fontSize: responsive.f(13), color: colors.text.gray },
   profileRight: { flexDirection: 'row', alignItems: 'center' },
-  qrButton: { width: responsive.w(32), height: responsive.w(32), backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: responsive.w(8), justifyContent: 'center', alignItems: 'center' },
+  qrButton: { width: responsive.w(32), height: responsive.w(32), backgroundColor: colors.background.transparentWhite50, borderRadius: responsive.w(8), justifyContent: 'center', alignItems: 'center' },
   menuItem: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.background.white,
     borderRadius: responsive.w(20),
     padding: responsive.h(16),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    shadowColor: '#898989',
+    shadowColor: colors.shadow.default,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
   },
   logoutButton: {
-    backgroundColor: '#FCD34D',
+    backgroundColor: colors.background.yellowLight,
     borderRadius: responsive.w(20),
     padding: responsive.h(16),
     marginHorizontal: responsive.s(16),

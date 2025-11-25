@@ -12,6 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native"; // ✅ import navigation
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack"; // adjust path
+import { colors, borders, typography } from "../styles";
 
 const ResetNameScreen: React.FC = () => {
   const [name, setName] = useState("Mym");
@@ -36,7 +37,7 @@ const ResetNameScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.container}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.container}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
@@ -53,7 +54,7 @@ const ResetNameScreen: React.FC = () => {
               value={name}
               onChangeText={setName}
               placeholder="请输入名字"
-              placeholderTextColor="#B8B8B8"
+              placeholderTextColor={colors.border.dark}
             />
             {name.length > 0 && (
               <TouchableOpacity
@@ -61,7 +62,7 @@ const ResetNameScreen: React.FC = () => {
                 onPress={handleClearName}
                 activeOpacity={0.6}
               >
-                <Ionicons name="close-circle" size={20} color="#999" />
+                <Ionicons name="close-circle" size={20} color={colors.text.lightGray} />
               </TouchableOpacity>
             )}
           </View>
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
@@ -99,26 +100,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.blackMedium,
   },
   placeholder: { width: 40 },
   content: { paddingHorizontal: 16, paddingTop: 20 },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 30,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius30,
     paddingHorizontal: 20,
     height: 52,
     marginBottom: 24,
   },
-  input: { flex: 1, fontSize: 15, color: "#333" },
+  input: { flex: 1, fontSize: typography.fontSize15, color: colors.text.blackMedium },
   clearButton: { padding: 4, marginLeft: 8 },
   confirmButton: {
-    backgroundColor: "#FCD34D",
-    borderRadius: 30,
+    backgroundColor: colors.background.yellowLight,
+    borderRadius: borders.radius30,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     marginHorizontal: 16,
   },
-  confirmButtonText: { fontSize: 16, fontWeight: "500", color: "#333" },
+  confirmButtonText: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight500, color: colors.text.blackMedium },
 });
 
 export default ResetNameScreen;

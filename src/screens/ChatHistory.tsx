@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { colors, borders, typography } from '../styles';
 
 interface FilterOption {
   icon: keyof typeof Ionicons.glyphMap;
@@ -101,7 +102,7 @@ const SearchFilterScreen: React.FC = () => {
                 mode={dateMode}
                 display="spinner"
                 onChange={handleDateChange}
-                textColor="#1F2937"
+                textColor={colors.text.dark}
               />
             </View>
           </View>
@@ -123,12 +124,12 @@ const SearchFilterScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FCD34D" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background.yellowLight} />
 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#374151" />
+          <Ionicons name="arrow-back" size={24} color={colors.text.medium} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>查找聊天记录</Text>
       </View>
@@ -136,11 +137,11 @@ const SearchFilterScreen: React.FC = () => {
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputWrapper}>
-          <Ionicons name="search-outline" size={20} color="#9CA3AF" style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={20} color={colors.text.grayLight} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="搜索"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.text.grayLight}
             value={searchText}
             onChangeText={setSearchText}
           />
@@ -157,7 +158,7 @@ const SearchFilterScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <View style={styles.filterIconWrapper}>
-              <Ionicons name={option.icon} size={28} color="#4B5563" />
+              <Ionicons name={option.icon} size={28} color={colors.text.grayDark} />
             </View>
             <Text style={styles.filterLabel}>{option.label}</Text>
           </TouchableOpacity>
@@ -192,10 +193,10 @@ const SearchFilterScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEF3C7',
+    backgroundColor: colors.background.chatBg,
   },
   header: {
-    backgroundColor: '#FCD34D',
+    backgroundColor: colors.background.yellowLight,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -206,9 +207,9 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#1F2937',
+    fontSize: typography.fontSize18,
+    fontWeight: typography.fontWeight500,
+    color: colors.text.dark,
   },
   searchContainer: {
     paddingHorizontal: 16,
@@ -218,8 +219,8 @@ const styles = StyleSheet.create({
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius8,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -228,8 +229,8 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#1F2937',
+    fontSize: typography.fontSize16,
+    color: colors.text.dark,
     padding: 0,
   },
   filterContainer: {
@@ -239,23 +240,23 @@ const styles = StyleSheet.create({
   },
   filterButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 8,
+    backgroundColor: colors.background.transparentWhite40,
+    borderRadius: borders.radius8,
     paddingVertical: 16,
     paddingHorizontal: 20,
   },
   filterIconWrapper: {
     width: 48,
     height: 48,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius8,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
   },
   filterLabel: {
-    fontSize: 14,
-    color: '#374151',
+    fontSize: typography.fontSize14,
+    color: colors.text.medium,
   },
   selectedDateContainer: {
     flexDirection: 'row',
@@ -264,27 +265,27 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   selectedDateLabel: {
-    fontSize: 14,
-    color: '#6B7280',
+    fontSize: typography.fontSize14,
+    color: colors.text.gray,
     marginRight: 8,
   },
   selectedDateText: {
-    fontSize: 14,
-    color: '#1F2937',
-    fontWeight: '500',
+    fontSize: typography.fontSize14,
+    color: colors.text.dark,
+    fontWeight: typography.fontWeight500,
   },
   emptySpace: {
     flex: 1,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.background.transparentBlack50,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    backgroundColor: colors.background.white,
+    borderTopLeftRadius: borders.radius16,
+    borderTopRightRadius: borders.radius16,
     paddingBottom: 34,
   },
   modalHeader: {
@@ -293,21 +294,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomWidth: borders.width1,
+    borderBottomColor: colors.border.gray,
   },
   modalTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.dark,
   },
   modalButton: {
-    fontSize: 16,
-    color: '#6B7280',
+    fontSize: typography.fontSize16,
+    color: colors.text.gray,
   },
   confirmButton: {
-    color: '#3B82F6',
-    fontWeight: '600',
+    color: colors.functional.blueLight,
+    fontWeight: typography.fontWeight600,
   },
 });
 

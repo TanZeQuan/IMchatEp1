@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; // ✅ import Ionicons
+import { colors, borders, typography } from "../styles";
 
 const ResetPasswordScreen: React.FC = () => {
   const navigation = useNavigation(); // ✅ 导航实例
@@ -26,7 +27,7 @@ const ResetPasswordScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.container}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
@@ -48,7 +49,7 @@ const ResetPasswordScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="请输入旧密码"
-              placeholderTextColor="#CCC"
+              placeholderTextColor={colors.border.grayMedium}
               value={oldPassword}
               onChangeText={setOldPassword}
               secureTextEntry={!showOldPassword}
@@ -60,7 +61,7 @@ const ResetPasswordScreen: React.FC = () => {
               <Ionicons
                 name={showOldPassword ? "eye-off-outline" : "eye-outline"}
                 size={20}
-                color="#666"
+                color={colors.text.darkGray}
               />
             </TouchableOpacity>
           </View>
@@ -70,7 +71,7 @@ const ResetPasswordScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="请输入新密码"
-              placeholderTextColor="#CCC"
+              placeholderTextColor={colors.border.grayMedium}
               value={newPassword}
               onChangeText={setNewPassword}
               secureTextEntry={!showNewPassword}
@@ -82,7 +83,7 @@ const ResetPasswordScreen: React.FC = () => {
               <Ionicons
                 name={showNewPassword ? "eye-off-outline" : "eye-outline"}
                 size={20}
-                color="#666"
+                color={colors.text.darkGray}
               />
             </TouchableOpacity>
           </View>
@@ -92,7 +93,7 @@ const ResetPasswordScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="请确认新密码"
-              placeholderTextColor="#CCC"
+              placeholderTextColor={colors.border.grayMedium}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
@@ -104,7 +105,7 @@ const ResetPasswordScreen: React.FC = () => {
               <Ionicons
                 name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
                 size={20}
-                color="#666"
+                color={colors.text.darkGray}
               />
             </TouchableOpacity>
           </View>
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
@@ -136,9 +137,9 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.blackMedium,
   },
   placeholder: {
     width: 40,
@@ -150,28 +151,28 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 25,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius25,
     paddingHorizontal: 25,
     marginBottom: 25,
     height: 50,
-    shadowColor: "#000",
+    shadowColor: colors.shadow.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3, 
+    shadowRadius: 3,
     elevation: 2,
   },
   input: {
     flex: 1,
-    fontSize: 14,
-    color: "#333",
+    fontSize: typography.fontSize14,
+    color: colors.text.blackMedium,
   },
   eyeIcon: {
     padding: 5,
   },
   submitButton: {
-    backgroundColor: "#FCD34D",
-    borderRadius: 30,
+    backgroundColor: colors.background.yellowLight,
+    borderRadius: borders.radius30,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -180,9 +181,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   submitButtonText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#333",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight500,
+    color: colors.text.blackMedium,
   },
 });
 

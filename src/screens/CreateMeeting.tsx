@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { LinearGradient } from "expo-linear-gradient";
+import { colors, borders, typography } from "../styles";
 
 interface SettingItemProps {
   label: string;
@@ -128,7 +129,7 @@ const CreateMeetingScreen: React.FC = () => {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{title}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#333" />
+              <Ionicons name="close" size={24} color={colors.text.blackMedium} />
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.optionsList}>
@@ -154,7 +155,7 @@ const CreateMeetingScreen: React.FC = () => {
                   {option}
                 </Text>
                 {selectedValue === option && (
-                  <Ionicons name="checkmark" size={20} color="#4CD964" />
+                  <Ionicons name="checkmark" size={20} color={colors.functional.greenBright} />
                 )}
               </TouchableOpacity>
             ))}
@@ -169,11 +170,11 @@ const CreateMeetingScreen: React.FC = () => {
   const [showAudioModal, setShowAudioModal] = useState(false);
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-            <Ionicons name="arrow-back" size={24} color="#333" />
+            <Ionicons name="arrow-back" size={24} color={colors.text.blackMedium} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>创建会议</Text>
           <View style={styles.placeholder} />
@@ -184,7 +185,7 @@ const CreateMeetingScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="请输入会议主题"
-              placeholderTextColor="#B8B8B8"
+              placeholderTextColor={colors.border.dark}
               value={meetingTopic}
               onChangeText={setMeetingTopic}
             />
@@ -214,9 +215,9 @@ const CreateMeetingScreen: React.FC = () => {
               <Switch
                 value={requirePassword}
                 onValueChange={setRequirePassword}
-                trackColor={{ false: "#D1D1D1", true: "#4CD964" }}
-                thumbColor="#FFFFFF"
-                ios_backgroundColor="#D1D1D1"
+                trackColor={{ false: colors.border.darker, true: colors.functional.greenBright }}
+                thumbColor={colors.background.white}
+                ios_backgroundColor={colors.border.darker}
               />
             </View>
           </View>
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
@@ -283,22 +284,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  headerTitle: { fontSize: 16, fontWeight: "600", color: "#333" },
+  headerTitle: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
   placeholder: { width: 40 },
   content: { flex: 1, paddingTop: 16 },
   inputContainer: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background.white,
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginHorizontal: 16,
     marginBottom: 16,
-    borderRadius: 12,
+    borderRadius: borders.radius12,
   },
-  input: { fontSize: 15, color: "#333", padding: 0 },
+  input: { fontSize: typography.fontSize15, color: colors.text.blackMedium, padding: 0 },
   settingsSection: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background.white,
     marginHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: borders.radius12,
     overflow: "hidden",
   },
   item: {
@@ -308,10 +309,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  label: { fontSize: 15, color: "#333", fontWeight: "500" },
+  label: { fontSize: typography.fontSize15, color: colors.text.blackMedium, fontWeight: typography.fontWeight500 },
   valueContainer: { flexDirection: "row", alignItems: "center", gap: 4 },
-  value: { fontSize: 14, color: "#999" },
-  divider: { height: 1, backgroundColor: "#F0F0F0", marginHorizontal: 16 },
+  value: { fontSize: typography.fontSize14, color: colors.text.lightGray },
+  divider: { height: 1, backgroundColor: colors.background.gray, marginHorizontal: 16 },
   switchItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -320,8 +321,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   completeButton: {
-    backgroundColor: "#FCD34D",
-    borderRadius: 30,
+    backgroundColor: colors.background.yellowLight,
+    borderRadius: borders.radius30,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -329,16 +330,16 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     marginHorizontal: 16,
   },
-  completeButtonText: { fontSize: 16, fontWeight: "500", color: "#333" },
+  completeButtonText: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight500, color: colors.text.blackMedium },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: colors.background.transparentBlack50,
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: colors.background.white,
+    borderTopLeftRadius: borders.radius20,
+    borderTopRightRadius: borders.radius20,
     maxHeight: "70%",
   },
   modalHeader: {
@@ -347,13 +348,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    borderBottomWidth: borders.width1,
+    borderBottomColor: colors.background.gray,
   },
   modalTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: typography.fontSize17,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.blackMedium,
   },
   closeButton: {
     padding: 4,
@@ -369,15 +370,15 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   optionItemSelected: {
-    backgroundColor: "#F5F5F5",
+    backgroundColor: colors.background.grayLight,
   },
   optionText: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: typography.fontSize16,
+    color: colors.text.blackMedium,
   },
   optionTextSelected: {
-    color: "#4CD964",
-    fontWeight: "600",
+    color: colors.functional.greenBright,
+    fontWeight: typography.fontWeight600,
   },
 });
 

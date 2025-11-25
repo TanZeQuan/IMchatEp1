@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { sendOTP, verifyOTP, resetPassword } from "../api/UserApi";
 import responsive from "../utils/responsive";
+import { colors, borders, typography } from "../styles";
 
 const ForgetPasswordScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -74,7 +75,7 @@ const ForgetPasswordScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.container}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.container}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
         <View style={styles.header}>
@@ -82,7 +83,7 @@ const ForgetPasswordScreen: React.FC = () => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={responsive.f(24)} color="#333" />
+            <Ionicons name="arrow-back" size={responsive.f(typography.fontSize24)} color={colors.text.blackMedium} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>找回密码</Text>
           <View style={styles.placeholder} />
@@ -94,7 +95,7 @@ const ForgetPasswordScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="请输入邮箱地址"
-              placeholderTextColor="#B8B8B8"
+              placeholderTextColor={colors.border.dark}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -108,7 +109,7 @@ const ForgetPasswordScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 placeholder="请输入验证码"
-                placeholderTextColor="#B8B8B8"
+                placeholderTextColor={colors.border.dark}
                 value={verificationCode}
                 onChangeText={setVerificationCode}
                 keyboardType="number-pad"
@@ -134,7 +135,7 @@ const ForgetPasswordScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="请输入新密码"
-              placeholderTextColor="#B8B8B8"
+              placeholderTextColor={colors.border.dark}
               secureTextEntry={!showNewPassword}
               value={newPassword}
               onChangeText={setNewPassword}
@@ -146,7 +147,7 @@ const ForgetPasswordScreen: React.FC = () => {
               <Ionicons
                 name={showNewPassword ? "eye-outline" : "eye-off-outline"}
                 size={responsive.f(22)}
-                color="#999"
+                color={colors.text.lightGray}
               />
             </TouchableOpacity>
           </View>
@@ -156,7 +157,7 @@ const ForgetPasswordScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="请确认密码"
-              placeholderTextColor="#B8B8B8"
+              placeholderTextColor={colors.border.dark}
               secureTextEntry={!showConfirmPassword}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
@@ -168,7 +169,7 @@ const ForgetPasswordScreen: React.FC = () => {
               <Ionicons
                 name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
                 size={responsive.f(22)}
-                color="#999"
+                color={colors.text.lightGray}
               />
             </TouchableOpacity>
           </View>
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: responsive.s(16),
     paddingVertical: responsive.h(8),
   },
@@ -199,19 +200,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  headerTitle: { fontSize: responsive.f(16), fontWeight: "600", color: "#333" },
+  headerTitle: { fontSize: responsive.f(typography.fontSize16), fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
   placeholder: { width: responsive.w(40) },
   content: { paddingHorizontal: responsive.s(20), paddingTop: responsive.h(32) },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: responsive.w(30),
+    backgroundColor: colors.background.white,
+    borderRadius: responsive.w(borders.radius30),
     paddingHorizontal: responsive.s(20),
     marginBottom: responsive.h(18),
     height: responsive.h(50),
   },
-  input: { flex: 1, fontSize: responsive.f(15), color: "#333" },
+  input: { flex: 1, fontSize: responsive.f(typography.fontSize15), color: colors.text.blackMedium },
   eyeIcon: { padding: responsive.w(8) },
   verificationRow: {
     flexDirection: "row",
@@ -221,8 +222,8 @@ const styles = StyleSheet.create({
   },
   verificationInput: { flex: 1 },
   sendCodeButton: {
-    backgroundColor: "#FCD34D",
-    borderRadius: responsive.w(30),
+    backgroundColor: colors.background.yellowLight,
+    borderRadius: responsive.w(borders.radius30),
     paddingHorizontal: responsive.s(22),
     paddingVertical: responsive.h(15),
     minWidth: responsive.w(120),
@@ -231,10 +232,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sendCodeButtonDisabled: { backgroundColor: "#E8DCA8", opacity: 0.6 },
-  sendCodeButtonText: { color: "#D32F2F", fontWeight: "600", fontSize: responsive.f(14) },
+  sendCodeButtonText: { color: "#D32F2F", fontWeight: typography.fontWeight600, fontSize: responsive.f(typography.fontSize14) },
   submitButton: {
-    backgroundColor: "#FCD34D",
-    borderRadius: responsive.w(30),
+    backgroundColor: colors.background.yellowLight,
+    borderRadius: responsive.w(borders.radius30),
     paddingVertical: responsive.h(15),
     alignItems: "center",
     justifyContent: "center",
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     marginBottom: responsive.h(60),
     marginHorizontal: responsive.s(16),
   },
-  submitButtonText: { fontSize: responsive.f(16), fontWeight: "600", color: "#333" },
+  submitButtonText: { fontSize: responsive.f(typography.fontSize16), fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
 });
 
 export default ForgetPasswordScreen;

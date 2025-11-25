@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../navigation/MainStack';
 import ViewShot from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
+import { colors, borders, typography } from "../styles";
 
 const { width } = Dimensions.get('window');
 
@@ -105,7 +106,7 @@ const QRScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: colors.text.blackAlt,
   },
   header: {
     flexDirection: 'row',
@@ -123,9 +124,9 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: colors.background.white,
+    fontSize: typography.fontSize18,
+    fontWeight: typography.fontWeightBold,
   },
   contentContainer: {
     flex: 1,
@@ -139,8 +140,8 @@ const styles = StyleSheet.create({
   qrCard: {
     width: width * 0.7,
     aspectRatio: 0.7,
-    backgroundColor: '#F4D03F',
-    borderRadius: 32,
+    backgroundColor: colors.background.yellow,
+    borderRadius: borders.radius32,
     padding: 20,
     alignItems: 'center',
   },
@@ -151,19 +152,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: typography.fontSize18,
+    fontWeight: typography.fontWeightBold,
+    color: colors.text.black,
   },
   userLocation: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: typography.fontSize14,
+    color: colors.text.darkGray,
   },
   avatarContainer: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    backgroundColor: '#fff',
+    borderRadius: borders.radius50,
+    backgroundColor: colors.background.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -172,25 +173,25 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.border.grayLight,
   },
   qrCodePlaceholder: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   qrText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: typography.fontSize24,
+    fontWeight: typography.fontWeightBold,
+    color: colors.text.black,
     letterSpacing: 2,
   },
   scanHint: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: typography.fontSize14,
+    color: colors.text.darkGray,
     marginTop:20,
   },
   actionsContainer: {
@@ -207,15 +208,15 @@ const styles = StyleSheet.create({
   actionIcon: {
     width: 56,
     height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(74, 74, 74, 0.8)',
+    borderRadius: borders.radius28,
+    backgroundColor: colors.background.transparentDark80,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
   },
   actionLabel: {
-    color: '#fff',
-    fontSize: 12,
+    color: colors.background.white,
+    fontSize: typography.fontSize12,
   },
 });
 

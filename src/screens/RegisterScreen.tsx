@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { register } from "../api/UserApi";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import responsive from "../utils/responsive";
+import { colors, borders, typography } from "../styles";
 
 type RegisterPayload = {
   name: string;
@@ -99,7 +100,7 @@ const RegisterScreen = () => {
     !isChecked;
 
   return (
-    <LinearGradient colors={["#FFEFB0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.bgShape1} />
         <View style={styles.bgShape2} />
@@ -129,7 +130,7 @@ const RegisterScreen = () => {
               onChangeText={setNickname}
               autoCapitalize="none"
               editable={!isLoading}
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.text.lightGray}
             />
           </View>
 
@@ -143,7 +144,7 @@ const RegisterScreen = () => {
               keyboardType="phone-pad"
               autoCapitalize="none"
               editable={!isLoading}
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.text.lightGray}
             />
           </View>
 
@@ -158,7 +159,7 @@ const RegisterScreen = () => {
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isLoading}
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.text.lightGray}
             />
           </View>
 
@@ -171,7 +172,7 @@ const RegisterScreen = () => {
               onChangeText={setPassword}
               secureTextEntry={!isPasswordVisible}
               editable={!isLoading}
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.text.lightGray}
             />
             <TouchableOpacity
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
@@ -179,7 +180,7 @@ const RegisterScreen = () => {
               <Ionicons
                 name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
                 size={responsive.f(22)}
-                color="#888"
+                color={colors.text.grayMedium}
                 style={styles.icon}
               />
             </TouchableOpacity>
@@ -194,7 +195,7 @@ const RegisterScreen = () => {
               onChangeText={setConfirmPassword}
               secureTextEntry={!isConfirmPasswordVisible}
               editable={!isLoading}
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.text.lightGray}
             />
             <TouchableOpacity
               onPress={() =>
@@ -206,7 +207,7 @@ const RegisterScreen = () => {
                   isConfirmPasswordVisible ? "eye-off-outline" : "eye-outline"
                 }
                 size={responsive.f(22)}
-                color="#888"
+                color={colors.text.grayMedium}
                 style={styles.icon}
               />
             </TouchableOpacity>
@@ -227,7 +228,7 @@ const RegisterScreen = () => {
             style={[styles.loginButtonWrapper, isButtonDisabled && styles.disabledButton]}
           >
             <LinearGradient
-              colors={["#FDFDFD", "#EAEAEA"]}
+              colors={colors.background.gradientWhite}
               style={styles.loginButtonGradient}
             >
               <Text style={styles.loginButtonText}>
@@ -245,7 +246,7 @@ const RegisterScreen = () => {
               <Ionicons
                 name={isChecked ? "checkbox" : "square-outline"}
                 size={responsive.f(18)}
-                color={isChecked ? "#007AFF" : "#888"}
+                color={isChecked ? colors.functional.blue : colors.text.grayMedium}
               />
             </TouchableOpacity>
             <Text style={styles.agreementText}>
@@ -272,11 +273,11 @@ const styles = StyleSheet.create({
   logoCard: {
     width: responsive.w(128),
     height: responsive.w(128),
-    backgroundColor: "#fff",
-    borderRadius: responsive.w(24),
+    backgroundColor: colors.background.white,
+    borderRadius: responsive.w(borders.radius24),
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: colors.shadow.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
@@ -287,8 +288,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: responsive.w(350),
     height: responsive.w(350),
-    borderRadius: responsive.w(60),
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    borderRadius: responsive.w(borders.radius60),
+    backgroundColor: colors.background.transparentWhite50,
     top: responsive.h(-100),
     right: responsive.w(-120),
     transform: [{ rotate: "45deg" }],
@@ -297,29 +298,29 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: responsive.w(300),
     height: responsive.w(300),
-    borderRadius: responsive.w(60),
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    borderRadius: responsive.w(borders.radius60),
+    backgroundColor: colors.background.transparentWhite70,
     top: responsive.h(50),
     left: responsive.w(-150),
     transform: [{ rotate: "30deg" }],
   },
-  title: { fontSize: responsive.f(28), fontWeight: "bold", marginBottom: responsive.h(30), color: "#333" },
+  title: { fontSize: responsive.f(typography.fontSize28), fontWeight: typography.fontWeightBold, marginBottom: responsive.h(30), color: colors.text.blackMedium },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
     height: responsive.h(55),
-    backgroundColor: "#FFF",
-    borderRadius: responsive.w(30),
+    backgroundColor: colors.background.white,
+    borderRadius: responsive.w(borders.radius30),
     marginBottom: responsive.h(20),
     paddingHorizontal: responsive.s(20),
-    shadowColor: "#B0C0E0",
+    shadowColor: colors.shadow.blue,
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
   },
-  inputField: { flex: 1, fontSize: responsive.f(16), color: "#333", height: "100%" },
+  inputField: { flex: 1, fontSize: responsive.f(typography.fontSize16), color: colors.text.blackMedium, height: "100%" },
   icon: { marginLeft: responsive.w(10) },
   linksContainer: {
     flexDirection: "row",
@@ -328,12 +329,12 @@ const styles = StyleSheet.create({
     marginBottom: responsive.h(30),
     paddingHorizontal: responsive.s(15),
   },
-  linkText: { color: "#555", fontSize: responsive.f(14) },
+  linkText: { color: colors.text.veryDarkGray, fontSize: responsive.f(typography.fontSize14) },
   loginButtonWrapper: {
     width: "100%",
     height: responsive.h(55),
-    borderRadius: responsive.w(30),
-    shadowColor: "#B0C0E0",
+    borderRadius: responsive.w(borders.radius30),
+    shadowColor: colors.shadow.blue,
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
@@ -346,11 +347,11 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: responsive.w(30),
-    borderWidth: 1,
-    borderColor: "#FFF",
+    borderRadius: responsive.w(borders.radius30),
+    borderWidth: borders.width1,
+    borderColor: colors.border.white,
   },
-  loginButtonText: { color: "#333", fontSize: responsive.f(16), fontWeight: "bold" },
+  loginButtonText: { color: colors.text.blackMedium, fontSize: responsive.f(typography.fontSize16), fontWeight: typography.fontWeightBold },
   disabledButton: { opacity: 0.6 },
   agreementContainer: {
     flexDirection: "row",
@@ -360,8 +361,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   checkbox: { padding: responsive.w(5) },
-  agreementText: { marginLeft: responsive.w(8), color: "#888", fontSize: responsive.f(13) },
-  agreementLink: { color: "#007AFF" },
+  agreementText: { marginLeft: responsive.w(8), color: colors.text.grayMedium, fontSize: responsive.f(typography.fontSize13) },
+  agreementLink: { color: colors.functional.blue },
 });
 
 export default RegisterScreen;

@@ -15,8 +15,9 @@ import { MainStackParamList } from "../navigation/MainStack";
 import { Platform } from "react-native";
 import pinyin from "pinyin";
 
-// 导入 responsive
+// 导入 responsive 和样式配置
 import { scaleWidth as w, scaleHeight as h, scaleFont as f } from "../utils/responsive";
+import { colors, borders, typography } from "../styles";
 
 interface Contact {
   id: number;
@@ -183,21 +184,21 @@ const ContactsLayout: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background.white,
   },
 
   /** HEADER */
   header: {
-    backgroundColor: "#F4D03F",
+    backgroundColor: colors.background.yellow,
     paddingHorizontal: w(18),
     paddingVertical: h(18),
     paddingTop: h(16),
   },
   headerTitle: {
-    fontSize: f(15),
-    fontWeight: "600",
+    fontSize: f(typography.fontSize15),
+    fontWeight: typography.fontWeight600,
     textAlign: "center",
-    color: "#1F2937",
+    color: colors.text.dark,
     marginBottom: h(12),
   },
 
@@ -205,20 +206,20 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius8,
     paddingHorizontal: 12,
     height: 45,
   },
   searchIcon: {
-    fontSize: f(17),
+    fontSize: f(typography.fontSize17),
     marginRight: w(8),
-    color: "#9CA3AF",
+    color: colors.text.grayLight,
   },
   searchInput: {
     flex: 1,
-    fontSize: f(14),
-    color: "#6B7280",
+    fontSize: f(typography.fontSize14),
+    color: colors.text.gray,
     padding: 0,
   },
 
@@ -237,34 +238,34 @@ const styles = StyleSheet.create({
   actionIcon: {
     width: w(50),
     height: h(50),
-    backgroundColor: "#F3F4F6",
-    borderRadius: w(25),
+    backgroundColor: colors.background.grayPale,
+    borderRadius: w(borders.radius25),
     justifyContent: "center",
     alignItems: "center",
     marginBottom: h(6),
   },
   actionLabel: {
-    fontSize: f(12),
-    color: "#374151",
+    fontSize: f(typography.fontSize12),
+    color: colors.text.medium,
     textAlign: "center",
   },
 
   /** CONTACT LIST */
-  listContainer: { 
-    flex: 1, 
+  listContainer: {
+    flex: 1,
     position: "relative",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.background.white,
   },
 
   sectionHeader: {
-    backgroundColor: "#FFF7D6",
+    backgroundColor: colors.background.yellowPale,
     paddingHorizontal: w(16),
     paddingVertical: h(6),
   },
   sectionHeaderText: {
-    fontSize: f(12),
-    color: "#4B5563",
-    fontWeight: "500",
+    fontSize: f(typography.fontSize12),
+    color: colors.text.grayDark,
+    fontWeight: typography.fontWeight500,
   },
 
   contactItem: {
@@ -272,23 +273,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: w(18),
     paddingVertical: h(14),
-    borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomWidth: borders.width1,
+    borderBottomColor: colors.border.light,
   },
 
   avatar: {
     width: w(42),
     height: h(42),
-    backgroundColor: "#D1D5DB",
-    borderRadius: w(6),
+    backgroundColor: colors.functional.avatarBg,
+    borderRadius: w(borders.radius6),
     justifyContent: "center",
     alignItems: "center",
     marginRight: w(14),
   },
-  contactName: { 
-    fontSize: f(16), 
-    color: "#111827",
-    fontWeight: "500",
+  contactName: {
+    fontSize: f(typography.fontSize16),
+    color: colors.text.darker,
+    fontWeight: typography.fontWeight500,
   },
 
   /** ALPHABET LIST */
@@ -299,14 +300,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1,
   },
-  alphabetItem: { 
-    paddingVertical: h(2), 
-    paddingHorizontal: w(4) 
+  alphabetItem: {
+    paddingVertical: h(2),
+    paddingHorizontal: w(4)
   },
   alphabetText: {
-    fontSize: f(12),
-    color: "#9CA3AF",
-    fontWeight: "600",
+    fontSize: f(typography.fontSize12),
+    color: colors.text.grayLight,
+    fontWeight: typography.fontWeight600,
   },
 });
 

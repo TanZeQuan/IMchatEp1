@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { LinearGradient } from "expo-linear-gradient";
+import { colors, borders, typography } from "../styles";
 
 interface MeetingItemProps {
   icon: string;
@@ -17,11 +18,11 @@ const MeetingItem: React.FC<MeetingItemProps> = ({ icon, label, onPress }) => (
   <TouchableOpacity style={styles.item} onPress={onPress} activeOpacity={0.7}>
     <View style={styles.itemLeft}>
       <View style={styles.iconContainer}>
-        <Ionicons name={icon as any} size={20} color="#FFFFFF" />
+        <Ionicons name={icon as any} size={20} color={colors.background.white} />
       </View>
       <Text style={styles.label}>{label}</Text>
     </View>
-    <Ionicons name="chevron-forward" size={20} color="#999" />
+    <Ionicons name="chevron-forward" size={20} color={colors.text.lightGray} />
   </TouchableOpacity>
 );
 
@@ -43,7 +44,7 @@ const MeetingScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.container} edges={["top"]}>
         {/* Header */}
         <View style={styles.header}>
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
@@ -95,9 +96,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.blackMedium,
   },
   placeholder: {
     width: 40,
@@ -111,14 +112,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius20,
     paddingHorizontal: 20,
     paddingVertical: 10,
     height: 60,
 
     // iOS Shadow
-    shadowColor: "#898989",
+    shadowColor: colors.shadow.default,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -134,15 +135,15 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: "#555",
+    borderRadius: borders.radius18,
+    backgroundColor: colors.text.veryDarkGray,
     alignItems: "center",
     justifyContent: "center",
   },
   label: {
-    fontSize: 15,
-    color: "#333",
-    fontWeight: "500",
+    fontSize: typography.fontSize15,
+    color: colors.text.blackMedium,
+    fontWeight: typography.fontWeight500,
   },
 });
 

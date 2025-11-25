@@ -11,17 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-
-const COLORS = {
-  background: "#F5F5F5",
-  header: "#F4D03F",
-  card: "#FFFFFF",
-  textPrimary: "#222222",
-  textSecondary: "#999999",
-  badge: "#FF6B6B",
-  avatarPlaceholder: "#D3D3D3",
-  searchBg: "#FFFFFF",
-};
+import { colors, borders, typography } from "../styles";
 
 // --- 模拟数据 ---
 const messageData: ChatItemType[] = [
@@ -151,7 +141,7 @@ const ChatItem = ({
     }
     return (
       <View style={styles.avatarPlaceholder}>
-        <Ionicons name="person" size={28} color="#888" />
+        <Ionicons name="person" size={28} color={colors.text.grayMedium} />
       </View>
     );
   };
@@ -212,7 +202,7 @@ export default function ChatListScreen() {
   }, [debouncedText]);
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.container} edges={["top"]}>
         {/* Header */}
         <View style={styles.header}>
@@ -225,12 +215,12 @@ export default function ChatListScreen() {
             <Ionicons
               name="search"
               size={18}
-              color={COLORS.textSecondary}
+              color={colors.text.lightGray}
               style={styles.searchIcon}
             />
             <TextInput
               placeholder="搜索"
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={colors.text.lightGray}
               style={styles.searchInput}
               value={searchText}
               onChangeText={setSearchText}
@@ -260,30 +250,29 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // backgroundColor: COLORS.background
   },
   header: {
-    backgroundColor: COLORS.header,
+    backgroundColor: colors.background.yellow,
     paddingTop: 16,
     paddingBottom: 12,
     paddingHorizontal: 16,
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.textPrimary,
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.primary,
   },
   searchSection: {
-    backgroundColor: COLORS.header,
+    backgroundColor: colors.background.yellow,
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
   searchBarContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.searchBg,
-    borderRadius: 8,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius8,
     paddingHorizontal: 12,
     height: 45,
   },
@@ -292,8 +281,8 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
-    color: COLORS.textPrimary,
+    fontSize: typography.fontSize15,
+    color: colors.text.primary,
     padding: 0,
   },
   listContent: {
@@ -302,16 +291,16 @@ const styles = StyleSheet.create({
   chatItemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.card,
+    backgroundColor: colors.background.white,
     paddingHorizontal: 15,
     paddingVertical: 15,
     margin: 8,
-    borderRadius: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#fff",
+    borderRadius: borders.radius10,
+    borderBottomWidth: borders.width05,
+    borderBottomColor: colors.border.whiteAlt,
 
     // iOS Shadow
-    shadowColor: "#898989",
+    shadowColor: colors.shadow.default,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -326,19 +315,19 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: 48,
     height: 48,
-    borderRadius: 8,
-    backgroundColor: COLORS.avatarPlaceholder,
+    borderRadius: borders.radius8,
+    backgroundColor: colors.functional.avatarPlaceholder,
     justifyContent: "center",
     alignItems: "center",
   },
   groupAvatarContainer: {
     width: 48,
     height: 48,
-    borderRadius: 8,
+    borderRadius: borders.radius8,
     flexDirection: "row",
     flexWrap: "wrap",
     overflow: "hidden",
-    backgroundColor: COLORS.avatarPlaceholder,
+    backgroundColor: colors.functional.avatarPlaceholder,
   },
   groupAvatarImage: {
     width: "50%",
@@ -348,44 +337,43 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -4,
     right: -4,
-    backgroundColor: COLORS.badge,
+    backgroundColor: colors.functional.redPale,
     borderRadius: 9,
     minWidth: 18,
     height: 18,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 5,
-    borderWidth: 2,
-    borderColor: COLORS.card,
+    borderWidth: borders.width2,
+    borderColor: colors.background.white,
   },
   badgeText: {
-    color: COLORS.card,
-    fontSize: 11,
-    fontWeight: "bold",
+    color: colors.background.white,
+    fontSize: typography.fontSize11,
+    fontWeight: typography.fontWeightBold,
   },
   textContainer: {
     flex: 1,
     justifyContent: "center",
   },
   nameText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: COLORS.textPrimary,
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight500,
+    color: colors.text.primary,
     marginBottom: 8,
   },
   messageText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
+    fontSize: typography.fontSize14,
+    color: colors.text.lightGray,
+    lineHeight: typography.lineHeight18,
   },
   metaContainer: {
     alignItems: "flex-end",
     justifyContent: "flex-start",
     paddingBottom: 20,
-    // marginLeft: 8,
   },
   timeText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
+    fontSize: typography.fontSize12,
+    color: colors.text.lightGray,
   },
 });

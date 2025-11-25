@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
+import { colors } from '../styles';
 
 interface VoiceMessageProps {
   uri: string;
@@ -69,7 +70,7 @@ export default function VoiceMessage({ uri }: VoiceMessageProps) {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.playButton} onPress={isPlaying ? pauseSound : playSound}>
-        <Ionicons name={isPlaying ? 'pause' : 'play'} size={24} color="black" />
+        <Ionicons name={isPlaying ? 'pause' : 'play'} size={24} color={colors.text.black} />
       </TouchableOpacity>
       <Text>{formatTime(position)} / {formatTime(duration)}</Text>
     </View>

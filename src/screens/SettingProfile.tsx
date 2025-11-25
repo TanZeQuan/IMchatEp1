@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { updateProfile } from '../api/UserApi';
 import { MainStackParamList } from "../navigation/MainStack"; // adjust path
+import { colors, borders, typography } from "../styles";
 
 interface ProfileItemProps {
   label: string;
@@ -49,13 +50,13 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
         <Ionicons
           name="qr-code-outline"
           size={24}
-          color="#666"
+          color={colors.text.darkGray}
           style={styles.qrIcon}
         />
       ) : (
         <Text style={styles.value}>{value}</Text>
       )}
-      {showArrow && <Ionicons name="chevron-forward" size={20} color="#999" />}
+      {showArrow && <Ionicons name="chevron-forward" size={20} color={colors.text.lightGray} />}
     </View>
   </TouchableOpacity>
 );
@@ -98,7 +99,7 @@ const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.container}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
@@ -151,33 +152,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
   backButton: { width: 40 },
-  headerTitle: { fontSize: 16, fontWeight: "600", color: "#333" },
+  headerTitle: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
   placeholder: { width: 40 },
-  content: { backgroundColor: "#fff" },
+  content: { backgroundColor: colors.background.white },
   item: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    borderBottomWidth: borders.width1,
+    borderBottomColor: colors.background.gray,
   },
-  label: { fontSize: 15, color: "#333" },
+  label: { fontSize: typography.fontSize15, color: colors.text.blackMedium },
   valueContainer: { flexDirection: "row", alignItems: "center" },
-  value: { fontSize: 15, color: "#999", marginRight: 8 },
+  value: { fontSize: typography.fontSize15, color: colors.text.lightGray, marginRight: 8 },
   avatar: {
     width: 40,
     height: 40,
-    borderRadius: 4,
+    borderRadius: borders.radius4,
     overflow: "hidden",
     marginRight: 8,
-    backgroundColor: "#EEE",
+    backgroundColor: colors.background.veryLightGray,
   },
   avatarImage: { width: "100%", height: "100%" },
   qrIcon: { marginRight: 8 },

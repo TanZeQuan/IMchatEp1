@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
 import { LinearGradient } from "expo-linear-gradient";
+import { colors, borders, typography } from "../styles";
 
 const COLORS = {
   background: "#F5F5F5",
@@ -47,7 +48,7 @@ const SettingScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
         {/* Header */}
         <View style={styles.header}>
@@ -130,16 +131,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.header,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    // borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    // borderBottomWidth: borders.width1,
+    borderBottomColor: colors.border.grayLight,
   },
   backButton: {
     padding: 4,
     width: 32,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
     color: COLORS.textPrimary,
     flex: 1,
     textAlign: "center",
@@ -157,14 +158,14 @@ const styles = StyleSheet.create({
   },
 
   friendRequestTitle: {
-    fontSize: 16,
+    fontSize: typography.fontSize16,
     color: COLORS.textPrimary,
-    fontWeight: "600",
+    fontWeight: typography.fontWeight600,
     marginBottom: 12,
   },
 
   friendRequestDesc: {
-    fontSize: 14,
+    fontSize: typography.fontSize14,
     color: COLORS.textSecondary,
   },
 
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 15,
-    borderBottomWidth: 1,
+    borderBottomWidth: borders.width1,
     borderColor: COLORS.border,
   },
   userInfo: {
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
   avatarWrapper: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: borders.radius20,
     overflow: "hidden",
     marginRight: 12,
   },
@@ -192,12 +193,12 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   userName: {
-    fontSize: 15,
+    fontSize: typography.fontSize15,
     color: COLORS.textPrimary,
-    fontWeight: "500",
+    fontWeight: typography.fontWeight500,
   },
   userIdText: {
-    fontSize: 12,
+    fontSize: typography.fontSize12,
     color: COLORS.textSecondary,
   },
   actionButtons: {
@@ -206,27 +207,27 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   statusText: {
-    fontSize: 14,
+    fontSize: typography.fontSize14,
     color: COLORS.textSecondary,
-    fontWeight: "500",
+    fontWeight: typography.fontWeight500,
     minWidth: 60,
     textAlign: 'center',
   },
   btn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 6,
+    borderRadius: borders.radius6,
   },
   acceptBtn: {
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
   },
   rejectBtn: {
-    backgroundColor: "#E5E5E5",
+    backgroundColor: COLORS.border,
   },
   btnText: {
-    color: "#232323",
-    fontSize: 14,
-    fontWeight: "500",
+    color: colors.text.primary,
+    fontSize: typography.fontSize14,
+    fontWeight: typography.fontWeight500,
   },
 });
 

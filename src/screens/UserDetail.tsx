@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Switch,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, NavigationProp, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, borders, typography } from "../styles";
 
 // Define your navigation stack param types
 type RootStackParamList = {
@@ -92,8 +86,8 @@ const ProfileSettingsScreen: React.FC = () => {
       <Switch
         value={item.key ? notifications[item.key] : false}
         onValueChange={() => item.key && toggleNotification(item.key)}
-        trackColor={{ false: '#E5E7EB', true: '#4ADE80' }}
-        thumbColor="#FFFFFF"
+        trackColor={{ false: colors.border.gray, true: colors.functional.greenBright }}
+        thumbColor={colors.background.white}
       />
     </View>
   );
@@ -177,54 +171,54 @@ const ProfileSettingsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FEF3C7' },
+  container: { flex: 1, backgroundColor: colors.background.chatBg },
   scrollView: { flex: 1 },
   header: {
-    backgroundColor: '#FCD34D',
+    backgroundColor: colors.background.yellowLight,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },
   backButton: { marginRight: 16 },
-  headerTitle: { fontSize: 18, fontWeight: '600', color: '#000' },
+  headerTitle: { fontSize: typography.fontSize18, fontWeight: typography.fontWeight600, color: colors.text.black },
   profileCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.white,
     marginHorizontal: 16,
     marginTop: 16,
-    borderRadius: 12,
+    borderRadius: borders.radius12,
     padding: 24,
     alignItems: 'center',
   },
   avatar: {
     width: 80,
     height: 80,
-    backgroundColor: '#D1D5DB',
-    borderRadius: 12,
+    backgroundColor: colors.functional.avatarBg,
+    borderRadius: borders.radius12,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
-  profileName: { fontSize: 16, fontWeight: '500', color: '#1F2937' },
+  profileName: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight500, color: colors.text.dark },
   section: { marginTop: 16, marginHorizontal: 16 },
-  sectionTitle: { fontSize: 14, color: '#6B7280', marginBottom: 8, paddingHorizontal: 8 },
-  card: { backgroundColor: '#FFFFFF', borderRadius: 12, overflow: 'hidden' },
+  sectionTitle: { fontSize: typography.fontSize14, color: colors.text.gray, marginBottom: 8, paddingHorizontal: 8 },
+  card: { backgroundColor: colors.background.white, borderRadius: borders.radius12, overflow: 'hidden' },
   settingItem: { flexDirection: 'row', alignItems: 'center', padding: 16 },
-  borderBottom: { borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+  borderBottom: { borderBottomWidth: borders.width1, borderBottomColor: colors.border.light },
   iconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#FBBF24',
-    borderRadius: 20,
+    backgroundColor: "#FBBF24",
+    borderRadius: borders.radius20,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
-  dangerIcon: { backgroundColor: '#EF4444' },
+  dangerIcon: { backgroundColor: colors.functional.redMedium },
   settingContent: { flex: 1 },
-  settingTitle: { fontSize: 16, fontWeight: '500', color: '#1F2937', marginBottom: 2 },
-  settingSubtitle: { fontSize: 12, color: '#9CA3AF' },
-  dangerTitle: { fontSize: 16, fontWeight: '500', color: '#EF4444', marginBottom: 2 },
-  dangerSubtitle: { fontSize: 12, color: '#FCA5A5' },
+  settingTitle: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight500, color: colors.text.dark, marginBottom: 2 },
+  settingSubtitle: { fontSize: typography.fontSize12, color: colors.text.grayLight },
+  dangerTitle: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight500, color: colors.functional.redMedium, marginBottom: 2 },
+  dangerSubtitle: { fontSize: typography.fontSize12, color: colors.functional.redLight },
 });
 
 export default ProfileSettingsScreen;

@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native"; // ✅ Import navigation hook
+import { colors, borders, typography } from "../styles";
 
 interface NotificationItemProps {
   label: string;
@@ -21,9 +22,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     <Switch
       value={value}
       onValueChange={onToggle}
-      trackColor={{ false: "#D1D1D1", true: "#4CD964" }}
-      thumbColor="#fff"
-      ios_backgroundColor="#D1D1D1"
+      trackColor={{ false: colors.border.darker, true: colors.functional.greenBright }}
+      thumbColor={colors.background.white}
+      ios_backgroundColor={colors.border.darker}
     />
   </View>
 );
@@ -40,7 +41,7 @@ const NotificationSettingsScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.container}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
@@ -92,15 +93,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.blackMedium,
   },
   placeholder: {
     width: 40,
   },
   content: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.background.white,
   },
   item: {
     flexDirection: "row",
@@ -108,12 +109,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    borderBottomWidth: borders.width1,
+    borderBottomColor: colors.background.gray,
   },
   label: {
-    fontSize: 15,
-    color: "#333",
+    fontSize: typography.fontSize15,
+    color: colors.text.blackMedium,
   },
 });
 

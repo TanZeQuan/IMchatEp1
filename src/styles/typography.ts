@@ -1,105 +1,29 @@
-export const typography = {
-    auth: {
-        title: {
-            fontFamily: "Plus Jakarta Sans-Bold",
-            fontSize: 25,
-            fontWeight: 700, // use number or correct string
-        },
-        formText: {
-            fontFamily: "Jakarta light 14",
-            fontSize: 14,
-            fontWeight: 300,
-        },
-        secondaryTitle: {
-            fontFamily: "Plus Jakarta Sans",
-            fontSize: 20,
-            fontWeight: 400,
-        },
-    },
+const typography = {
+  // Font Size
+  fontSize11: 11,
+  fontSize12: 12,
+  fontSize13: 13,
+  fontSize14: 14,
+  fontSize15: 15,
+  fontSize16: 16,
+  fontSize17: 17,
+  fontSize18: 18,
+  fontSize20: 20,
+  fontSize22: 22,
+  fontSize24: 24,
+  fontSize28: 28,
 
-    profile: {
-        title: {
-            fontFamily: "Plus Jakarta Sans-Bold",
-            fontSize: 18,
-            fontWeight: "700",
-        },
-        titleId: {
-            fontFamily: "Plus Jakarta Sans-Medium",
-            fontSize: 12,
-            fontWeight: "500",
-        },
-        secondaryTitle: {
-            fontFamily: "Plus Jakarta Sans-Medium",
-            fontSize: 20,
-            fontWeight: "400",
-        },
-        buttonText: {
-            fontFamily: "Plus Jakarta Sans",
-            fontSize: 20,
-            fontWeight: "400",
-        },
-        formText: {
-            fontFamily: "Plus Jakarta Sans",
-            fontSize: 14,
-            fontWeight: "300",
-        }
-    },
+  // Font Weight
+  fontWeight300: '300' as const,
+  fontWeight400: '400' as const,
+  fontWeight500: '500' as const,
+  fontWeight600: '600' as const,
+  fontWeight700: '700' as const,
+  fontWeightBold: 'bold' as const,
 
-    contact: {
-        Title: {
-            fontFamily: "Plus Jakarta Sans",
-            fontSize: 18,
-            fontWeight: "400",
-        },
-        subTitle: {
-            fontFamily: "Plus Jakarta Sans-Medium",
-            fontSize: 12,
-            fontWeight: "500",
-        },
-        SecondaryTitle: {
-            fontFamily: "Plus Jakarta Sans-Medium",
-            fontSize: 12,
-            fontWeight: "500",
-        },
-        bodyText: {
-            fontFamily: "Plus Jakarta Sans-Medium",
-            fontSize: 12,
-            fontWeight: "400",
-        },
-        buttonText: {
-            fontFamily: "Plus Jakarta Sans-Bold",
-            fontSize: 18,
-            fontWeight: "700",
-        },
-    },
-
-    chat: {
-        Title: {
-            fontFamily: "Plus Jakarta Sans-Bold",
-            fontSize: 18,
-            fontWeight: "400",
-        },
-        bodyTitle: {
-            fontFamily: "Inter-Medium",
-            fontSize: 16,
-            fontWeight: "500",
-        },
-        bodySubtitle: {
-            fontFamily: "Inter-Medium",
-            fontSize: 16,
-            fontWeight: "500",
-        },
-        chatTitle: {
-            fontFamily: "Plus Jakarta Sans-Bold",
-            fontSize: 18,
-            fontWeight: "700",
-        },
-        chatSubtitle: {
-            fontFamily: "Plus Jakarta Sans-Medium",
-            fontSize: 12,
-            fontWeight: "500",
-        }
-    }
+  // Line Height
+  lineHeight18: 18,
+  lineHeight22: 22,
 };
 
 export default typography;

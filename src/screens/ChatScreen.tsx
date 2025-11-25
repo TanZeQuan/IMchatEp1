@@ -20,6 +20,7 @@ import { Audio } from "expo-av";
 import VoiceMessage from '../components/VoiceMessage';
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
+import { colors, borders, typography } from "../styles";
 
 type ChatScreenNavProp = NativeStackNavigationProp<MainStackParamList, "Chat">;
 
@@ -36,19 +37,6 @@ interface RouteParams {
   chatName?: string;
   userId?: string;
 }
-
-const COLORS = {
-  background: "#FEF3C7",
-  header: "#FFD860",
-  messageBubbleLeft: "#FFFFFF",
-  messageBubbleRight: "#95EC69",
-  textPrimary: "#000000",
-  inputBg: "#FFD860",
-  toolbarBg: "#F7F7F7",
-  avatarBg: "#B0B0B0",
-  iconBg: "#E8E8E8",
-  white: "#fff",
-};
 
 export default function ChatScreen() {
   const navigation = useNavigation<ChatScreenNavProp>();
@@ -171,7 +159,7 @@ export default function ChatScreen() {
   );
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header with working back button */}
         <View style={styles.header}>
@@ -260,32 +248,116 @@ export default function ChatScreen() {
 // Your styles remain exactly the same
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: COLORS.header, paddingHorizontal: 12, paddingVertical: 10, borderBottomColor: "#D0D0D0" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: colors.background.yellowBright,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomColor: colors.border.medium
+  },
   backButton: { padding: 4 },
-  headerTitle: { fontSize: 16, fontWeight: "500", color: COLORS.textPrimary, flex: 1, textAlign: "center" },
+  headerTitle: {
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight500,
+    color: colors.text.primary,
+    flex: 1,
+    textAlign: "center"
+  },
   moreButton: { padding: 4 },
   keyboardAvoidingView: { flex: 1 },
   chatList: { paddingHorizontal: 12, paddingVertical: 16 },
   messageRow: { flexDirection: "row", marginVertical: 6, alignItems: "flex-start" },
   messageRowLeft: { justifyContent: "flex-start" },
   messageRowRight: { justifyContent: "flex-end" },
-  avatar: { width: 40, height: 40, borderRadius: 4, backgroundColor: COLORS.avatarBg, justifyContent: "center", alignItems: "center", marginHorizontal: 8 },
-  bubble: { maxWidth: "60%", borderRadius: 4, paddingHorizontal: 12, paddingVertical: 10 },
-  bubbleLeft: { backgroundColor: COLORS.messageBubbleLeft },
-  bubbleRight: { backgroundColor: COLORS.messageBubbleRight },
-  senderName: { fontWeight: "bold", marginBottom: 2, fontSize: 14, color: COLORS.textPrimary },
-  messageText: { fontSize: 16, color: COLORS.textPrimary, lineHeight: 22 },
-  inputSection: { backgroundColor: COLORS.toolbarBg },
-  inputContainer: { flexDirection: "row", alignItems: "center", backgroundColor: COLORS.inputBg, paddingHorizontal: 10, paddingVertical: 12, borderTopColor: "#D0D0D0" },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: borders.radius4,
+    backgroundColor: colors.functional.avatarGray,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 8
+  },
+  bubble: {
+    maxWidth: "60%",
+    borderRadius: borders.radius4,
+    paddingHorizontal: 12,
+    paddingVertical: 10
+  },
+  bubbleLeft: { backgroundColor: colors.background.white },
+  bubbleRight: { backgroundColor: colors.functional.green },
+  senderName: {
+    fontWeight: typography.fontWeightBold,
+    marginBottom: 2,
+    fontSize: typography.fontSize14,
+    color: colors.text.primary
+  },
+  messageText: {
+    fontSize: typography.fontSize16,
+    color: colors.text.primary,
+    lineHeight: typography.lineHeight22
+  },
+  inputSection: { backgroundColor: colors.background.grayLight },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.background.yellowBright,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    borderTopColor: colors.border.medium
+  },
   iconButton: { padding: 8 },
-  recordingButton: { backgroundColor: "#FFE5E5", borderRadius: 20 },
-  input: { flex: 1, minHeight: 36, maxHeight: 100, backgroundColor: COLORS.white, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, fontSize: 16, color: COLORS.textPrimary },
-  recordingIndicator: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: 8, backgroundColor: "#FFE5E5" },
-  recordingDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FF0000", marginRight: 8 },
-  recordingText: { fontSize: 14, color: "#FF0000", fontWeight: "500" },
-  toolbar: { backgroundColor: COLORS.toolbarBg, paddingVertical: 25, paddingHorizontal: 15 },
+  recordingButton: {
+    backgroundColor: colors.background.redLight,
+    borderRadius: borders.radius20
+  },
+  input: {
+    flex: 1,
+    minHeight: 36,
+    maxHeight: 100,
+    backgroundColor: colors.background.whiteAlt,
+    borderRadius: borders.radius10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: typography.fontSize16,
+    color: colors.text.primary
+  },
+  recordingIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    backgroundColor: colors.background.redLight
+  },
+  recordingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: borders.radius4,
+    backgroundColor: colors.functional.red,
+    marginRight: 8
+  },
+  recordingText: {
+    fontSize: typography.fontSize14,
+    color: colors.functional.red,
+    fontWeight: typography.fontWeight500
+  },
+  toolbar: {
+    backgroundColor: colors.background.grayLight,
+    paddingVertical: 25,
+    paddingHorizontal: 15
+  },
   toolbarRow: { flexDirection: "row", justifyContent: "space-around" },
   toolbarButton: { alignItems: "center", width: 70, margin: 10 },
-  toolbarIconContainer: { width: 50, height: 50, borderRadius: 8, backgroundColor: COLORS.iconBg, justifyContent: "center", alignItems: "center", marginBottom: 6 },
-  toolbarLabel: { fontSize: 12, color: COLORS.textPrimary },
+  toolbarIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: borders.radius8,
+    backgroundColor: colors.background.iconBg,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 6
+  },
+  toolbarLabel: { fontSize: typography.fontSize12, color: colors.text.primary },
 });

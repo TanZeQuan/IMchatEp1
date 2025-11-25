@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { LinearGradient } from "expo-linear-gradient";
+import { colors, borders, typography } from "../styles";
 
 const JoinMeetingScreen: React.FC = () => {
   const navigation =
@@ -38,7 +39,7 @@ const JoinMeetingScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
@@ -55,7 +56,7 @@ const JoinMeetingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 placeholder="请输入会议号"
-                placeholderTextColor="#B8B8B8"
+                placeholderTextColor={colors.border.dark}
                 value={meetingId}
                 onChangeText={setMeetingId}
                 keyboardType="number-pad"
@@ -69,7 +70,7 @@ const JoinMeetingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 placeholder="请输入您想显示的名字"
-                placeholderTextColor="#B8B8B8"
+                placeholderTextColor={colors.border.dark}
                 value={displayName}
                 onChangeText={setDisplayName}
               />
@@ -82,9 +83,9 @@ const JoinMeetingScreen: React.FC = () => {
               <Switch
                 value={micEnabled}
                 onValueChange={setMicEnabled}
-                trackColor={{ false: "#D1D1D1", true: "#4CD964" }}
-                thumbColor="#FFFFFF"
-                ios_backgroundColor="#D1D1D1"
+                trackColor={{ false: colors.border.darker, true: colors.functional.greenBright }}
+                thumbColor={colors.background.white}
+                ios_backgroundColor={colors.border.darker}
               />
             </View>
 
@@ -95,9 +96,9 @@ const JoinMeetingScreen: React.FC = () => {
               <Switch
                 value={cameraEnabled}
                 onValueChange={setCameraEnabled}
-                trackColor={{ false: "#D1D1D1", true: "#4CD964" }}
-                thumbColor="#FFFFFF"
-                ios_backgroundColor="#D1D1D1"
+                trackColor={{ false: colors.border.darker, true: colors.functional.greenBright }}
+                thumbColor={colors.background.white}
+                ios_backgroundColor={colors.border.darker}
               />
             </View>
           </View>
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
@@ -138,9 +139,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.blackMedium,
   },
   placeholder: {
     width: 40,
@@ -151,8 +152,8 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   inputSection: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius12,
     overflow: "hidden",
   },
   inputGroup: {
@@ -160,24 +161,24 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   label: {
-    fontSize: 15,
-    color: "#333",
-    fontWeight: "500",
+    fontSize: typography.fontSize15,
+    color: colors.text.blackMedium,
+    fontWeight: typography.fontWeight500,
     marginBottom: 8,
   },
   input: {
-    fontSize: 14,
-    color: "#333",
+    fontSize: typography.fontSize14,
+    color: colors.text.blackMedium,
     paddingVertical: 4,
   },
   divider: {
     height: 1,
-    backgroundColor: "#F0F0F0",
+    backgroundColor: colors.background.gray,
     marginHorizontal: 16,
   },
   switchSection: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius12,
     marginTop: 12,
     overflow: "hidden",
   },
@@ -189,18 +190,18 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   switchLabel: {
-    fontSize: 15,
-    color: "#333",
-    fontWeight: "500",
+    fontSize: typography.fontSize15,
+    color: colors.text.blackMedium,
+    fontWeight: typography.fontWeight500,
   },
   switchDivider: {
     height: 1,
-    backgroundColor: "#F0F0F0",
+    backgroundColor: colors.background.gray,
     marginHorizontal: 16,
   },
   joinButton: {
-    backgroundColor: "#FCD34D",
-    borderRadius: 30,
+    backgroundColor: colors.background.yellowLight,
+    borderRadius: borders.radius30,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -209,9 +210,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   joinButtonText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#333",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight500,
+    color: colors.text.blackMedium,
   },
 });
 

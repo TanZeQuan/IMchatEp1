@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native"; // ✅ import navigation
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack"; // adjust path
+import { colors, borders, typography } from "../styles";
 
 const EditPhoneScreen: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("+6011****00");
@@ -37,7 +38,7 @@ const EditPhoneScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.container}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.container}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
@@ -54,7 +55,7 @@ const EditPhoneScreen: React.FC = () => {
               value={phoneNumber}
               onChangeText={setPhoneNumber}
               placeholder="请输入手机号码"
-              placeholderTextColor="#B8B8B8"
+              placeholderTextColor={colors.border.dark}
               keyboardType="phone-pad"
               editable={true}
             />
@@ -64,7 +65,7 @@ const EditPhoneScreen: React.FC = () => {
                 onPress={handleClearPhone}
                 activeOpacity={0.6}
               >
-                <Ionicons name="close-circle" size={20} color="#999" />
+                <Ionicons name="close-circle" size={20} color={colors.text.lightGray} />
               </TouchableOpacity>
             )}
           </View>
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFD860",
+    backgroundColor: colors.background.yellowBright,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
@@ -109,30 +110,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  headerTitle: { fontSize: 16, fontWeight: "600", color: "#333" },
+  headerTitle: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
   placeholder: { width: 40 },
   content: { paddingHorizontal: 16, paddingTop: 20 },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 30,
+    backgroundColor: colors.background.white,
+    borderRadius: borders.radius30,
     paddingHorizontal: 20,
     height: 52,
     marginBottom: 100,
   },
-  input: { flex: 1, fontSize: 15, color: "#333" },
+  input: { flex: 1, fontSize: typography.fontSize15, color: colors.text.blackMedium },
   clearButton: { padding: 4, marginLeft: 8 },
   actionButton: {
-    backgroundColor: "#FCD34D",
-    borderRadius: 30,
+    backgroundColor: colors.background.yellowLight,
+    borderRadius: borders.radius30,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
     marginHorizontal: 16,
   },
-  actionButtonText: { fontSize: 16, fontWeight: "600", color: "#333" },
+  actionButtonText: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
 });
 
 export default EditPhoneScreen;

@@ -1,5 +1,6 @@
-import colors from "../styles/color";
-import theme from "../styles/theme";
-import typography from "../styles/typography";
+import colors from './colors';
+import borders from './borders';
+import typography from './typography';
+import theme from './theme';
 
-export { colors, typography, theme };
+export { colors, borders, typography, theme };

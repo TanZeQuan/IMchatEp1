@@ -7,6 +7,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
 import { useSettingsStore } from "../store/settingsStore";
 import { LinearGradient } from "expo-linear-gradient";
+import { colors, borders, typography } from "../styles";
 
 
 const COLORS = {
@@ -52,9 +53,9 @@ const SettingItem: React.FC<SettingItemProps> = ({
       )}
       {showSwitch && (
         <Switch
-          trackColor={{ false: "#E5E5E5", true: COLORS.switchActive }}
-          thumbColor="#FFFFFF"
-          ios_backgroundColor="#E5E5E5"
+          trackColor={{ false: colors.border.lightGray, true: colors.functional.greenBright }}
+          thumbColor={colors.background.white}
+          ios_backgroundColor={colors.border.lightGray}
           onValueChange={onSwitchValueChange}
           value={switchValue}
         />
@@ -69,7 +70,7 @@ const SettingScreen: React.FC = () => {
   const { showSendButton, setShowSendButton } = useSettingsStore();
 
   return (
-    <LinearGradient colors={["#FFEFb0", "#FFF9E5"]} style={styles.safeArea}>
+    <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
         {/* Header */}
         <View style={styles.header}>
@@ -138,16 +139,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.header,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    // borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    // borderBottomWidth: borders.width1,
+    borderBottomColor: colors.border.grayLight,
   },
   backButton: {
     padding: 4,
     width: 32,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
     color: COLORS.textPrimary,
     flex: 1,
     textAlign: "center",
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
   },
   settingsGroup: {
     backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
+    borderBottomWidth: borders.width1,
     gap: 1,
     borderColor: COLORS.border,
   },
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   settingTitle: {
-    fontSize: 16,
+    fontSize: typography.fontSize16,
     color: COLORS.textPrimary,
     flex: 1,
   },
