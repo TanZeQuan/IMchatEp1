@@ -87,6 +87,7 @@ const ContactsLayout: React.FC = () => {
   const sections = groupContacts(filteredContacts);
 
   const handleLetterPress = (letter: string) => {
+    console.log('Pressed letter:', letter); // For debugging
     const index = sections.findIndex((s) => s.title === letter);
     if (index !== -1 && sectionListRef.current) {
       sectionListRef.current.scrollToLocation({
@@ -118,9 +119,8 @@ const ContactsLayout: React.FC = () => {
       {/* Moved into SectionList's ListHeaderComponent */}
 
       {/* SectionList */}
-      <View style={styles.contentContainer}>
-        <View style={styles.listContainer}>
-          <SectionList
+      <View style={styles.listContainer}>
+        <SectionList
           ref={sectionListRef}
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
@@ -162,10 +162,10 @@ const ContactsLayout: React.FC = () => {
             </TouchableOpacity>
           )}
         />
-        </View>
+      </View>
 
-        {/* Alphabet Index */}
-        <View style={styles.alphabetIndex}>
+      {/* Alphabet Index */}
+      <View style={styles.alphabetIndex}>
         {alphabet.map((letter) => (
           <TouchableOpacity
             key={letter}
@@ -176,7 +176,6 @@ const ContactsLayout: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
-      </View> {/* Closes styles.contentContainer */}
     </SafeAreaView>
   );
 };
@@ -185,11 +184,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-  },
-
-  contentContainer: {
-    flex: 1,
-    flexDirection: "row", // Arrange children horizontally
   },
 
   /** HEADER */
@@ -257,7 +251,8 @@ const styles = StyleSheet.create({
 
   /** CONTACT LIST */
   listContainer: { 
-    flex: 1, // Take up all available space horizontally except for alphabet index
+    flex: 1, 
+    position: "relative",
     backgroundColor: "#FFFFFF",
   },
 
@@ -298,16 +293,18 @@ const styles = StyleSheet.create({
 
   /** ALPHABET LIST */
   alphabetIndex: {
-    justifyContent: "center", // Center letters vertically
-    paddingVertical: h(10),
-    paddingHorizontal: w(5),
+    position: "absolute",
+    right: w(8),
+    top: h(290),
+    alignItems: "center",
+    zIndex: 1,
   },
   alphabetItem: { 
     paddingVertical: h(2), 
     paddingHorizontal: w(4) 
   },
   alphabetText: {
-    fontSize: f(13),
+    fontSize: f(12),
     color: "#9CA3AF",
     fontWeight: "600",
   },
