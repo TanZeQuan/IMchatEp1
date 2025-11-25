@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
-
+import { Platform } from "react-native";
 import pinyin from "pinyin";
 
 // 导入 responsive
@@ -93,7 +93,7 @@ const ContactsLayout: React.FC = () => {
       sectionListRef.current.scrollToLocation({
         sectionIndex: index,
         itemIndex: 0,
-        animated: true,
+        animated: Platform.OS === "android"
       });
     }
   };
