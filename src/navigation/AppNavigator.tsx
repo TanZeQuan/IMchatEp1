@@ -7,6 +7,8 @@ import MainStack from './MainStack';
 const AppNavigator = () => {
   const { userToken } = useUserStore();
 
+  console.log("AppNavigator - 当前 userToken:", userToken);
+
   return (
     <NavigationContainer>
       {userToken ? <MainStack /> : <AuthStack />}

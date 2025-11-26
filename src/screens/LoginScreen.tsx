@@ -42,16 +42,23 @@ const LoginScreen = () => {
     setIsLoading(true);
     try {
       const res = await login({ phone, password });
+      console.log("后端返回数据:", res);
 
-      if (!res || res.status !== "success") {
+      // 后端返回格式: { error: false, message: "Success", response: "IM65056417" }
+      if (!res || res.error !== false) {
         throw new Error(res?.message || "登录失败");
       }
 
-      // 登录成功，设置 token
-      setUserToken(res.token);
+      // 登录成功，使用后端返回的用户ID作为临时 token
+      // 等后端实现真正的 token 后再改为 res.token
+      const tempToken = res.token || res.response || phone;
+      console.log("设置 token:", tempToken);
+      setUserToken(tempToken);
 
+      console.log("Token 已设置，应该会自动跳转");
       Alert.alert("成功", "登录成功！");
     } catch (err: any) {
+      console.error("登录错误:", err);
       Alert.alert("登录失败", err?.message || "服务器错误");
     } finally {
       setIsLoading(false);

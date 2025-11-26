@@ -4,7 +4,7 @@ const colors = {
     white: '#FFFFFF',
     whiteAlt: '#fff',
     gradientYellow: ['#FFEFB0', '#FFF9E5'] as const,
-    gradientWhite: ['#FDFDFD', '#EAEAEA'] as const,
+    gradientWhite: ['#FDFDFD', '#ffd285ff'] as const,
     yellow: '#F4D03F',
     yellowBright: '#FFD860',
     yellowLight: '#FCD34D',
