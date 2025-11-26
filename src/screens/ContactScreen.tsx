@@ -55,6 +55,7 @@ const ContactsLayout: React.FC = () => {
 
   const AddFriend = () => navigation.navigate("AddFriend");
   const FriendReq = () => navigation.navigate("FriendReq");
+  const AddGroupNav = () => navigation.navigate("AddGroup");
 
   const [searchText, setSearchText] = React.useState("");
 
@@ -127,7 +128,7 @@ const ContactsLayout: React.FC = () => {
           keyExtractor={(item) => item.id.toString()}
           ListHeaderComponent={
             <View style={styles.actionButtons}>
-              <TouchableOpacity style={styles.actionButton}>
+              <TouchableOpacity style={styles.actionButton} onPress={AddGroupNav}>
                 <View style={styles.actionIcon}>
                   <Ionicons name="chatbubbles" size={f(18)} color="#666" />
                 </View>

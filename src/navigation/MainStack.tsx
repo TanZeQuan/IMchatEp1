@@ -18,6 +18,7 @@ import UserDetail from "../screens/UserDetail";
 import ChatHistory from "../screens/ChatHistory";
 import MyQRCode from "../screens/QRScreen";
 import ScanQRCode from "../screens/QRScreen2";
+import AddGroup from "../screens/AddGroup";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -40,6 +41,7 @@ export type MainStackParamList = {
   UserDetail: { userId: string };
   MyQRCode: undefined;
   ScanQRCode: undefined;
+  AddGroup: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -138,6 +140,11 @@ export default function MainStack() {
       <Stack.Screen
         name="ScanQRCode"
         component={ScanQRCode}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddGroup"
+        component={AddGroup}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

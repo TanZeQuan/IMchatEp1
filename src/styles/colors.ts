@@ -67,6 +67,7 @@ const colors = {
     blueLight: '#3B82F6',
     green: '#95EC69',
     greenBright: '#4CD964',
+    greenSuccess:'#4BB543',
     red: '#FF0000',
     redMedium: '#EF4444',
     redLight: '#FCA5A5',
