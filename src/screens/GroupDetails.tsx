@@ -173,14 +173,21 @@ export default function GroupScreenDetails() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>群信息</Text>
           <View style={styles.card}>
-            <ListItem label="群名称" value="越狱的猫" icon="people" />
+            <TouchableOpacity onPress={() => navigation.navigate('EditGroupName')}>
+              <ListItem label="群名称" value="越狱的猫" icon="people" />
+            </TouchableOpacity>
             <ListItem label="群二维码" type="arrow" icon="qr-code-outline" />
-            <ListItem
-              label="群公告"
-              value="暂无公告"
-              icon="megaphone-outline"
-            />
-            <ListItem label="群名片" isLast={true} icon="card-outline" />
+            <TouchableOpacity onPress={() => navigation.navigate('GroupAnnouncement')}>
+              <ListItem
+                label="群公告"
+                value="暂无公告"
+                icon="megaphone-outline"
+              />
+            </TouchableOpacity>
+            <ListItem label="群名片" icon="card-outline" />
+            <TouchableOpacity onPress={() => navigation.navigate('EditMyGroupName')}>
+              <ListItem label="我的群昵称" isLast={true} icon="person-circle-outline" />
+            </TouchableOpacity>
           </View>
         </View>
 

@@ -21,6 +21,9 @@ import ScanQRCode from "../screens/QRScreen2";
 import AddGroup from "../screens/AddGroup";
 import GroupScreen from "../screens/GroupScreen";
 import GroupScreenDetails from "../screens/GroupDetails";
+import EditGroupName from "../screens/EditGroupName";
+import GroupAnnouncement from "../screens/GroupAnnouncement";
+import EditMyGroupName from "../screens/EditMyGroupName";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -46,6 +49,9 @@ export type MainStackParamList = {
   AddGroup: undefined;
   GroupScreen: { groupName?: string; groupId?: string };
   GroupScreenDetails: undefined;
+  EditGroupName: undefined;
+  GroupAnnouncement: undefined;
+  EditMyGroupName: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -162,6 +168,21 @@ export default function MainStack() {
       <Stack.Screen
         name="GroupScreenDetails"
         component={GroupScreenDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditGroupName"
+        component={EditGroupName}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="GroupAnnouncement"
+        component={GroupAnnouncement}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditMyGroupName"
+        component={EditMyGroupName}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
