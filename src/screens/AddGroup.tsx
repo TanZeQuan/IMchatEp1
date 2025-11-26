@@ -153,8 +153,23 @@ export default function AddGroup() {
             <TouchableOpacity
               style={styles.createButton}
               onPress={() => {
-                console.log("选择:", selectedFriends);
-                navigation.goBack();
+                // 获取选中好友的名字
+                const selectedNames = contactsData
+                  .filter((contact) => selectedFriends.includes(contact.id))
+                  .map((contact) => contact.name)
+                  .slice(0, 3)
+                  .join("、");
+
+                // 生成群聊名称
+                const groupName = selectedNames + (selectedFriends.length > 3 ? "..." : "");
+
+                console.log("创建群聊，选择的好友:", selectedFriends);
+
+                // 导航到 GroupScreen
+                navigation.navigate("GroupScreen", {
+                  groupName: groupName,
+                  groupId: Date.now().toString(),
+                });
               }}
             >
               <Text style={styles.createButtonText}>发起群聊</Text>

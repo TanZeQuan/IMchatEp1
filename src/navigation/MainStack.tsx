@@ -14,11 +14,13 @@ import EditPhone from "../screens/EditPhone";
 import ResetEmail from "../screens/ResetEmail";
 import AddFriend from "../screens/AddFriend";
 import FriendReq from "../screens/FriendReq";
-import UserDetail from "../screens/UserDetail";
+import UserDetail from "../screens/ChatDetail";
 import ChatHistory from "../screens/ChatHistory";
 import MyQRCode from "../screens/QRScreen";
 import ScanQRCode from "../screens/QRScreen2";
 import AddGroup from "../screens/AddGroup";
+import GroupScreen from "../screens/GroupScreen";
+import GroupScreenDetails from "../screens/GroupDetails";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -42,6 +44,8 @@ export type MainStackParamList = {
   MyQRCode: undefined;
   ScanQRCode: undefined;
   AddGroup: undefined;
+  GroupScreen: { groupName?: string; groupId?: string };
+  GroupScreenDetails: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -145,6 +149,19 @@ export default function MainStack() {
       <Stack.Screen
         name="AddGroup"
         component={AddGroup}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="GroupScreen"
+        component={GroupScreen}
+        options={({ route }) => ({
+          headerShown: false,
+          title: route.params?.groupName || "群聊",
+        })}
+      />
+      <Stack.Screen
+        name="GroupScreenDetails"
+        component={GroupScreenDetails}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
