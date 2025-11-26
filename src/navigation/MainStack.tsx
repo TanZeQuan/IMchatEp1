@@ -14,7 +14,7 @@ import EditPhone from "../screens/EditPhone";
 import ResetEmail from "../screens/ResetEmail";
 import AddFriend from "../screens/AddFriend";
 import FriendReq from "../screens/FriendReq";
-import UserDetail from "../screens/ChatDetail";
+import UserDetail from "../screens/ChatUserDetail";
 import ChatHistory from "../screens/ChatHistory";
 import MyQRCode from "../screens/QRScreen";
 import ScanQRCode from "../screens/QRScreen2";
