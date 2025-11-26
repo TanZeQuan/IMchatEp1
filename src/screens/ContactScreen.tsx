@@ -135,7 +135,7 @@ const ContactsLayout: React.FC = () => {
                 <Text style={styles.actionLabel}>发起群聊</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.actionButton}>
+              <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('JoinGroup')}>
                 <View style={styles.actionIcon}>
                   <Ionicons name="people" size={f(18)} color="#666" />
                 </View>
