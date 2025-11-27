@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SectionList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,14 +16,18 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { Platform } from "react-native";
 import pinyin from "pinyin";
+import { getFriendRequests } from "../api/FriendReq";
+import { useUserStore } from "../store/userStore";
 
 // 导入 responsive 和样式配置
 import { scaleWidth as w, scaleHeight as h, scaleFont as f } from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
 
 interface Contact {
-  id: number;
+  id: string;
   name: string;
+  userId: string;
+  image?: string;
 }
 
 interface Section {
@@ -30,37 +35,68 @@ interface Section {
   data: Contact[];
 }
 
-const contactsData: Contact[] = [
-  { id: 1, name: "Alice" },
-  { id: 2, name: "Anna" },
-  { id: 3, name: "张三" },
-  { id: 4, name: "李四" },
-  { id: 5, name: "Bob" },
-  { id: 6, name: "王五" },
-  { id: 7, name: "😊A" },
-  { id: 8, name: "Anna" },
-  { id: 9, name: "Celine" },
-  { id: 10, name: "Zack" },
-  { id: 11, name: "David" },
-  { id: 12, name: "Eve" },
-  { id: 13, name: "陈六" },
-  { id: 14, name: "Frank" },
-  { id: 15, name: "🌟Star" },
-];
-
 const alphabet: string[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#".split("");
 
 const ContactsLayout: React.FC = () => {
+  const { userToken } = useUserStore();
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
-  const AddFriend = () => navigation.navigate("AddFriend");
-  const FriendReq = () => navigation.navigate("FriendReq");
-  const AddGroupNav = () => navigation.navigate("AddGroup");
-
-  const [searchText, setSearchText] = React.useState("");
+  const [searchText, setSearchText] = useState("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const sectionListRef = React.useRef<SectionList>(null);
+
+  // Fetch friends on component mount
+  useEffect(() => {
+    if (userToken) {
+      fetchFriends();
+    }
+  }, [userToken]);
+
+  const fetchFriends = async () => {
+    if (!userToken) return;
+
+    try {
+      setIsLoading(true);
+      const response = await getFriendRequests(userToken, 2); // Get accepted friends (status=2)
+
+      if (response && !response.error && response.response) {
+        const requestFriends = response.response.request || [];
+        const approveFriends = response.response.approve || [];
+
+        // Merge both arrays and create Contact objects
+        const allFriends: Contact[] = [];
+
+        // Friends where I sent the request
+        requestFriends.forEach((friend: any) => {
+          allFriends.push({
+            id: friend.list_id || friend.approve_id,
+            name: friend.name || friend.approve_id || "未知用户",
+            userId: friend.approve_id,
+            image: friend.image,
+          });
+        });
+
+        // Friends where I received the request
+        approveFriends.forEach((friend: any) => {
+          allFriends.push({
+            id: friend.list_id || friend.request_id,
+            name: friend.name || friend.request_id || "未知用户",
+            userId: friend.request_id,
+            image: friend.image,
+          });
+        });
+
+        setContacts(allFriends);
+      }
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const groupContacts = (contacts: Contact[]): Section[] => {
     const grouped: Record<string, Contact[]> = {};
@@ -83,8 +119,9 @@ const ContactsLayout: React.FC = () => {
       .map((key) => ({ title: key, data: grouped[key] }));
   };
 
-  const filteredContacts = contactsData.filter((c) =>
-    c.name.toLowerCase().startsWith(searchText.toLowerCase())
+  const filteredContacts = contacts.filter((c) =>
+    c.name.toLowerCase().includes(searchText.toLowerCase()) ||
+    c.userId.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const sections = groupContacts(filteredContacts);
@@ -100,6 +137,19 @@ const ContactsLayout: React.FC = () => {
       });
     }
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>通讯录</Text>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.text.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -132,9 +182,16 @@ const ContactsLayout: React.FC = () => {
           ref={sectionListRef}
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
+          ListEmptyComponent={
+            !isLoading && (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>暂时无好友，快添加好友吧！</Text>
+              </View>
+            )
+          }
           ListHeaderComponent={
             <View style={styles.actionButtons}>
-              <TouchableOpacity style={styles.actionButton} onPress={AddGroupNav}>
+              <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("AddGroup")}>
                 <View style={styles.actionIcon}>
                   <Ionicons name="chatbubbles" size={f(18)} color="#666" />
                 </View>
@@ -148,7 +205,7 @@ const ContactsLayout: React.FC = () => {
                 <Text style={styles.actionLabel}>加入群聊</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.actionButton} onPress={AddFriend}>
+              <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("AddFriend")}>
                 <View style={styles.actionIcon}>
                   <Ionicons name="person-add" size={f(18)} color="#666" />
                 </View>
@@ -165,11 +222,14 @@ const ContactsLayout: React.FC = () => {
             <TouchableOpacity style={styles.contactItem}>
               <View style={styles.avatar}>
                 <Image
-                  source={{ uri: "https://postimg.cc/34y84VvN" }}
+                  source={{ uri: item.image || "https://postimg.cc/34y84VvN" }}
                   style={styles.avatarImage}
                 />
               </View>
-              <Text style={styles.contactName}>{item.name}</Text>
+              <View style={styles.contactInfo}>
+                <Text style={styles.contactName}>{item.name}</Text>
+                <Text style={styles.contactUserId}>ID: {item.userId}</Text>
+              </View>
             </TouchableOpacity>
           )}
         />
@@ -195,6 +255,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.white,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: h(60),
+  },
+  emptyText: {
+    fontSize: f(typography.fontSize14),
+    color: colors.text.grayLight,
+    textAlign: 'center',
   },
 
   /** HEADER */
@@ -301,10 +379,19 @@ const styles = StyleSheet.create({
     width: w(42),
     height: h(42),
   },
+  contactInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
   contactName: {
     fontSize: f(typography.fontSize16),
     color: colors.text.darker,
     fontWeight: typography.fontWeight500,
+    marginBottom: h(2),
+  },
+  contactUserId: {
+    fontSize: f(typography.fontSize12),
+    color: colors.text.grayLight,
   },
 
   /** ALPHABET LIST */

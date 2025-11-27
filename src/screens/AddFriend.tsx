@@ -87,7 +87,7 @@ const AddFriend: React.FC = () => {
         setFoundUser({
           user_id: user.user_id,
           name: user.name,
-          avatar: user.image || `https://i.postimg.cc/34y84VvN/default-avatar.jpg`, // Use user.image or fallback to the new default avatar
+          avatar: user.image || "https://postimg.cc/34y84VvN",
           phone: user.phone,
           image: user.image, // Store the image URL if available
         });
