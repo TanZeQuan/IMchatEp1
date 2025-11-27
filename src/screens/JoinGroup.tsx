@@ -109,6 +109,11 @@ const JoinGroupScreen: React.FC = () => {
               onChangeText={setSearchId}
               returnKeyType="search"
             />
+            {searchId.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchId("")}>
+                <Ionicons name="close-circle" size={20} color={colors.text.grayLight} />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

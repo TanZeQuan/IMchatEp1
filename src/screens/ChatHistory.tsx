@@ -145,6 +145,11 @@ const SearchFilterScreen: React.FC = () => {
             value={searchText}
             onChangeText={setSearchText}
           />
+          {searchText.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchText("")}>
+              <Ionicons name="close-circle" size={20} color={colors.text.grayLight} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
