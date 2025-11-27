@@ -15,8 +15,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { useUserStore } from "../store/userStore";
+import Storage from '../store/userStorage';
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
 import { AuthStackParamList } from "../navigation/AuthStack";
@@ -24,9 +25,8 @@ import { login } from "../api/UserApi";
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
-const LoginScreen = () => {
+const LoginScreen = ({ setUserToken }: { setUserToken: (token: string) => void }) => {
   const navigation = useNavigation<NavigationProp>();
-  const { setUserToken } = useUserStore();
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -37,31 +37,42 @@ const LoginScreen = () => {
   // ---------------- LOGIN FUNCTION ----------------
   // 登录函数示例
   const handleLogin = async () => {
-    if (!phone || !password) return Alert.alert("错误", "请输入手机号和密码");
+    if (!phone || !password) return;
 
-    setIsLoading(true);
     try {
       const res = await login({ phone, password });
       console.log("后端返回数据:", res);
 
-      // 后端返回格式: { error: false, message: "Success", response: "IM65056417" }
-      if (!res || res.error !== false) {
-        throw new Error(res?.message || "登录失败");
-      }
+      if (!res || res.error) throw new Error(res?.message || "登录失败");
 
-      // 登录成功，使用后端返回的用户ID作为临时 token
-      // 等后端实现真正的 token 后再改为 res.token
-      const tempToken = res.token || res.response || phone;
-      console.log("设置 token:", tempToken);
-      setUserToken(tempToken);
+      const userId = res.response;
+      const token = res.token || userId;
 
-      console.log("Token 已设置，应该会自动跳转");
-      Alert.alert("成功", "登录成功！");
+      // Save current user info
+      await AsyncStorage.multiSet([
+        ["userId", userId],
+        ["userToken", token],
+      ]);
+
+      // Read saved info (from registration or previous login)
+      const userName = await AsyncStorage.getItem(`userName_${userId}`);
+      const userEmail = await AsyncStorage.getItem(`userEmail_${userId}`);
+      const userPhone = await AsyncStorage.getItem(`userPhone_${userId}`);
+      const userAvatar = await AsyncStorage.getItem(`userAvatar_${userId}`);
+
+      console.log("当前用户信息:", {
+        userId,
+        userName,
+        userEmail,
+        userPhone,
+        userAvatar,
+        token,
+      });
+
+      setUserToken(token); // update Zustand / state
     } catch (err: any) {
       console.error("登录错误:", err);
       Alert.alert("登录失败", err?.message || "服务器错误");
-    } finally {
-      setIsLoading(false);
     }
   };
 

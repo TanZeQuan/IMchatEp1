@@ -7,6 +7,7 @@ const BASE_URL = "https://prelabial-lustrously-michaela.ngrok-free.dev/api"; // 
 export interface RegisterPayload {
   name: string;     // 昵称
   phone: string;    // 手机号
+  email: string;    // 邮箱
   password: string; // 密码
 }
 
@@ -58,6 +59,7 @@ export const register = async (payload: RegisterPayload) => {
       JSON.stringify({
         phone: payload.phone,
         passcode: payload.password, // 后端叫 passcode
+        email: payload.email,
         roles: "user",
         status: 1,
         name: payload.name,
@@ -174,45 +176,44 @@ export const changeEmail = async (payload: ChangeEmailPayload) => {
   }
 };
 
-export const updateProfile = async (payload: UpdateProfilePayload) => {
+export const updateProfile = async (payload: any) => {
   try {
     const formData = new FormData();
 
     formData.append(
-      'data',
+      "data",
       JSON.stringify({
         user_id: payload.user_id,
-        name: payload.name,
-        about: payload.about,
+        name: payload.name || "",
+        about: payload.about || "",
       })
     );
 
     if (payload.image) {
-      formData.append('image', {
+      formData.append("image", {
         uri: payload.image.uri,
-        name: payload.image.name || 'avatar.jpg',
-        type: payload.image.type || 'image/jpeg',
+        name: payload.image.name || "avatar.jpg",
+        type: payload.image.type || "image/jpeg",
       } as any);
     }
 
-    const res = await fetch('https://your-api.com/api/users/info/update', {
-      method: 'POST',
-      headers: {
-        // 如果后端需要 token：
-        // Authorization: `Bearer ${token}`,
-        // 注意不要手动设置 Content-Type
-      },
-      body: formData,
-    });
+    const res = await fetch(
+      "https://prelabial-lustrously-michaela.ngrok-free.dev/api/users/info/update",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || '更新失败');
-    }
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || "更新失败");
 
-    return await res.json();
+    return json;
   } catch (error) {
-    console.error('Update profile error:', error);
+    console.error("Update profile error:", error);
     throw error;
   }
 };
+
+
+

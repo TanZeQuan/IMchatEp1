@@ -1,20 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { updateProfile } from '../api/UserApi';
-import { MainStackParamList } from "../navigation/MainStack"; // adjust path
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MainStackParamList } from "../navigation/MainStack";
 import { colors, borders, typography } from "../styles";
 
 interface ProfileItemProps {
@@ -32,7 +30,11 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
   showArrow = true,
   imageUri,
 }) => (
-  <TouchableOpacity style={styles.item} onPress={onPress}>
+  <TouchableOpacity
+    style={styles.item}
+    onPress={onPress}
+    activeOpacity={onPress ? 0.7 : 1}
+  >
     <Text style={styles.label}>{label}</Text>
     <View style={styles.valueContainer}>
       {label === "头像" ? (
@@ -46,70 +48,63 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
             style={styles.avatarImage}
           />
         </View>
-      ) : label === "QR" ? (
-        <Ionicons
-          name="qr-code-outline"
-          size={24}
-          color={colors.text.darkGray}
-          style={styles.qrIcon}
-        />
       ) : (
         <Text style={styles.value}>{value}</Text>
       )}
-      {showArrow && <Ionicons name="chevron-forward" size={20} color={colors.text.lightGray} />}
+      {showArrow && onPress && (
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={colors.text.lightGray}
+        />
+      )}
     </View>
   </TouchableOpacity>
 );
 
 const ProfileScreen: React.FC = () => {
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [nickname, setNickname] = useState<string>("未命名用户");
+  const [phone, setPhone] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
+
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
-  const handlePickAvatar = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert('权限被拒绝', '需要访问相册权限以更换头像');
-      return;
-    }
+  useEffect(() => {
+    const loadUserData = async () => {
+      const currentUserId = await AsyncStorage.getItem("userId");
+      if (!currentUserId) return;
+      setUserId(currentUserId);
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
+      const storedName = await AsyncStorage.getItem(`userName_${currentUserId}`);
+      setNickname(storedName || "未命名用户");
 
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setAvatarUri(uri); // 本地显示
+      const storedPhone = await AsyncStorage.getItem(`userPhone_${currentUserId}`);
+      setPhone(storedPhone || "");
 
-      try {
-        const response = await updateProfile({
-          user_id: '12345678', // 替换为实际用户ID
-          image: { uri, name: 'avatar.jpg', type: 'image/jpeg' },
-        });
-        console.log('上传成功', response);
-        Alert.alert('成功', '头像已更新');
-      } catch (err) {
-        console.error(err);
-        Alert.alert('失败', '头像上传失败');
-      }
-    }
-  };
+      const storedAvatar = await AsyncStorage.getItem(`userAvatar_${currentUserId}`);
+      setAvatarUri(storedAvatar || null);
+    };
+
+    loadUserData();
+  }, []);
 
   return (
-    <LinearGradient colors={colors.background.gradientYellow} style={styles.container}>
+    <LinearGradient
+      colors={colors.background.gradientYellow}
+      style={styles.container}
+    >
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.goBack()} // Go back
+            onPress={() => navigation.goBack()}
           >
             <Ionicons name="chevron-back" size={24} color="#333" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>主页</Text>
+          <Text style={styles.headerTitle}>个人资料</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -118,25 +113,20 @@ const ProfileScreen: React.FC = () => {
           <ProfileItem
             label="头像"
             value=""
-            onPress={handlePickAvatar}
             imageUri={avatarUri}
+            showArrow={false} // no arrow, no edit
           />
           <ProfileItem
             label="名字"
-            value="Mym"
-            onPress={() => navigation.navigate("EditName")} // navigate to EditName screen
+            value={nickname}
+            onPress={() => navigation.navigate("EditName")}
           />
           <ProfileItem
             label="手机号码"
-            value="+6011****1QQ"
-            onPress={() => navigation.navigate("EditPhone")} // navigate to EditPhone screen
+            value={phone}
+            showArrow={false} // read-only
           />
-          <ProfileItem label="账号ID" value="123456" showArrow={false} />
-          <ProfileItem
-            label="QR"
-            value=""
-          // onPress={() => navigation.navigate('QRScreen')} // navigate to QR screen
-          />
+          <ProfileItem label="账号ID" value={userId} showArrow={false} />
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -144,10 +134,7 @@ const ProfileScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // backgroundColor: "#F5E6B3"
-  },
+  container: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -157,7 +144,11 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   backButton: { width: 40 },
-  headerTitle: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
+  headerTitle: {
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight600,
+    color: colors.text.blackMedium,
+  },
   placeholder: { width: 40 },
   content: { backgroundColor: colors.background.white },
   item: {
@@ -181,7 +172,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.veryLightGray,
   },
   avatarImage: { width: "100%", height: "100%" },
-  qrIcon: { marginRight: 8 },
 });
 
 export default ProfileScreen;

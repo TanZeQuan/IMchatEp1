@@ -1,10 +1,9 @@
-// src/navigation/MainTab.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Image } from 'react-native'; // ✅ 导入 Image
 import MessageScreen from '../screens/MessageScreen';
 import ContactScreen from '../screens/ContactScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import { Image } from 'react-native';
 
 const messageIcon = require('../../assets/images/chat.png'); 
 const contactIcon = require('../../assets/images/contact.png');
@@ -12,7 +11,11 @@ const profileIcon = require('../../assets/images/user.png');
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTab() {
+interface Props {
+  setUserToken: (token: string | null) => void;
+}
+
+export default function MainTab({ setUserToken }: Props) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -38,15 +41,7 @@ export default function MainTab() {
         component={MessageScreen}
         options={{
           tabBarLabel: '消息',
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={messageIcon}
-              style={{
-                width: 30,
-                height: 30,
-              }}
-            />
-          ),
+          tabBarIcon: () => <Image source={messageIcon} style={{ width: 30, height: 30 }} />,
         }}
       />
       <Tab.Screen
@@ -54,33 +49,18 @@ export default function MainTab() {
         component={ContactScreen}
         options={{
           tabBarLabel: '通讯录',
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={contactIcon}
-              style={{
-                width: 30,
-                height: 30,
-              }}
-            />
-          ),
+          tabBarIcon: () => <Image source={contactIcon} style={{ width: 30, height: 30 }} />,
         }}
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
         options={{
           tabBarLabel: '我的',
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={profileIcon}
-              style={{
-                width: 30,
-                height: 30,
-              }}
-            />
-          ),
+          tabBarIcon: () => <Image source={profileIcon} style={{ width: 30, height: 30 }} />,
         }}
-      />
+      >
+        {() => <ProfileScreen setUserToken={setUserToken} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }

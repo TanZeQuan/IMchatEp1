@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { register } from "../api/UserApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
@@ -52,43 +53,43 @@ const RegisterScreen = () => {
   };
 
   const handleRegister = async () => {
-    if (!isChecked) {
-      Alert.alert("提示", "请先阅读并同意隐私政策和服务协议");
-      return;
-    }
-    if (!nickname || !phone || !email || !password || !confirmPassword) {
-      Alert.alert("错误", "请填写所有必填项");
-      return;
-    }
-    if (!validateEmail(email)) {
-      Alert.alert("错误", "请输入有效的邮箱地址");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert("错误", "两次输入的密码不一致");
-      return;
-    }
+    if (!nickname || !phone || !email || !password || !confirmPassword) return;
 
-    setIsLoading(true);
     try {
-      const payload: RegisterPayload = {
-        name: nickname,
+      const res = await register({ name: nickname, phone, email, password });
+      console.log("Register success:", res);
+
+      if (res.error) throw new Error(res.message || "注册失败");
+
+      const userId = res.response; // backend userId
+      const token = res.token || userId; // optional token
+
+      // ✅ Save all info keyed by backend userId
+      await AsyncStorage.multiSet([
+        ["userId", userId], // current logged-in user
+        ["userToken", token],
+        [`userName_${userId}`, nickname],
+        [`userEmail_${userId}`, email],
+        [`userPhone_${userId}`, phone],
+        [`userAvatar_${userId}`, ""], // optional empty
+      ]);
+
+      console.log("用户信息已存储到 AsyncStorage:", {
+        userId,
+        nickname,
         phone,
         email,
-        password,
-      };
-      const response = await register(payload);
-      console.log("Register success:", response);
+      });
+
       Alert.alert("成功", "注册成功！", [
         { text: "OK", onPress: () => navigation.navigate("Login") },
       ]);
-    } catch (error: any) {
-      console.error("Register error:", error);
-      Alert.alert("错误", error?.message || "注册失败");
-    } finally {
-      setIsLoading(false);
+    } catch (err: any) {
+      console.error("Register error:", err);
+      Alert.alert("错误", err?.message || "注册失败");
     }
   };
+
 
   const isButtonDisabled =
     isLoading ||

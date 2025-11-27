@@ -10,7 +10,6 @@ import CreateMeeting from "../screens/CreateMeeting";
 import JoinMeeting from "../screens/JoinMeeting";
 import MeetingScreen from "../screens/MeetingScreen";
 import EditName from "../screens/EditName";
-import EditPhone from "../screens/EditPhone";
 import ResetEmail from "../screens/ResetEmail";
 import AddFriend from "../screens/AddFriend";
 import FriendReq from "../screens/FriendReq";
@@ -36,7 +35,6 @@ export type MainStackParamList = {
   JoinMeeting: undefined;
   MeetingScreen: undefined;
   EditName: undefined;
-  EditPhone: undefined;
   QRScan: undefined;
   ResetEmail: undefined;
   AddFriend: undefined;
@@ -56,20 +54,22 @@ export type MainStackParamList = {
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
-export default function MainStack() {
+interface Props {
+  setUserToken: (token: string | null) => void;
+}
+
+export default function MainStack({ setUserToken }: Props) {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Home"
-        component={MainTab}
-        options={{ headerShown: false }}
-      />
+    <Stack.Navigator >
+      <Stack.Screen name="Home" options={{ headerShown: false }}>
+        {() => <MainTab setUserToken={setUserToken} />}
+      </Stack.Screen>
       <Stack.Screen
         name="Chat"
         component={ChatScreen}
         options={({ route }) => ({
           headerShown: false,
-          title: route.params?.chatName || "Chat",
+          title: route.params?.chatName || 'Chat',
         })}
       />
       <Stack.Screen
@@ -110,11 +110,6 @@ export default function MainStack() {
       <Stack.Screen
         name="EditName"
         component={EditName}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EditPhone"
-        component={EditPhone}
         options={{ headerShown: false }}
       />
       <Stack.Screen
