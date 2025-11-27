@@ -195,7 +195,9 @@ export default function GroupScreenDetails() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>聊天管理</Text>
           <View style={styles.card}>
-            <ListItem label="查找聊天记录" icon="search-outline" />
+            <TouchableOpacity onPress={() => navigation.navigate('GroupHistory', { groupName: '越狱的猫', groupId: '1' })}>
+              <ListItem label="查找聊天记录" icon="search-outline" />
+            </TouchableOpacity>
             <ListItem label="聊天设置" isLast={true} icon="settings-outline" />
           </View>
         </View>
