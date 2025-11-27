@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, NavigationProp, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -116,7 +116,10 @@ const ProfileSettingsScreen: React.FC = () => {
         {/* Profile Section */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Ionicons name="person" size={48} color="#4B5563" />
+            <Image
+              source={{ uri: "https://postimg.cc/34y84VvN" }}
+              style={styles.avatarImage}
+            />
           </View>
           <Text style={styles.profileName}>{profileName}</Text>
         </View>
@@ -197,6 +200,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
   },
   profileName: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight500, color: colors.text.dark },
   section: { marginTop: 16, marginHorizontal: 16 },

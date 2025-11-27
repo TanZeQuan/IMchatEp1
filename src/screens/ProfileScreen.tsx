@@ -106,7 +106,10 @@ const ProfileMenu: React.FC = () => {
                   <Image source={{ uri: avatarUri }} style={styles.avatar} />
                 ) : (
                   <View style={styles.avatarPlaceholder}>
-                    <Ionicons name="person" size={responsive.f(32)} color={colors.text.white} />
+                    <Image
+                      source={{ uri: "https://postimg.cc/34y84VvN" }}
+                      style={styles.defaultAvatarImage}
+                    />
                   </View>
                 )}
               </TouchableOpacity>
@@ -169,7 +172,8 @@ const styles = StyleSheet.create({
   profileLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   avatarContainer: { width: responsive.w(56), height: responsive.w(56), borderRadius: responsive.w(16), overflow: 'hidden' },
   avatar: { width: responsive.w(56), height: responsive.w(56), borderRadius: responsive.w(16) },
-  avatarPlaceholder: { width: responsive.w(56), height: responsive.w(56), backgroundColor: colors.text.dark, borderRadius: responsive.w(16), justifyContent: 'center', alignItems: 'center' },
+  avatarPlaceholder: { width: responsive.w(56), height: responsive.w(56), backgroundColor: colors.text.dark, borderRadius: responsive.w(16), justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
+  defaultAvatarImage: { width: responsive.w(56), height: responsive.w(56) },
   profileInfo: { marginLeft: responsive.w(12), flex: 1 },
   profileName: { fontSize: responsive.f(18), fontWeight: typography.fontWeight600, color: colors.text.dark, marginBottom: responsive.h(2) },
   profileId: { fontSize: responsive.f(13), color: colors.text.gray },

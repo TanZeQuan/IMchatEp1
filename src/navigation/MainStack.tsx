@@ -26,6 +26,7 @@ import GroupAnnouncement from "../screens/GroupAnnouncement";
 import EditMyGroupName from "../screens/EditMyGroupName";
 import JoinGroup from "../screens/JoinGroup";
 import GroupHistory from "../screens/GroupHistory";
+import GroupMemberList from "../screens/GroupMemberList";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -56,6 +57,7 @@ export type MainStackParamList = {
   EditMyGroupName: undefined;
   JoinGroup: undefined;
   GroupHistory: { groupName: string; groupId: string };
+  GroupMemberList: { groupId: string };
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -197,6 +199,11 @@ export default function MainStack() {
       <Stack.Screen
         name="GroupHistory"
         component={GroupHistory}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="GroupMemberList"
+        component={GroupMemberList}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

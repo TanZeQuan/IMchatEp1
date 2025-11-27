@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -186,7 +187,10 @@ export default function ChatScreen() {
     >
       {item.sender === "other" && (
         <View style={styles.avatar}>
-          <Ionicons name="person" size={20} color="#666" />
+          <Image
+            source={{ uri: "https://postimg.cc/34y84VvN" }}
+            style={styles.avatarImage}
+          />
         </View>
       )}
       <View
@@ -204,7 +208,10 @@ export default function ChatScreen() {
       </View>
       {item.sender === "me" && (
         <View style={styles.avatar}>
-          <Ionicons name="person" size={20} color="#666" />
+          <Image
+            source={{ uri: "https://postimg.cc/34y84VvN" }}
+            style={styles.avatarImage}
+          />
         </View>
       )}
     </View>
@@ -431,6 +438,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 8,
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: 40,
+    height: 40,
   },
   bubble: {
     maxWidth: "60%",

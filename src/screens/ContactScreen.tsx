@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SectionList,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -163,7 +164,10 @@ const ContactsLayout: React.FC = () => {
           renderItem={({ item, index }) => (
             <TouchableOpacity style={styles.contactItem}>
               <View style={styles.avatar}>
-                <Ionicons name="person" size={f(16)} color="#fff" />
+                <Image
+                  source={{ uri: "https://postimg.cc/34y84VvN" }}
+                  style={styles.avatarImage}
+                />
               </View>
               <Text style={styles.contactName}>{item.name}</Text>
             </TouchableOpacity>
@@ -291,6 +295,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: w(14),
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: w(42),
+    height: h(42),
   },
   contactName: {
     fontSize: f(typography.fontSize16),

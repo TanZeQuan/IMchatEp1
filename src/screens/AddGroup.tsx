@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -55,7 +56,10 @@ const FriendItem = ({
     >
       <View style={styles.leftSection}>
         <View style={styles.avatarPlaceholder}>
-          <Ionicons name="person" size={28} color={colors.text.grayMedium} />
+          <Image
+            source={{ uri: "https://postimg.cc/34y84VvN" }}
+            style={styles.avatarImage}
+          />
         </View>
         <Text style={styles.friendName}>{item.name}</Text>
       </View>
@@ -286,6 +290,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: 48,
+    height: 48,
   },
   friendName: {
     fontSize: typography.fontSize16,

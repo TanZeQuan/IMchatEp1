@@ -141,7 +141,10 @@ const ChatItem = ({
     }
     return (
       <View style={styles.avatarPlaceholder}>
-        <Ionicons name="person" size={28} color={colors.text.grayMedium} />
+        <Image
+          source={{ uri: "https://postimg.cc/34y84VvN" }}
+          style={styles.avatarImage}
+        />
       </View>
     );
   };
@@ -324,6 +327,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.functional.avatarPlaceholder,
     justifyContent: "center",
     alignItems: "center",
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: 48,
+    height: 48,
   },
   groupAvatarContainer: {
     width: 48,
