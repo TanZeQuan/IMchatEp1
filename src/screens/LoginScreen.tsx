@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { useUserStore } from "../store/userStore";
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
 import { AuthStackParamList } from "../navigation/AuthStack";
@@ -26,6 +26,7 @@ type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 const LoginScreen = ({ setUserToken }: { setUserToken: (token: string) => void }) => {
   const navigation = useNavigation<NavigationProp>();
+  const { setUserId } = useUserStore();
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -44,13 +45,20 @@ const LoginScreen = ({ setUserToken }: { setUserToken: (token: string) => void }
 
       if (!res || res.error) throw new Error(res?.message || "登录失败");
 
-      const userId = res.response;
-      const token = res.token || userId;
+      // 登录成功，使用后端返回的用户ID作为临时 token
+      // 等后端实现真正的 token 后再改为 res.token
+      const tempToken = res.token || res.response || phone;
+      const userId = res.response; // 后端返回的用户ID (如 "IM65056417")
+
+      console.log("设置 token:", tempToken);
+      console.log("设置 userId:", userId);
+
+      setUserToken(tempToken);
+      setUserId(userId); // 保存用户ID
 
       // Save current user info
       await AsyncStorage.multiSet([
         ["userId", userId],
-        ["userToken", token],
       ]);
 
       // Read saved info (from registration or previous login)
@@ -65,10 +73,7 @@ const LoginScreen = ({ setUserToken }: { setUserToken: (token: string) => void }
         userEmail,
         userPhone,
         userAvatar,
-        token,
       });
-
-      setUserToken(token); // update Zustand / state
     } catch (err: any) {
       console.error("登录错误:", err);
       Alert.alert("登录失败", err?.message || "服务器错误");

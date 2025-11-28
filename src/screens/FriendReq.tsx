@@ -7,8 +7,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, borders, typography } from "../styles";
-import { getFriendRequests, updateFriendRequest } from "../api/FriendReq";
-import { useUserStore } from "../store/useToken";
+import { getFriendRequests, updateFriendRequest } from "../api/FriendApi";
+import { useUserStore } from "../store/userStore";
 
 const COLORS = {
   background: "#F5F5F5",
