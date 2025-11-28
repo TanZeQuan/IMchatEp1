@@ -31,6 +31,7 @@ import GroupMemberList from "../screens/GroupMemberList";
 export type MainStackParamList = {
   Home: undefined;
   Chat: { chatName: string };
+  ChatScreen: { chatId: string; chatName: string; userId: string };
   Setting: undefined;
   SettingProfile: undefined;
   ResetPassword: undefined;
@@ -72,6 +73,14 @@ export default function MainStack() {
       />
       <Stack.Screen
         name="Chat"
+        component={ChatScreen}
+        options={({ route }) => ({
+          headerShown: false,
+          title: route.params?.chatName || "Chat",
+        })}
+      />
+      <Stack.Screen
+        name="ChatScreen"
         component={ChatScreen}
         options={({ route }) => ({
           headerShown: false,

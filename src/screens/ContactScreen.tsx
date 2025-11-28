@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,12 +11,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { Platform } from "react-native";
 import pinyin from "pinyin";
 import { getFriendRequests } from "../api/FriendReq";
+import { createPrivateChat } from "../api/Chat";
 import { useUserStore } from "../store/userStore";
 
 // 导入 responsive 和样式配置
@@ -48,12 +49,14 @@ const ContactsLayout: React.FC = () => {
 
   const sectionListRef = React.useRef<SectionList>(null);
 
-  // Fetch friends on component mount
-  useEffect(() => {
-    if (userToken) {
-      fetchFriends();
-    }
-  }, [userToken]);
+  // Fetch friends when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userToken) {
+        fetchFriends();
+      }
+    }, [userToken])
+  );
 
   const fetchFriends = async () => {
     if (!userToken) return;
@@ -138,6 +141,28 @@ const ContactsLayout: React.FC = () => {
     }
   };
 
+  const handleContactPress = async (contact: Contact) => {
+    if (!userToken) return;
+
+    try {
+      // Create or get existing private chat
+      const response = await createPrivateChat(userToken, contact.userId, contact.name);
+
+      if (response && !response.error && response.response) {
+        const chatId = response.response;
+
+        // Navigate to ChatScreen with chat_id and friend info
+        navigation.navigate('ChatScreen', {
+          chatId: chatId,
+          chatName: contact.name,
+          userId: contact.userId,
+        });
+      }
+    } catch (error) {
+      console.error('Error creating private chat:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -219,7 +244,10 @@ const ContactsLayout: React.FC = () => {
             </View>
           )}
           renderItem={({ item, index }) => (
-            <TouchableOpacity style={styles.contactItem}>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={() => handleContactPress(item)}
+            >
               <View style={styles.avatar}>
                 <Image
                   source={{ uri: item.image || "https://postimg.cc/34y84VvN" }}

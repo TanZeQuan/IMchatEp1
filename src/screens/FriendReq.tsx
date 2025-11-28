@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,32 +32,65 @@ interface FriendRequest {
 
 const FriendReqScreen: React.FC = () => {
   const { userToken } = useUserStore();
-  const [receivedRequests, setReceivedRequests] = useState<FriendRequest[]>([]);
-  const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
+
+  // Received requests (收到的请求)
+  const [receivedPending, setReceivedPending] = useState<FriendRequest[]>([]);
+  const [receivedAccepted, setReceivedAccepted] = useState<FriendRequest[]>([]);
+  const [receivedDeclined, setReceivedDeclined] = useState<FriendRequest[]>([]);
+
+  // Sent requests (发送的请求)
+  const [sentPending, setSentPending] = useState<FriendRequest[]>([]);
+  const [sentAccepted, setSentAccepted] = useState<FriendRequest[]>([]);
+  const [sentDeclined, setSentDeclined] = useState<FriendRequest[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
-  useEffect(() => {
-    if (userToken) {
-      fetchFriendRequests();
-    }
-  }, [userToken]);
+  // Fetch friend requests when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userToken) {
+        fetchFriendRequests();
+      }
+    }, [userToken])
+  );
 
   const fetchFriendRequests = async () => {
     if (!userToken) return;
 
     try {
       setIsLoading(true);
-      const response = await getFriendRequests(userToken, 1); // Get pending requests
 
-      if (response && !response.error && response.response) {
-        // approve: requests I received
-        setReceivedRequests(response.response.approve || []);
-        // request: requests I sent
-        setSentRequests(response.response.request || []);
+      // Fetch all 3 statuses in parallel
+      const [pendingRes, acceptedRes, declinedRes] = await Promise.all([
+        getFriendRequests(userToken, 1), // Pending
+        getFriendRequests(userToken, 2), // Accepted
+        getFriendRequests(userToken, 3), // Declined
+      ]);
+
+      console.log('Pending Response:', pendingRes);
+      console.log('Accepted Response:', acceptedRes);
+      console.log('Declined Response:', declinedRes);
+
+      // Pending (status=1)
+      if (pendingRes && !pendingRes.error && pendingRes.response) {
+        setReceivedPending(pendingRes.response.approve || []);
+        setSentPending(pendingRes.response.request || []);
+      }
+
+      // Accepted (status=2)
+      if (acceptedRes && !acceptedRes.error && acceptedRes.response) {
+        setReceivedAccepted(acceptedRes.response.approve || []);
+        setSentAccepted(acceptedRes.response.request || []);
+      }
+
+      // Declined (status=3)
+      if (declinedRes && !declinedRes.error && declinedRes.response) {
+        setReceivedDeclined(declinedRes.response.approve || []);
+        setSentDeclined(declinedRes.response.request || []);
       }
     } catch (error) {
       console.error('Error fetching friend requests:', error);
@@ -102,7 +135,7 @@ const FriendReqScreen: React.FC = () => {
     }
   };
 
-  const renderRequestItem = (req: FriendRequest, isReceived: boolean) => {
+  const renderRequestItem = (req: FriendRequest, isReceived: boolean, status: 'pending' | 'accepted' | 'declined') => {
     const displayName = req.name || req.request_id || "未知用户";
     const displayAvatar = req.image || "https://postimg.cc/34y84VvN";
     const userId = isReceived ? req.request_id : req.approve_id;
@@ -124,7 +157,7 @@ const FriendReqScreen: React.FC = () => {
         </View>
 
         <View style={styles.actionButtons}>
-          {isReceived ? (
+          {status === 'pending' && isReceived ? (
             <>
               <TouchableOpacity
                 style={[styles.btn, styles.acceptBtn]}
@@ -140,8 +173,12 @@ const FriendReqScreen: React.FC = () => {
                 <Text style={styles.btnText}>拒绝</Text>
               </TouchableOpacity>
             </>
-          ) : (
+          ) : status === 'pending' && !isReceived ? (
             <Text style={styles.statusText}>等待回应</Text>
+          ) : status === 'accepted' ? (
+            <Text style={[styles.statusText, styles.acceptedText]}>已接受</Text>
+          ) : (
+            <Text style={[styles.statusText, styles.declinedText]}>已拒绝</Text>
           )}
         </View>
       </View>
@@ -194,29 +231,81 @@ const FriendReqScreen: React.FC = () => {
         </View>
 
         <ScrollView style={styles.content}>
-          {/* Received Requests */}
+          {/* Received Pending Requests */}
           <View style={styles.friendRequestBox}>
             <Text style={styles.friendRequestTitle}>
-              收到的好友请求 ({receivedRequests.length})
+              收到的待处理请求 ({receivedPending.length})
             </Text>
 
-            {receivedRequests.length === 0 ? (
+            {receivedPending.length === 0 ? (
               <Text style={styles.friendRequestDesc}>目前没有待处理的好友请求～</Text>
             ) : (
-              receivedRequests.map((req) => renderRequestItem(req, true))
+              receivedPending.map((req) => renderRequestItem(req, true, 'pending'))
             )}
           </View>
 
-          {/* Sent Requests */}
-          <View style={[styles.friendRequestBox, styles.sentRequestsBox]}>
+          {/* Received Accepted */}
+          <View style={[styles.friendRequestBox, styles.historyBox]}>
             <Text style={styles.friendRequestTitle}>
-              发送的好友请求 ({sentRequests.length})
+              已接受的好友 ({receivedAccepted.length})
             </Text>
 
-            {sentRequests.length === 0 ? (
-              <Text style={styles.friendRequestDesc}>你还没有发送好友请求～</Text>
+            {receivedAccepted.length === 0 ? (
+              <Text style={styles.friendRequestDesc}>还没有接受的好友请求～</Text>
             ) : (
-              sentRequests.map((req) => renderRequestItem(req, false))
+              receivedAccepted.map((req) => renderRequestItem(req, true, 'accepted'))
+            )}
+          </View>
+
+          {/* Received Declined */}
+          <View style={[styles.friendRequestBox, styles.historyBox]}>
+            <Text style={styles.friendRequestTitle}>
+              已拒绝的请求 ({receivedDeclined.length})
+            </Text>
+
+            {receivedDeclined.length === 0 ? (
+              <Text style={styles.friendRequestDesc}>还没有拒绝的好友请求～</Text>
+            ) : (
+              receivedDeclined.map((req) => renderRequestItem(req, true, 'declined'))
+            )}
+          </View>
+
+          {/* Sent Pending Requests */}
+          <View style={[styles.friendRequestBox, styles.sentRequestsBox]}>
+            <Text style={styles.friendRequestTitle}>
+              发送的待处理请求 ({sentPending.length})
+            </Text>
+
+            {sentPending.length === 0 ? (
+              <Text style={styles.friendRequestDesc}>你还没有发送待处理的好友请求～</Text>
+            ) : (
+              sentPending.map((req) => renderRequestItem(req, false, 'pending'))
+            )}
+          </View>
+
+          {/* Sent Accepted */}
+          <View style={[styles.friendRequestBox, styles.historyBox]}>
+            <Text style={styles.friendRequestTitle}>
+              对方已接受的请求 ({sentAccepted.length})
+            </Text>
+
+            {sentAccepted.length === 0 ? (
+              <Text style={styles.friendRequestDesc}>还没有被接受的好友请求～</Text>
+            ) : (
+              sentAccepted.map((req) => renderRequestItem(req, false, 'accepted'))
+            )}
+          </View>
+
+          {/* Sent Declined */}
+          <View style={[styles.friendRequestBox, styles.historyBox]}>
+            <Text style={styles.friendRequestTitle}>
+              对方已拒绝的请求 ({sentDeclined.length})
+            </Text>
+
+            {sentDeclined.length === 0 ? (
+              <Text style={styles.friendRequestDesc}>还没有被拒绝的好友请求～</Text>
+            ) : (
+              sentDeclined.map((req) => renderRequestItem(req, false, 'declined'))
             )}
           </View>
         </ScrollView>
@@ -269,6 +358,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     marginBottom: 16,
+  },
+  historyBox: {
+    backgroundColor: '#FAFAFA',
   },
   sentRequestsBox: {
     marginTop: 8,
@@ -329,6 +421,12 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight500,
     minWidth: 60,
     textAlign: 'center',
+  },
+  acceptedText: {
+    color: '#22C55E',
+  },
+  declinedText: {
+    color: '#EF4444',
   },
   btn: {
     paddingVertical: 6,

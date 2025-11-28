@@ -12,6 +12,9 @@ export const getFriendRequests = async (userId: string, status: number = 1) => {
     approve_id: userId,  // Get friends where this user received request
     isstatus: status,    // 1 = Pending, 2 = Accepted, 3 = Declined
   };
+
+  console.log('getFriendRequests - Sending params:', data);
+
   formData.append("data", JSON.stringify(data));
 
   try {
@@ -20,6 +23,9 @@ export const getFriendRequests = async (userId: string, status: number = 1) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+
+    console.log('getFriendRequests - Response:', response.data);
+
     // Response structure: { response: { request: [...], approve: [...] }, error: false, message: "..." }
     return response.data;
   } catch (error) {
