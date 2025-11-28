@@ -26,7 +26,7 @@ type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { setUserToken } = useUserStore();
+  const { setUserToken, setUserId } = useUserStore();
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -52,8 +52,13 @@ const LoginScreen = () => {
       // 登录成功，使用后端返回的用户ID作为临时 token
       // 等后端实现真正的 token 后再改为 res.token
       const tempToken = res.token || res.response || phone;
+      const userId = res.response; // 后端返回的用户ID (如 "IM65056417")
+
       console.log("设置 token:", tempToken);
+      console.log("设置 userId:", userId);
+
       setUserToken(tempToken);
+      setUserId(userId); // 保存用户ID
 
       console.log("Token 已设置，应该会自动跳转");
       Alert.alert("成功", "登录成功！");

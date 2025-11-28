@@ -4,8 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface UserState {
   userToken: string | null;
+  userId: string | null;
   contacts: any[]; // You can define a proper type for contacts
   setUserToken: (token: string | null) => void;
+  setUserId: (userId: string | null) => void;
   setContacts: (contacts: any[]) => void;
 }
 
@@ -13,8 +15,10 @@ export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       userToken: null,
+      userId: null,
       contacts: [],
       setUserToken: (token) => set({ userToken: token }),
+      setUserId: (userId) => set({ userId }),
       setContacts: (contacts) => set({ contacts }),
     }),
     {

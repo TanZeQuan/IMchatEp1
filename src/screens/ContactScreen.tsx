@@ -16,7 +16,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { Platform } from "react-native";
 import pinyin from "pinyin";
-import { getFriendRequests } from "../api/FriendReq";
+import { getFriendRequests } from "../api/FriendApi";
 import { createPrivateChat } from "../api/Chat";
 import { useUserStore } from "../store/userStore";
 
@@ -105,6 +105,9 @@ const ContactsLayout: React.FC = () => {
     const grouped: Record<string, Contact[]> = {};
 
     contacts.forEach((contact) => {
+      // Safety check: ensure contact has a name
+      if (!contact.name) return;
+
       let firstChar = contact.name[0];
 
       if (/[\u4e00-\u9fa5]/.test(firstChar)) {
@@ -122,10 +125,15 @@ const ContactsLayout: React.FC = () => {
       .map((key) => ({ title: key, data: grouped[key] }));
   };
 
-  const filteredContacts = contacts.filter((c) =>
-    c.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    c.userId.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredContacts = contacts.filter((c) => {
+    const searchLower = searchText.toLowerCase();
+    const name = c.name || '';
+    const userId = c.userId || '';
+    return (
+      name.toLowerCase().includes(searchLower) ||
+      userId.toLowerCase().includes(searchLower)
+    );
+  });
 
   const sections = groupContacts(filteredContacts);
 
