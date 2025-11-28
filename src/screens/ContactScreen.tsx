@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { Platform } from "react-native";
@@ -22,6 +22,7 @@ import { useUserStore } from "../store/useToken";
 // 导入 responsive 和样式配置
 import { scaleWidth as w, scaleHeight as h, scaleFont as f } from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
+import { createPrivateChat } from "../api/Chat";
 
 interface Contact {
   id: string;
@@ -45,26 +46,44 @@ const ContactsLayout: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const sectionListRef = React.useRef<SectionList>(null);
 
-  // Fetch friends on component mount
-  useEffect(() => {
-    if (userToken) {
-      fetchFriends();
-    }
-  }, [userToken]);
+  // Fetch friends when screen comes into focus AND when userToken is available
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userToken && !hasFetched) {
+        console.log('Fetching friends with token:', userToken);
+        fetchFriends();
+      }
+      
+      // Reset hasFetched when leaving screen to refresh on next focus
+      return () => {
+        setHasFetched(false);
+      };
+    }, [userToken, hasFetched])
+  );
 
   const fetchFriends = async () => {
-    if (!userToken) return;
+    if (!userToken) {
+      console.log('No user token available');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       setIsLoading(true);
+      console.log('Making API call to get friends...');
       const response = await getFriendRequests(userToken, 2); // Get accepted friends (status=2)
+      console.log('API Response:', response);
 
       if (response && !response.error && response.response) {
         const requestFriends = response.response.request || [];
         const approveFriends = response.response.approve || [];
+
+        console.log('Request friends:', requestFriends);
+        console.log('Approve friends:', approveFriends);
 
         // Merge both arrays and create Contact objects
         const allFriends: Contact[] = [];
@@ -72,7 +91,7 @@ const ContactsLayout: React.FC = () => {
         // Friends where I sent the request
         requestFriends.forEach((friend: any) => {
           allFriends.push({
-            id: friend.list_id || friend.approve_id,
+            id: friend.list_id || friend.approve_id || `req_${friend.approve_id}`,
             name: friend.name || friend.approve_id || "未知用户",
             userId: friend.approve_id,
             image: friend.image,
@@ -82,30 +101,45 @@ const ContactsLayout: React.FC = () => {
         // Friends where I received the request
         approveFriends.forEach((friend: any) => {
           allFriends.push({
-            id: friend.list_id || friend.request_id,
+            id: friend.list_id || friend.request_id || `app_${friend.request_id}`,
             name: friend.name || friend.request_id || "未知用户",
             userId: friend.request_id,
             image: friend.image,
           });
         });
 
+        console.log('All friends processed:', allFriends);
         setContacts(allFriends);
+        setHasFetched(true);
+      } else {
+        console.log('No valid response data');
+        setContacts([]);
+        setHasFetched(true);
       }
     } catch (error) {
       console.error('Error fetching friends:', error);
+      setContacts([]);
+      setHasFetched(true);
     } finally {
       setIsLoading(false);
     }
   };
 
   const groupContacts = (contacts: Contact[]): Section[] => {
+    if (contacts.length === 0) return [];
+    
     const grouped: Record<string, Contact[]> = {};
 
     contacts.forEach((contact) => {
       let firstChar = contact.name[0];
 
       if (/[\u4e00-\u9fa5]/.test(firstChar)) {
-        firstChar = pinyin(firstChar, { style: "first_letter" })[0][0];
+        try {
+          firstChar = pinyin(firstChar, { style: "first_letter" })[0][0];
+        } catch (error) {
+          console.warn('Pinyin conversion failed for:', firstChar);
+          firstChar = '#';
+        }
       }
 
       const letter = /[A-Z]/i.test(firstChar) ? firstChar.toUpperCase() : "#";
@@ -127,7 +161,7 @@ const ContactsLayout: React.FC = () => {
   const sections = groupContacts(filteredContacts);
 
   const handleLetterPress = (letter: string) => {
-    console.log('Pressed letter:', letter); // For debugging
+    console.log('Pressed letter:', letter);
     const index = sections.findIndex((s) => s.title === letter);
     if (index !== -1 && sectionListRef.current) {
       sectionListRef.current.scrollToLocation({
@@ -138,14 +172,47 @@ const ContactsLayout: React.FC = () => {
     }
   };
 
+  const handleContactPress = async (contact: Contact) => {
+    if (!userToken) return;
+
+    try {
+      // Create or get existing private chat
+      const response = await createPrivateChat(userToken, contact.userId, contact.name);
+
+      if (response && !response.error && response.response) {
+        const chatId = response.response;
+
+        // Navigate to ChatScreen with chat_id and friend info
+        navigation.navigate('ChatScreen', {
+          chatId: chatId,
+          chatName: contact.name,
+          userId: contact.userId,
+        });
+      }
+    } catch (error) {
+      console.error('Error creating private chat:', error);
+    }
+  };
+
+  // Add manual refresh function for testing
+  const handleManualRefresh = () => {
+    setHasFetched(false);
+    fetchFriends();
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>通讯录</Text>
+          {/* Add refresh button for debugging */}
+          <TouchableOpacity onPress={handleManualRefresh} style={styles.debugButton}>
+            <Text style={styles.debugButtonText}>手动刷新</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.text.primary} />
+          <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </SafeAreaView>
     );
@@ -156,6 +223,11 @@ const ContactsLayout: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>通讯录</Text>
+        
+        {/* Add refresh button for debugging */}
+        <TouchableOpacity onPress={handleManualRefresh} style={styles.debugButton}>
+          <Text style={styles.debugButtonText}>刷新</Text>
+        </TouchableOpacity>
 
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={f(14)} style={styles.searchIcon} />
@@ -173,9 +245,6 @@ const ContactsLayout: React.FC = () => {
         </View>
       </View>
 
-      {/* Action Buttons */}
-      {/* Moved into SectionList's ListHeaderComponent */}
-
       {/* SectionList */}
       <View style={styles.listContainer}>
         <SectionList
@@ -183,11 +252,12 @@ const ContactsLayout: React.FC = () => {
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
           ListEmptyComponent={
-            !isLoading && (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>暂时无好友，快添加好友吧！</Text>
-              </View>
-            )
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>暂时无好友，快添加好友吧！</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("AddFriend")} style={styles.addFriendButton}>
+                <Text style={styles.addFriendButtonText}>添加好友</Text>
+              </TouchableOpacity>
+            </View>
           }
           ListHeaderComponent={
             <View style={styles.actionButtons}>
@@ -219,11 +289,15 @@ const ContactsLayout: React.FC = () => {
             </View>
           )}
           renderItem={({ item, index }) => (
-            <TouchableOpacity style={styles.contactItem}>
+            <TouchableOpacity
+              style={styles.contactItem}
+              onPress={() => handleContactPress(item)}
+            >
               <View style={styles.avatar}>
                 <Image
-                  source={{ uri: item.image || "https://postimg.cc/34y84VvN" }}
+                  source={{ uri: item.image || "https://i.postimg.cc/34y84VvN/user.png" }}
                   style={styles.avatarImage}
+                  onError={(e) => console.log('Image load error:', e.nativeEvent.error)}
                 />
               </View>
               <View style={styles.contactInfo}>
@@ -234,18 +308,20 @@ const ContactsLayout: React.FC = () => {
           )}
         />
 
-        {/* Alphabet Index - 移到 listContainer 内部 */}
-        <View style={styles.alphabetIndex}>
-          {alphabet.map((letter) => (
-            <TouchableOpacity
-              key={letter}
-              style={styles.alphabetItem}
-              onPress={() => handleLetterPress(letter)}
-            >
-              <Text style={styles.alphabetText}>{letter}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {/* Alphabet Index */}
+        {sections.length > 0 && (
+          <View style={styles.alphabetIndex}>
+            {alphabet.map((letter) => (
+              <TouchableOpacity
+                key={letter}
+                style={styles.alphabetItem}
+                onPress={() => handleLetterPress(letter)}
+              >
+                <Text style={styles.alphabetText}>{letter}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -263,6 +339,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  loadingText: {
+    marginTop: h(10),
+    fontSize: f(typography.fontSize14),
+    color: colors.text.grayLight,
+  },
+
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -273,6 +355,32 @@ const styles = StyleSheet.create({
     fontSize: f(typography.fontSize14),
     color: colors.text.grayLight,
     textAlign: 'center',
+    marginBottom: h(20),
+  },
+
+  addFriendButton: {
+    backgroundColor: colors.background.yellow,
+    paddingHorizontal: w(20),
+    paddingVertical: h(10),
+    borderRadius: borders.radius8,
+  },
+  addFriendButtonText: {
+    color: colors.text.dark,
+    fontSize: f(typography.fontSize14),
+    fontWeight: typography.fontWeight500,
+  },
+
+  debugButton: {
+    position: 'absolute',
+    right: w(10),
+    top: h(10),
+    backgroundColor: colors.background.grayPale,
+    padding: w(5),
+    borderRadius: borders.radius4,
+  },
+  debugButtonText: {
+    fontSize: f(typography.fontSize11),
+    color: colors.text.gray,
   },
 
   /** HEADER */
@@ -398,9 +506,9 @@ const styles = StyleSheet.create({
   alphabetIndex: {
     position: "absolute",
     right: w(8),
-    top: h(130), // 从 action buttons 之后开始
-    bottom: h(20), // 留一点底部空间
-    justifyContent: "center", // 自动垂直居中字母列表
+    top: h(120),
+    bottom: h(20),
+    justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
   },

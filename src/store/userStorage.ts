@@ -7,10 +7,16 @@ const USER_TOKEN_KEY = 'userToken';
 // 给每个用户独立的 key
 const getUserKey = (userId: string, key: string) => `${key}_${userId}`;
 
+let user = {
+  id: '',
+  token: ''
+};
+AsyncStorage.setItem(CURRENT_USER_ID_KEY, JSON.stringify(user));
+
 export const Storage = {
   // ---------- 当前登录用户 ID ----------
   setUserId: async (userId: string) => {
-    await AsyncStorage.setItem(CURRENT_USER_ID_KEY, userId);
+    // await AsyncStorage.setItem(CURRENT_USER_ID_KEY, userId);
   },
   getUserId: async (): Promise<string | null> => {
     return AsyncStorage.getItem(CURRENT_USER_ID_KEY);

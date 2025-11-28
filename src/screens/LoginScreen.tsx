@@ -17,7 +17,6 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import Storage from '../store/userStorage';
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
 import { AuthStackParamList } from "../navigation/AuthStack";
