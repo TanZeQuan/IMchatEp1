@@ -91,7 +91,7 @@ const AddFriend: React.FC = () => {
     setFoundUser(null);
     setRequestStatus("idle"); // Reset request status when searching
     try {
-      const user = await searchUser(id, userToken); // Pass userToken for friend status check
+      const user = await searchUser(id, userToken ?? undefined); // Pass userToken for friend status check
       if (user) {
         console.log('Found user with status:', user);
 
@@ -101,7 +101,7 @@ const AddFriend: React.FC = () => {
         if (user.request_by === 2 && user.isstatus === 1 && !listId && userToken) {
           console.log('Found pending request, fetching list_id...');
           try {
-            const friendReqRes = await getFriendRequests(userToken, 1); // Get pending requests
+            const friendReqRes = await getFriendRequests(userToken!, 1); // Get pending requests
             console.log('getFriendRequests response:', friendReqRes);
 
             if (friendReqRes && !friendReqRes.error && friendReqRes.response) {
