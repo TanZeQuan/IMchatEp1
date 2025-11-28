@@ -21,7 +21,7 @@ interface FilterOption {
   id: string;
 }
 
-const SearchFilterScreen: React.FC = () => {
+const GroupHistory: React.FC = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState<string>('');
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
@@ -47,11 +47,11 @@ const SearchFilterScreen: React.FC = () => {
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
     }
-    
+
     if (date) {
       setSelectedDate(date);
       console.log('Selected date:', date);
-      
+
       // If we just selected a date on iOS, show time picker next
       if (Platform.OS === 'ios' && dateMode === 'date') {
         setDateMode('time');
@@ -131,7 +131,7 @@ const SearchFilterScreen: React.FC = () => {
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text.medium} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>查找聊天记录</Text>
+        <Text style={styles.headerTitle}>查找群聊记录</Text>
       </View>
 
       {/* Search Bar */}
@@ -317,4 +317,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchFilterScreen;
+export default GroupHistory;

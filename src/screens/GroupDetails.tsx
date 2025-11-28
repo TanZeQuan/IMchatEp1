@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   Switch,
+  Image,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -120,9 +121,10 @@ export default function GroupScreenDetails() {
   const renderMember = (item: Member) => (
     <View key={item.id} style={styles.gridItem}>
       <View style={styles.avatarContainer}>
-        <View style={styles.avatarPlaceholder}>
-          <AntDesign name="user" size={24} color="#666" />
-        </View>
+        <Image
+          source={{ uri: "https://postimg.cc/34y84VvN" }}
+          style={styles.avatarImage}
+        />
       </View>
       <Text style={styles.memberName} numberOfLines={1}>
         {item.name}
@@ -163,7 +165,10 @@ export default function GroupScreenDetails() {
               <Text style={styles.memberName}>移除</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.viewMoreBtn}>
+          <TouchableOpacity
+            style={styles.viewMoreBtn}
+            onPress={() => navigation.navigate('GroupMemberList', { groupId: '1' })}
+          >
             <Text style={styles.viewMoreText}>查看全部成员 (12)</Text>
             <Ionicons name="chevron-forward" size={16} color="#999" />
           </TouchableOpacity>
@@ -195,7 +200,9 @@ export default function GroupScreenDetails() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>聊天管理</Text>
           <View style={styles.card}>
-            <ListItem label="查找聊天记录" icon="search-outline" />
+            <TouchableOpacity onPress={() => navigation.navigate('GroupHistory', { groupName: '越狱的猫', groupId: '1' })}>
+              <ListItem label="查找聊天记录" icon="search-outline" />
+            </TouchableOpacity>
             <ListItem label="聊天设置" isLast={true} icon="settings-outline" />
           </View>
         </View>
@@ -310,6 +317,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 6,
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: 48,
+    height: 48,
   },
   avatarPlaceholder: {
     width: 28,
