@@ -57,7 +57,9 @@ const ResetNameScreen: React.FC = () => {
       await AsyncStorage.setItem(`userName_${userId}`, name.trim());
 
       setNickname(name.trim()); // ✅ 更新 UI
-      Alert.alert("成功", "名字已更新");
+      Alert.alert("成功", "名字已更新", [
+        { text: "确定", onPress: () => navigation.goBack() } // ✅ 自动返回上一页
+      ]);;
     } catch (err) {
       console.error("更新名字失败", err);
       Alert.alert("失败", "名字更新失败");

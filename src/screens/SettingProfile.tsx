@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MainStackParamList } from "../navigation/MainStack";
@@ -71,24 +71,33 @@ const ProfileScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
+  const loadUserData = async () => {
+    const currentUserId = await AsyncStorage.getItem("userId");
+    if (!currentUserId) return;
+    setUserId(currentUserId);
+
+    const storedName = await AsyncStorage.getItem(`userName_${currentUserId}`);
+    setNickname(storedName || "未命名用户");
+
+    const storedPhone = await AsyncStorage.getItem(`userPhone_${currentUserId}`);
+    setPhone(storedPhone || "");
+
+    const storedAvatar = await AsyncStorage.getItem(`userAvatar_${currentUserId}`);
+    console.log("ProfileScreen loaded avatar:", storedAvatar);
+    setAvatarUri(storedAvatar || null);
+  };
+
+  // Load data on mount
   useEffect(() => {
-    const loadUserData = async () => {
-      const currentUserId = await AsyncStorage.getItem("userId");
-      if (!currentUserId) return;
-      setUserId(currentUserId);
-
-      const storedName = await AsyncStorage.getItem(`userName_${currentUserId}`);
-      setNickname(storedName || "未命名用户");
-
-      const storedPhone = await AsyncStorage.getItem(`userPhone_${currentUserId}`);
-      setPhone(storedPhone || "");
-
-      const storedAvatar = await AsyncStorage.getItem(`userAvatar_${currentUserId}`);
-      setAvatarUri(storedAvatar || null);
-    };
-
     loadUserData();
   }, []);
+
+  // Reload data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadUserData();
+    }, [])
+  );
 
   return (
     <LinearGradient

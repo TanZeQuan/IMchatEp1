@@ -34,6 +34,7 @@ export interface ResetPasswordPayload {
 }
 
 export interface ChangeEmailPayload {
+  user_id: string;
   email: string;
 }
 
@@ -168,13 +169,23 @@ export const resetPassword = async (payload: ResetPasswordPayload) => {
 
 export const changeEmail = async (payload: ChangeEmailPayload) => {
   try {
-    const res = await axios.post(`${BASE_URL}/users/email/change`, payload);
+    const formData = new FormData();
+    formData.append("data", JSON.stringify({
+      user_id: payload.user_id,
+      email: payload.email,
+    }));
+
+    const res = await axios.post(`${BASE_URL}/users/email/change`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
     return res.data;
   } catch (error: any) {
     console.error("Change Email Error:", error.response?.data || error.message);
     throw error.response?.data || error;
   }
 };
+
 
 export const updateProfile = async (payload: any) => {
   try {

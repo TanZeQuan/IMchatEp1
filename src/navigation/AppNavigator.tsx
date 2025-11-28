@@ -11,19 +11,25 @@ const AppNavigator = () => {
 
   useEffect(() => {
     const load = async () => {
-      const id = await Storage.getUserId();
-      if (!id) return;
+      try {
+        const id = await Storage.getUserId();
 
-      const name = await Storage.getUserName(id);
-      const avatar = await Storage.getUserAvatar(id);
-
-      setUserId(id);
-      if (name) setName(name);
+        if (id) {
+          // 如果有登录的用户
+          setUserToken(id);
+        } else {
+          // 没有登录
+          setUserToken(null);
+        }
+      } catch (err) {
+        console.log("Load user error:", err);
+      } finally {
+        setLoading(false); // 🌟 最重要的
+      }
     };
 
     load();
   }, []);
-
 
   if (loading) {
     return (
@@ -33,20 +39,15 @@ const AppNavigator = () => {
     );
   }
 
-
   return (
     <NavigationContainer>
-      {userToken ? <MainStack setUserToken={setUserToken} /> : <AuthStack setUserToken={setUserToken} />}
+      {userToken ? (
+        <MainStack setUserToken={setUserToken} />
+      ) : (
+        <AuthStack setUserToken={setUserToken} />
+      )}
     </NavigationContainer>
   );
 };
 
 export default AppNavigator;
-function setUserId(id: string) {
-  throw new Error('Function not implemented.');
-}
-
-function setName(name: string) {
-  throw new Error('Function not implemented.');
-}
-
