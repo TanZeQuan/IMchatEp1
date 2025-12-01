@@ -55,10 +55,10 @@ export default function ChatScreen() {
       id: "1",
       sender: "other",
       senderName: chatPartnerName,
-      text: "你好呀 4593年",
+      text: "你好呀 这是 DEMO 聊天",
       type: "text",
     },
-    { id: "2", sender: "me", senderName: "我", text: "好的内容", type: "text" },
+    { id: "2", sender: "me", senderName: "我", text: "好的 DEMO 回复", type: "text" },
   ]);
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
