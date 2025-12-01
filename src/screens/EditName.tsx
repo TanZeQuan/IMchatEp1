@@ -1,39 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native"; // ✅ import navigation
+import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MainStackParamList } from "../navigation/MainStack"; // adjust path
+import { MainStackParamList } from "../navigation/MainStack";
 import { colors, borders, typography } from "../styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { updateProfile } from "../api/UserApi";
 
 const ResetNameScreen: React.FC = () => {
-  const [name, setName] = useState("Mym");
+  const [name, setName] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const [nickname, setNickname] = useState(""); // UI实时显示
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
+  // Load current userId and nickname from AsyncStorage
+  useEffect(() => {
+    const loadUserData = async () => {
+      const id = await AsyncStorage.getItem("userId");
+      if (!id) return;
+      setUserId(id);
+
+      const storedName = await AsyncStorage.getItem(`userName_${id}`);
+      setName(storedName || "");
+      setNickname(storedName || ""); // ✅ 同步到 UI
+    };
+    loadUserData();
+  }, []);
+
+
   const handleGoBack = () => {
-    navigation.goBack(); // ✅ navigate back
+    navigation.goBack();
   };
 
   const handleClearName = () => {
     setName("");
   };
 
-  const handleConfirm = () => {
-    if (!name.trim()) {
-      alert("请输入名字");
-      return;
+  const handleConfirm = async () => {
+    if (!name.trim()) return Alert.alert("提示", "请输入名字");
+    if (!userId) return;
+
+    try {
+      await updateProfile({ user_id: userId, name: name.trim(), about: "", image: null });
+      await AsyncStorage.setItem(`userName_${userId}`, name.trim());
+
+      setNickname(name.trim()); // ✅ 更新 UI
+      Alert.alert("成功", "名字已更新", [
+        { text: "确定", onPress: () => navigation.goBack() } // ✅ 自动返回上一页
+      ]);;
+    } catch (err) {
+      console.error("更新名字失败", err);
+      Alert.alert("失败", "名字更新失败");
     }
-    console.log("Name updated:", name);
-    handleGoBack();
   };
 
   return (
@@ -81,10 +111,7 @@ const ResetNameScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // backgroundColor: "#F5E6B3"
-  },
+  container: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -93,12 +120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  backButton: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
   headerTitle: {
     fontSize: typography.fontSize16,
     fontWeight: typography.fontWeight600,
@@ -127,7 +149,11 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     marginHorizontal: 16,
   },
-  confirmButtonText: { fontSize: typography.fontSize16, fontWeight: typography.fontWeight500, color: colors.text.blackMedium },
+  confirmButtonText: {
+    fontSize: typography.fontSize16,
+    fontWeight: typography.fontWeight500,
+    color: colors.text.blackMedium,
+  },
 });
 
 export default ResetNameScreen;
