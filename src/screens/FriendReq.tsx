@@ -31,7 +31,7 @@ interface FriendRequest {
 }
 
 const FriendReqScreen: React.FC = () => {
-  const { userToken } = useUserStore();
+  const { userToken, contacts, setContacts } = useUserStore();
 
   // Received requests (收到的请求)
   const [receivedPending, setReceivedPending] = useState<FriendRequest[]>([]);
@@ -101,12 +101,24 @@ const FriendReqScreen: React.FC = () => {
     }
   };
 
-  const handleAccept = async (listId: string, name: string) => {
+  const handleAccept = async (req: FriendRequest) => {
     try {
-      const response = await updateFriendRequest(listId, 2); // 2 = Accept
+      const response = await updateFriendRequest(req.list_id, 2); // 2 = Accept
 
       if (response && !response.error) {
-        Alert.alert("成功", `你已接受 ${name} 的好友请求`);
+        Alert.alert("成功", `你已接受 ${req.name} 的好友请求`);
+
+        const newFriend = {
+          id: req.request_id,
+          name: req.name || "未知用户",
+          userId: req.request_id,
+          image: req.image,
+        };
+
+        if (!contacts.some(contact => contact.userId === newFriend.userId)) {
+          setContacts([...contacts, newFriend]);
+        }
+
         // Refresh the list
         fetchFriendRequests();
       } else {
@@ -161,7 +173,7 @@ const FriendReqScreen: React.FC = () => {
             <>
               <TouchableOpacity
                 style={[styles.btn, styles.acceptBtn]}
-                onPress={() => handleAccept(req.list_id, displayName)}
+                onPress={() => handleAccept(req)}
               >
                 <Text style={styles.btnText}>接受</Text>
               </TouchableOpacity>

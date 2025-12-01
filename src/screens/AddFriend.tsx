@@ -25,7 +25,7 @@ interface MenuItem {
 
 const AddFriend: React.FC = () => {
   const navigation = useNavigation();
-  const { userToken, userId } = useUserStore();
+  const { userToken, userId, contacts, setContacts } = useUserStore();
 
   const [searchId, setSearchId] = useState("");
   const [debouncedSearchId, setDebouncedSearchId] = useState("");
@@ -186,6 +186,17 @@ const AddFriend: React.FC = () => {
       console.log('Calling updateFriendRequest with list_id:', foundUser.list_id, 'status: 2 (Accept)');
 
       await updateFriendRequest(foundUser.list_id, 2); // 2 = Accept
+
+      const newFriend = {
+        id: foundUser.user_id,
+        name: foundUser.name || "未知用户",
+        userId: foundUser.user_id,
+        image: foundUser.image,
+      };
+
+      if (!contacts.some(contact => contact.userId === newFriend.userId)) {
+        setContacts([...contacts, newFriend]);
+      }
 
       setRequestStatus("sent");
       Alert.alert(

@@ -39,12 +39,11 @@ interface Section {
 const alphabet: string[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#".split("");
 
 const ContactsLayout: React.FC = () => {
-  const { userToken, userId } = useUserStore();  // ← 添加 userId
+  const { userToken, userId, contacts, setContacts } = useUserStore();  // ← 添加 userId
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
   const [searchText, setSearchText] = useState("");
-  const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const sectionListRef = React.useRef<SectionList>(null);
@@ -114,18 +113,20 @@ const ContactsLayout: React.FC = () => {
         setContacts(allFriends);
       } else {
         console.log('⚠️ No friends data in response');
+        setContacts([]); // Clear contacts if fetch fails
       }
     } catch (error) {
       console.error('❌ Error fetching friends:', error);
+      setContacts([]); // Also clear on error
     } finally {
       setIsLoading(false);
     }
   };
 
-  const groupContacts = (contacts: Contact[]): Section[] => {
+  const groupContacts = (currentContacts: Contact[]): Section[] => {
     const grouped: Record<string, Contact[]> = {};
 
-    contacts.forEach((contact) => {
+    currentContacts.forEach((contact) => {
       // Safety check: ensure contact has a name
       if (!contact.name) return;
 
@@ -183,7 +184,17 @@ const ContactsLayout: React.FC = () => {
       console.log('🔄 Creating private chat...');
 
       // Create or get existing private chat - 使用 userId 而不是 userToken
-      const response = await createPrivateChat(userId, contact.userId, contact.name);
+      let response = await createPrivateChat(userId, contact.userId, contact.name);
+
+      console.log('📬 createPrivateChat first response:', response);
+
+      // Check if chat was created but no chatId returned (server-side issue)
+      if (response && !response.error && !response.response) {
+        console.log('⚠️ Chat created but no chat ID returned. Retrying to get chat ID...');
+        // Retry to get the chat ID
+        response = await createPrivateChat(userId, contact.userId, contact.name);
+        console.log('📬 createPrivateChat retry response:', response);
+      }
 
       console.log('📬 createPrivateChat response:', response);
 
