@@ -13,109 +13,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, borders, typography } from "../styles";
 
-// --- 模拟数据 ---
-const messageData: ChatItemType[] = [
-  {
-    id: "1",
-    name: "妈妈",
-    lastMessage: "好的,去吧",
-    time: "2:44 PM",
-    type: "single",
-    unreadCount: 0,
-    avatars: [],
-  },
-  {
-    id: "2",
-    name: "闺蜜",
-    lastMessage: "对啊 哈哈",
-    time: "2:44 PM",
-    type: "single",
-    unreadCount: 0,
-    avatars: [],
-  },
-  {
-    id: "3",
-    name: "姐姐",
-    lastMessage: "OK",
-    time: "2:44 PM",
-    type: "single",
-    unreadCount: 0,
-    avatars: [],
-  },
-  {
-    id: "4",
-    name: "疯子群",
-    lastMessage: "哈哈哈哈哈",
-    time: "2:44 PM",
-    type: "group",
-    unreadCount: 0,
-    avatars: [
-      "https://i.pravatar.cc/150?img=11",
-      "https://i.pravatar.cc/150?img=12",
-      "https://i.pravatar.cc/150?img=13",
-      "https://i.pravatar.cc/150?img=14",
-    ],
-  },
-  {
-    id: "5",
-    name: "Leo",
-    lastMessage: "Noooooo",
-    time: "2:44 PM",
-    type: "single",
-    unreadCount: 0,
-    avatars: [],
-  },
-  {
-    id: "6",
-    name: "家长群",
-    lastMessage: "周末了！",
-    time: "2:44 PM",
-    type: "group",
-    unreadCount: 0,
-    avatars: [
-      "https://i.pravatar.cc/150?img=15",
-      "https://i.pravatar.cc/150?img=16",
-      "https://i.pravatar.cc/150?img=17",
-      "https://i.pravatar.cc/150?img=18",
-    ],
-  },
-  {
-    id: "7",
-    name: "销售部",
-    lastMessage: "欢迎们,各个都回归...",
-    time: "2:44 PM",
-    type: "group",
-    unreadCount: 0,
-    avatars: [
-      "https://i.pravatar.cc/150?img=19",
-      "https://i.pravatar.cc/150?img=20",
-      "https://i.pravatar.cc/150?img=21",
-      "https://i.pravatar.cc/150?img=22",
-    ],
-  },
-  {
-    id: "8",
-    name: "Leo",
-    lastMessage: "Noooooo",
-    time: "2:44 PM",
-    type: "single",
-    unreadCount: 0,
-    avatars: [],
-  },
-];
+import { getChatsForUser } from "../api/message";
 
 // --- TypeScript Interfaces ---
 interface ChatItemType {
-  id: string;
+  chat_id: string;
   name: string;
-  lastMessage: string;
-  time: string;
-  type: "single" | "group";
-  unreadCount: number;
-  avatars: string[];
+  image: string;
+  isdelete: number;
+  istype: number; // 1 for single, 2 for group
+  // Making these optional or providing default values for now as they are not directly from the API response
+  lastMessage?: string;
+  time?: string;
+  unreadCount?: number;
+  avatars?: string[];
 }
 
 import { useNavigation } from "@react-navigation/native";
+import { useUserStore } from "../store/userStore";
 
 // --- 聊天项组件 ---
 const ChatItem = ({
@@ -125,35 +40,40 @@ const ChatItem = ({
   item: ChatItemType;
   navigation: any;
 }) => {
+  // Use item.istype for type check: 1 for single, 2 for group
+  const isGroupChat = item.istype === 2;
+
   const renderAvatar = () => {
-    if (item.type === "group") {
-      return (
-        <View style={styles.groupAvatarContainer}>
-          {item.avatars.slice(0, 4).map((url: string, index: number) => (
+    if (isGroupChat) {
+      if (item.avatars && item.avatars.length > 0) {
+        return (
+          <View style={styles.groupAvatarContainer}>
+            {item.avatars.slice(0, 4).map((url: string, index: number) => (
+              <Image
+                key={index}
+                source={{ uri: url }}
+                style={styles.groupAvatarImage}
+              />
+            ))}
+          </View>
+        );
+      } else {
+        return (
+          <View style={styles.avatarPlaceholder}>
             <Image
-              key={index}
-              source={{ uri: url }}
-              style={styles.groupAvatarImage}
+              source={{ uri: item.image || "https://postimg.cc/34y84VvN" }}
+              style={styles.avatarImage}
             />
-          ))}
-        </View>
-      );
+          </View>
+        );
+      }
     }
     return (
       <View style={styles.avatarPlaceholder}>
         <Image
-          source={{ uri: "https://postimg.cc/34y84VvN" }}
+          source={{ uri: item.image || "https://postimg.cc/34y84VvN" }}
           style={styles.avatarImage}
         />
-      </View>
-    );
-  };
-
-  const renderBadge = () => {
-    if (item.unreadCount === 0) return null;
-    return (
-      <View style={styles.badgeContainer}>
-        <Text style={styles.badgeText}>{item.unreadCount}</Text>
       </View>
     );
   };
@@ -161,21 +81,15 @@ const ChatItem = ({
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => navigation.navigate("Chat", { chatName: item.name })}
+      onPress={() => navigation.navigate("Chat", { chatName: item.name, chatId: item.chat_id })}
     >
       <View style={styles.chatItemContainer}>
         <View style={styles.avatarWrapper}>
           {renderAvatar()}
-          {renderBadge()}
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.nameText}>{item.name}</Text>
-          <Text style={styles.messageText} numberOfLines={1}>
-            {item.lastMessage}
-          </Text>
-        </View>
-        <View style={styles.metaContainer}>
-          <Text style={styles.timeText}>{item.time}</Text>
+          {/* Temporarily removed lastMessage, time, and badge for debugging */}
         </View>
       </View>
     </TouchableOpacity>
@@ -185,8 +99,32 @@ const ChatItem = ({
 // --- 页面主组件 ---
 export default function ChatListScreen() {
   const navigation = useNavigation();
+  const { userId } = useUserStore(); // Changed from userToken to userId
   const [searchText, setSearchText] = React.useState("");
   const [debouncedText, setDebouncedText] = React.useState("");
+  const [chatData, setChatData] = React.useState<ChatItemType[]>([]);
+
+  // Fetch chat data
+  React.useEffect(() => {
+    if (userId) { // Check for userId
+      getChatsForUser(userId) // Pass userId
+        .then(data => {
+          // Assuming the API returns an array, otherwise we might need to adapt
+          if (data && Array.isArray(data.response)) {
+            setChatData(data.response); // Set chatData to data.response
+          } else {
+            console.error("Fetched data.response is not an array or data is null/undefined:", data);
+            // Handle cases where API might return a different structure on error or no-data
+            setChatData([]);
+          }
+        })
+        .catch(error => {
+          console.error("Failed to fetch chats:", error);
+          // Optionally, show an error message to the user
+          setChatData([]); // Clear data on error
+        });
+    }
+  }, [userId]); // Depend on userId
 
   // 防抖逻辑
   React.useEffect(() => {
@@ -198,11 +136,11 @@ export default function ChatListScreen() {
 
   // 根据 debouncedText 过滤聊天列表
   const filteredData = React.useMemo(() => {
-    if (!debouncedText.trim()) return messageData;
-    return messageData.filter((item) =>
+    if (!debouncedText.trim()) return chatData;
+    return chatData.filter((item) =>
       item.name.toLowerCase().startsWith(debouncedText.toLowerCase())
     );
-  }, [debouncedText]);
+  }, [debouncedText, chatData]);
 
   return (
     <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
@@ -239,7 +177,7 @@ export default function ChatListScreen() {
         {/* Chat List */}
         <FlatList
           data={filteredData}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.chat_id}
           renderItem={({ item }) => (
             <ChatItem item={item} navigation={navigation} />
           )}
