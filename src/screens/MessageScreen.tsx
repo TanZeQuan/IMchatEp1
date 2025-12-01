@@ -8,12 +8,13 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, borders, typography } from "../styles";
 
-import { getChatsForUser } from "../api/message";
+import { getChatsForUser } from "../api/Message";
 
 // --- TypeScript Interfaces ---
 interface ChatItemType {
@@ -29,7 +30,7 @@ interface ChatItemType {
   avatars?: string[];
 }
 
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useUserStore } from "../store/userStore";
 
 // --- 聊天项组件 ---
@@ -78,10 +79,20 @@ const ChatItem = ({
     );
   };
 
+  const handlePress = () => {
+    if (isGroupChat) {
+      // Navigate to GroupScreen for group chats
+      navigation.navigate("GroupScreen", { groupName: item.name, groupId: item.chat_id });
+    } else {
+      // Navigate to Chat for private chats
+      navigation.navigate("Chat", { chatName: item.name, chatId: item.chat_id });
+    }
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => navigation.navigate("Chat", { chatName: item.name, chatId: item.chat_id })}
+      onPress={handlePress}
     >
       <View style={styles.chatItemContainer}>
         <View style={styles.avatarWrapper}>
@@ -103,28 +114,42 @@ export default function ChatListScreen() {
   const [searchText, setSearchText] = React.useState("");
   const [debouncedText, setDebouncedText] = React.useState("");
   const [chatData, setChatData] = React.useState<ChatItemType[]>([]);
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  // Fetch chat data
-  React.useEffect(() => {
-    if (userId) { // Check for userId
-      getChatsForUser(userId) // Pass userId
-        .then(data => {
-          // Assuming the API returns an array, otherwise we might need to adapt
-          if (data && Array.isArray(data.response)) {
-            setChatData(data.response); // Set chatData to data.response
-          } else {
-            console.error("Fetched data.response is not an array or data is null/undefined:", data);
-            // Handle cases where API might return a different structure on error or no-data
-            setChatData([]);
-          }
-        })
-        .catch(error => {
-          console.error("Failed to fetch chats:", error);
-          // Optionally, show an error message to the user
-          setChatData([]); // Clear data on error
-        });
+  // Fetch chat data function
+  const fetchChats = React.useCallback(async () => {
+    if (!userId) return;
+
+    try {
+      console.log('🔄 Fetching chats for user:', userId);
+      const data = await getChatsForUser(userId);
+
+      if (data && Array.isArray(data.response)) {
+        setChatData(data.response);
+        console.log('✅ Chats loaded:', data.response.length);
+      } else {
+        console.error("Fetched data.response is not an array or data is null/undefined:", data);
+        setChatData([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch chats:", error);
+      setChatData([]);
     }
-  }, [userId]); // Depend on userId
+  }, [userId]);
+
+  // Auto-refresh when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchChats();
+    }, [fetchChats])
+  );
+
+  // Pull-to-refresh handler
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await fetchChats();
+    setRefreshing(false);
+  }, [fetchChats]);
 
   // 防抖逻辑
   React.useEffect(() => {
@@ -183,6 +208,14 @@ export default function ChatListScreen() {
           )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.text.primary}
+              colors={[colors.text.primary]}
+            />
+          }
         />
       </SafeAreaView>
     </LinearGradient>

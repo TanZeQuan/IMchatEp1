@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -8,36 +8,25 @@ import {
   TouchableOpacity,
   View,
   Image,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, borders, typography } from "../styles";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
+import { useUserStore } from "../store/userStore";
+import { getFriendRequests } from "../api/FriendApi";
+import { addGroup } from "../api/Group";
 
 interface Contact {
-  id: number;
+  id: string;
   name: string;
+  userId: string;
+  image?: string;
 }
-
-const contactsData: Contact[] = [
-  { id: 1, name: "Alice" },
-  { id: 2, name: "Anna" },
-  { id: 3, name: "Peter" },
-  { id: 4, name: "Nick" },
-  { id: 5, name: "Bob" },
-  { id: 6, name: "John" },
-  { id: 7, name: "Alex" },
-  { id: 8, name: "Tom" },
-  { id: 9, name: "Celine" },
-  { id: 10, name: "Zack" },
-  { id: 11, name: "David" },
-  { id: 12, name: "Eve" },
-  { id: 13, name: "Holly" },
-  { id: 14, name: "Frank" },
-  { id: 15, name: "Star" },
-];
 
 const FriendItem = ({
   item,
@@ -46,7 +35,7 @@ const FriendItem = ({
 }: {
   item: Contact;
   isSelected: boolean;
-  onToggle: (id: number) => void;
+  onToggle: (id: string) => void;
 }) => {
   return (
     <TouchableOpacity
@@ -57,11 +46,14 @@ const FriendItem = ({
       <View style={styles.leftSection}>
         <View style={styles.avatarPlaceholder}>
           <Image
-            source={{ uri: "https://postimg.cc/34y84VvN" }}
+            source={{ uri: item.image || "https://postimg.cc/34y84VvN" }}
             style={styles.avatarImage}
           />
         </View>
-        <Text style={styles.friendName}>{item.name}</Text>
+        <View>
+          <Text style={styles.friendName}>{item.name}</Text>
+          <Text style={styles.friendId}>ID: {item.userId}</Text>
+        </View>
       </View>
 
       <View style={styles.rightSection}>
@@ -82,18 +74,190 @@ const FriendItem = ({
 
 export default function AddGroup() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+  const { userId } = useUserStore();
   const [searchText, setSearchText] = useState("");
-  const [selectedFriends, setSelectedFriends] = useState<number[]>([]);
+  const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+  const [groupName, setGroupName] = useState("");
 
-  const toggleFriend = (id: number) => {
-    setSelectedFriends((prev) =>
-      prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
-    );
+  // Fetch friends when component mounts
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userId) {
+        fetchFriends();
+      }
+    }, [userId])
+  );
+
+  const fetchFriends = async () => {
+    if (!userId) {
+      console.log('⚠️ No userId available');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await getFriendRequests(userId, 2); // Get accepted friends (status=2)
+
+      if (response && !response.error && response.response) {
+        const requestFriends = response.response.request || [];
+        const approveFriends = response.response.approve || [];
+
+        const allFriends: Contact[] = [];
+
+        // Friends where I sent the request
+        requestFriends.forEach((friend: any) => {
+          const friendUserId = friend.approve_id || friend.user_id || friend.id;
+          allFriends.push({
+            id: friend.list_id || friendUserId || String(Math.random()),
+            name: friend.name || friendUserId || "未知用户",
+            userId: friendUserId,
+            image: friend.image,
+          });
+        });
+
+        // Friends where I received the request
+        approveFriends.forEach((friend: any) => {
+          const friendUserId = friend.request_id || friend.user_id || friend.id;
+          allFriends.push({
+            id: friend.list_id || friendUserId || String(Math.random()),
+            name: friend.name || friendUserId || "未知用户",
+            userId: friendUserId,
+            image: friend.image,
+          });
+        });
+
+        console.log('✅ Loaded friends for group:', allFriends.length);
+        setContacts(allFriends);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching friends:', error);
+      Alert.alert('错误', '无法加载好友列表');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const filteredData = contactsData.filter((contact) =>
-    contact.name.toLowerCase().includes(searchText.toLowerCase())
+  const toggleFriend = (id: string) => {
+    setSelectedFriends((prev) => {
+      const newSelected = prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id];
+
+      // Auto-generate group name when selection changes
+      if (newSelected.length > 0) {
+        const selectedContacts = contacts.filter((contact) => newSelected.includes(contact.id));
+        const autoGeneratedName = selectedContacts
+          .map((contact) => contact.name)
+          .slice(0, 3)
+          .join("、") + (selectedContacts.length > 3 ? "..." : "");
+
+        // Only update if user hasn't manually edited the name
+        if (!groupName || prev.length === 0) {
+          setGroupName(autoGeneratedName);
+        }
+      } else {
+        setGroupName("");
+      }
+
+      return newSelected;
+    });
+  };
+
+  const filteredData = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(searchText.toLowerCase()) ||
+    contact.userId.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  const handleCreateGroup = async () => {
+    if (!userId) {
+      Alert.alert('错误', '无法获取用户信息');
+      return;
+    }
+
+    if (selectedFriends.length < 1) {
+      Alert.alert('提示', '请至少选择一位好友');
+      return;
+    }
+
+    if (!groupName.trim()) {
+      Alert.alert('提示', '请输入群聊名称');
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+
+      // Get selected friend details
+      const selectedContacts = contacts.filter((contact) =>
+        selectedFriends.includes(contact.id)
+      );
+
+      // Prepare group members array
+      const groupMembers = [
+        { user_id: userId, isadmin: 2 }, // Creator is admin
+        ...selectedContacts.map(contact => ({
+          user_id: contact.userId,
+          isadmin: 1 // Regular members
+        }))
+      ];
+
+      console.log('📝 Creating group with:', {
+        name: groupName.trim(),
+        user_id: userId,
+        members: groupMembers.length
+      });
+
+      const response = await addGroup({
+        name: groupName.trim(),
+        user_id: userId,
+        image: "",
+        group: groupMembers
+      });
+
+      console.log('✅ Group created:', response);
+
+      if (response && !response.error) {
+        const chatId = response.response;
+
+        // Navigate to GroupScreen
+        navigation.navigate("GroupScreen", {
+          groupName: groupName.trim(),
+          groupId: chatId,
+        });
+      } else {
+        Alert.alert('错误', response?.message || '创建群聊失败');
+      }
+    } catch (error) {
+      console.error('❌ Error creating group:', error);
+      Alert.alert('错误', '创建群聊时发生错误');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
+        <SafeAreaView style={styles.container} edges={["top"]}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>发起群聊</Text>
+            <View style={styles.placeholder} />
+          </View>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.text.primary} />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
 
   return (
     <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
@@ -135,11 +299,26 @@ export default function AddGroup() {
         </View>
 
         {selectedFriends.length > 0 && (
-          <View style={styles.selectedCountContainer}>
-            <Text style={styles.selectedCountText}>
-              选择了 {selectedFriends.length} 人
-            </Text>
-          </View>
+          <>
+            <View style={styles.selectedCountContainer}>
+              <Text style={styles.selectedCountText}>
+                选择了 {selectedFriends.length} 人
+              </Text>
+            </View>
+
+            {/* Group Name Input */}
+            <View style={styles.groupNameContainer}>
+              <Text style={styles.groupNameLabel}>群聊名称</Text>
+              <TextInput
+                style={styles.groupNameInput}
+                placeholder="请输入群聊名称"
+                placeholderTextColor={colors.text.lightGray}
+                value={groupName}
+                onChangeText={setGroupName}
+                maxLength={50}
+              />
+            </View>
+          </>
         )}
 
         {/* Friend List */}
@@ -160,28 +339,15 @@ export default function AddGroup() {
         {selectedFriends.length > 0 && (
           <View style={styles.createButtonContainer}>
             <TouchableOpacity
-              style={styles.createButton}
-              onPress={() => {
-                // 获取选中好友的名字
-                const selectedNames = contactsData
-                  .filter((contact) => selectedFriends.includes(contact.id))
-                  .map((contact) => contact.name)
-                  .slice(0, 3)
-                  .join("、");
-
-                // 生成群聊名称
-                const groupName = selectedNames + (selectedFriends.length > 3 ? "..." : "");
-
-                console.log("创建群聊，选择的好友:", selectedFriends);
-
-                // 导航到 GroupScreen
-                navigation.navigate("GroupScreen", {
-                  groupName: groupName,
-                  groupId: Date.now().toString(),
-                });
-              }}
+              style={[styles.createButton, isCreating && styles.createButtonDisabled]}
+              onPress={handleCreateGroup}
+              disabled={isCreating}
             >
-              <Text style={styles.createButtonText}>发起群聊</Text>
+              {isCreating ? (
+                <ActivityIndicator size="small" color={colors.background.white} />
+              ) : (
+                <Text style={styles.createButtonText}>发起群聊</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -253,6 +419,27 @@ const styles = StyleSheet.create({
     color: colors.text.medium,
     fontWeight: typography.fontWeight500,
   },
+  groupNameContainer: {
+    backgroundColor: colors.background.white,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: borders.width1,
+    borderBottomColor: colors.border.light,
+  },
+  groupNameLabel: {
+    fontSize: typography.fontSize14,
+    color: colors.text.medium,
+    marginBottom: 8,
+    fontWeight: typography.fontWeight500,
+  },
+  groupNameInput: {
+    backgroundColor: colors.background.grayPale,
+    borderRadius: borders.radius8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: typography.fontSize15,
+    color: colors.text.primary,
+  },
   listContent: {
     paddingTop: 10,
   },
@@ -300,6 +487,11 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize16,
     fontWeight: typography.fontWeight500,
     color: colors.text.primary,
+    marginBottom: 2,
+  },
+  friendId: {
+    fontSize: typography.fontSize12,
+    color: colors.text.grayLight,
   },
   rightSection: {
     marginLeft: 12,
@@ -334,5 +526,13 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize16,
     fontWeight: typography.fontWeight600,
     color: colors.background.white,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createButtonDisabled: {
+    opacity: 0.6,
   },
 });
