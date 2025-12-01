@@ -187,19 +187,8 @@ const ContactsLayout: React.FC = () => {
 
       console.log('📬 createPrivateChat response:', response);
 
-      if (response && !response.error) {
+      if (response && !response.error && response.response) {
         const chatId = response.response;
-
-        // Backend bug workaround: if chatId is empty but creation was successful
-        if (!chatId || chatId === "") {
-          console.warn('⚠️ Backend returned empty chat_id, but creation was successful');
-          console.warn('⚠️ This is a backend bug - it should return the chat_id');
-
-          // Show alert to user
-          alert('聊天创建成功，但后端未返回聊天ID。这是后端的问题，请联系后端开发人员修复。\n\n返回消息: ' + response.message);
-          return;
-        }
-
         console.log('✅ Chat ID received:', chatId);
 
         // Navigate to ChatScreen with chat_id and friend info
@@ -217,8 +206,9 @@ const ContactsLayout: React.FC = () => {
 
         console.log('✅ Navigation successful');
       } else {
-        console.error('❌ API returned error:', response);
-        alert('创建聊天失败: ' + (response?.message || '未知错误'));
+        // Handle cases where API returns an error or an empty response
+        console.error('❌ Failed to create or retrieve chat:', response);
+        alert('创建聊天失败: ' + (response?.message || '无法获取聊天ID'));
       }
     } catch (error) {
       console.error('❌ Error in handleContactPress:', error);
