@@ -20,7 +20,7 @@ import { useUserStore } from "../store/userStore";
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
 import { AuthStackParamList } from "../navigation/AuthStack";
-import { login } from "../api/UserApi";
+import { login, getUserProfile } from "../api/UserApi";
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -62,10 +62,36 @@ const LoginScreen = ({ setUserToken }: { setUserToken: (token: string) => void }
       ]);
 
       // Read saved info (from registration or previous login)
-      const userName = await AsyncStorage.getItem(`userName_${userId}`);
-      const userEmail = await AsyncStorage.getItem(`userEmail_${userId}`);
-      const userPhone = await AsyncStorage.getItem(`userPhone_${userId}`);
-      const userAvatar = await AsyncStorage.getItem(`userAvatar_${userId}`);
+      let userName = await AsyncStorage.getItem(`userName_${userId}`);
+      let userEmail = await AsyncStorage.getItem(`userEmail_${userId}`);
+      let userPhone = await AsyncStorage.getItem(`userPhone_${userId}`);
+      let userAvatar = await AsyncStorage.getItem(`userAvatar_${userId}`);
+
+      // If user info is not in AsyncStorage, fetch it from the server
+      if (!userName) {
+        try {
+          const userProfile = await getUserProfile(userId);
+          if (userProfile && userProfile.response) {
+            const { name, email, phone, avatar } = userProfile.response;
+            
+            userName = name;
+            userEmail = email;
+            userPhone = phone;
+            userAvatar = avatar;
+
+            // Save fetched info to AsyncStorage
+            await AsyncStorage.multiSet([
+              [`userName_${userId}`, name || ''],
+              [`userEmail_${userId}`, email || ''],
+              [`userPhone_${userId}`, phone || ''],
+              [`userAvatar_${userId}`, avatar || ''],
+            ]);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user profile:", error);
+          // Decide if you want to alert the user about this failure
+        }
+      }
 
       console.log("当前用户信息:", {
         userId,

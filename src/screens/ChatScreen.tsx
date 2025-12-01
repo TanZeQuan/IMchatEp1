@@ -242,7 +242,7 @@ export default function ChatScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.replace('Home')}
           >
             <Ionicons name="chevron-back" size={24} color="#333" />
           </TouchableOpacity>

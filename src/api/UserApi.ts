@@ -226,5 +226,16 @@ export const updateProfile = async (payload: any) => {
   }
 };
 
+// Get user profile
+export const getUserProfile = async (userId: string) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/users/info/${userId}`);
+    return res.data;
+  } catch (error: any) {
+    console.error("Get user profile error:", error.response?.data || error.message);
+    throw error.response?.data || error;
+  }
+};
+
 
 

@@ -26,6 +26,8 @@ const ProfileMenu: React.FC<Props> = ({ setUserToken }) => {
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('未命名用户');
   const [userId, setUserId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [phone, setPhone] = useState<string | null>(null);
 
   const menuItems: MenuItem[] = [
     { icon: 'star-outline', label: '我的收藏' },
@@ -54,6 +56,8 @@ const ProfileMenu: React.FC<Props> = ({ setUserToken }) => {
 
       const email = await AsyncStorage.getItem(`userEmail_${currentUserId}`);
       const phone = await AsyncStorage.getItem(`userPhone_${currentUserId}`);
+      setEmail(email);
+      setPhone(phone);
       console.log("Profile loaded info:", { currentUserId, nickname, avatar, email, phone });
     };
 
@@ -207,6 +211,8 @@ const ProfileMenu: React.FC<Props> = ({ setUserToken }) => {
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{userName}</Text>
                 <Text style={styles.profileId}>账号ID：{userId}</Text>
+                {email && <Text style={styles.profileId}>Email: {email}</Text>}
+                {phone && <Text style={styles.profileId}>Phone: {phone}</Text>}
               </View>
             </View>
             <View style={styles.profileRight}>

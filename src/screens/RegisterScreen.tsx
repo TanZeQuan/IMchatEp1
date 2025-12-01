@@ -55,6 +55,12 @@ const RegisterScreen = () => {
   const handleRegister = async () => {
     if (!nickname || !phone || !email || !password || !confirmPassword) return;
 
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+
+
     try {
       const res = await register({ name: nickname, phone, email, password });
       console.log("Register success:", res);
@@ -81,12 +87,12 @@ const RegisterScreen = () => {
         email,
       });
 
-      Alert.alert("成功", "注册成功！", [
+      Alert.alert("Success", "Registration successful!", [
         { text: "OK", onPress: () => navigation.navigate("Login") },
       ]);
     } catch (err: any) {
       console.error("Register error:", err);
-      Alert.alert("错误", err?.message || "注册失败");
+      Alert.alert("Error", err?.message || "Registration failed");
     }
   };
 

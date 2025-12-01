@@ -39,12 +39,11 @@ interface Section {
 const alphabet: string[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#".split("");
 
 const ContactsLayout: React.FC = () => {
-  const { userToken } = useUserStore();
+  const { userToken, userId, contacts, setContacts } = useUserStore();  // ← 添加 userId
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
   const [searchText, setSearchText] = useState("");
-  const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
 
@@ -53,84 +52,82 @@ const ContactsLayout: React.FC = () => {
   // Fetch friends when screen comes into focus AND when userToken is available
   useFocusEffect(
     React.useCallback(() => {
-      if (userToken && !hasFetched) {
-        console.log('Fetching friends with token:', userToken);
+      if (userId) {
         fetchFriends();
       }
-      
-      // Reset hasFetched when leaving screen to refresh on next focus
-      return () => {
-        setHasFetched(false);
-      };
-    }, [userToken, hasFetched])
+    }, [userId])
   );
 
   const fetchFriends = async () => {
-    if (!userToken) {
-      console.log('No user token available');
-      setIsLoading(false);
+    if (!userId) {
+      console.log('⚠️ fetchFriends: No userId available');
       return;
     }
 
+    console.log('📋 Fetching friends with userId:', userId);
+
     try {
       setIsLoading(true);
-      console.log('Making API call to get friends...');
-      const response = await getFriendRequests(userToken, 2); // Get accepted friends (status=2)
-      console.log('API Response:', response);
+      const response = await getFriendRequests(userId, 2); // Get accepted friends (status=2)
+
+      console.log('📥 getFriendRequests response:', response);
 
       if (response && !response.error && response.response) {
         const requestFriends = response.response.request || [];
         const approveFriends = response.response.approve || [];
 
-        console.log('Request friends:', requestFriends);
-        console.log('Approve friends:', approveFriends);
+        console.log('📊 Request friends:', requestFriends.length);
+        console.log('📊 Approve friends:', approveFriends.length);
+        console.log('🔍 Sample request friend:', requestFriends[0]);
+        console.log('🔍 Sample approve friend:', approveFriends[0]);
 
         // Merge both arrays and create Contact objects
         const allFriends: Contact[] = [];
 
         // Friends where I sent the request
         requestFriends.forEach((friend: any) => {
+          console.log('🔍 Processing request friend:', friend);
+          const friendUserId = friend.approve_id || friend.user_id || friend.id;
           allFriends.push({
-            id: friend.list_id || friend.approve_id || `req_${friend.approve_id}`,
-            name: friend.name || friend.approve_id || "未知用户",
-            userId: friend.approve_id,
+            id: friend.list_id || friendUserId || String(Math.random()),
+            name: friend.name || friendUserId || "未知用户",
+            userId: friendUserId,
             image: friend.image,
           });
         });
 
         // Friends where I received the request
         approveFriends.forEach((friend: any) => {
+          console.log('🔍 Processing approve friend:', friend);
+          const friendUserId = friend.request_id || friend.user_id || friend.id;
           allFriends.push({
-            id: friend.list_id || friend.request_id || `app_${friend.request_id}`,
-            name: friend.name || friend.request_id || "未知用户",
-            userId: friend.request_id,
+            id: friend.list_id || friendUserId || String(Math.random()),
+            name: friend.name || friendUserId || "未知用户",
+            userId: friendUserId,
             image: friend.image,
           });
         });
 
-        console.log('All friends processed:', allFriends);
+        console.log('✅ Total friends loaded:', allFriends.length);
+        console.log('📝 Friends data:', allFriends);
+
         setContacts(allFriends);
-        setHasFetched(true);
       } else {
-        console.log('No valid response data');
-        setContacts([]);
-        setHasFetched(true);
+        console.log('⚠️ No friends data in response');
+        setContacts([]); // Clear contacts if fetch fails
       }
     } catch (error) {
-      console.error('Error fetching friends:', error);
-      setContacts([]);
-      setHasFetched(true);
+      console.error('❌ Error fetching friends:', error);
+      setContacts([]); // Also clear on error
     } finally {
       setIsLoading(false);
     }
   };
 
-  const groupContacts = (contacts: Contact[]): Section[] => {
-    if (contacts.length === 0) return [];
-    
+  const groupContacts = (currentContacts: Contact[]): Section[] => {
     const grouped: Record<string, Contact[]> = {};
 
-    contacts.forEach((contact) => {
+    currentContacts.forEach((contact) => {
       // Safety check: ensure contact has a name
       if (!contact.name) return;
 
@@ -181,24 +178,58 @@ const ContactsLayout: React.FC = () => {
   };
 
   const handleContactPress = async (contact: Contact) => {
-    if (!userToken) return;
+    console.log('👤 Contact pressed:', contact);
+    console.log('🔑 Current userId:', userId);
+
+    if (!userId) {
+      console.error('❌ No userId available!');
+      return;
+    }
 
     try {
-      // Create or get existing private chat
-      const response = await createPrivateChat(userToken, contact.userId, contact.name);
+      console.log('🔄 Creating private chat...');
+
+      // Create or get existing private chat - 使用 userId 而不是 userToken
+      let response = await createPrivateChat(userId, contact.userId, contact.name);
+
+      console.log('📬 createPrivateChat first response:', response);
+
+      // Check if chat was created but no chatId returned (server-side issue)
+      if (response && !response.error && !response.response) {
+        console.log('⚠️ Chat created but no chat ID returned. Retrying to get chat ID...');
+        // Retry to get the chat ID
+        response = await createPrivateChat(userId, contact.userId, contact.name);
+        console.log('📬 createPrivateChat retry response:', response);
+      }
+
+      console.log('📬 createPrivateChat response:', response);
 
       if (response && !response.error && response.response) {
         const chatId = response.response;
+        console.log('✅ Chat ID received:', chatId);
 
         // Navigate to ChatScreen with chat_id and friend info
+        console.log('🧭 Navigating to ChatScreen with params:', {
+          chatId: chatId,
+          chatName: contact.name,
+          userId: contact.userId,
+        });
+
         navigation.navigate('ChatScreen', {
           chatId: chatId,
           chatName: contact.name,
           userId: contact.userId,
         });
+
+        console.log('✅ Navigation successful');
+      } else {
+        // Handle cases where API returns an error or an empty response
+        console.error('❌ Failed to create or retrieve chat:', response);
+        alert('创建聊天失败: ' + (response?.message || '无法获取聊天ID'));
       }
     } catch (error) {
-      console.error('Error creating private chat:', error);
+      console.error('❌ Error in handleContactPress:', error);
+      alert('创建聊天时发生错误，请稍后重试。');
     }
   };
 
