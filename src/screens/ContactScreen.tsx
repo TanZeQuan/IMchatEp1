@@ -45,10 +45,11 @@ const ContactsLayout: React.FC = () => {
 
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const sectionListRef = React.useRef<SectionList>(null);
 
-  // Fetch friends when screen comes into focus
+  // Fetch friends when screen comes into focus AND when userToken is available
   useFocusEffect(
     React.useCallback(() => {
       if (userId) {
@@ -133,7 +134,12 @@ const ContactsLayout: React.FC = () => {
       let firstChar = contact.name[0];
 
       if (/[\u4e00-\u9fa5]/.test(firstChar)) {
-        firstChar = pinyin(firstChar, { style: "first_letter" })[0][0];
+        try {
+          firstChar = pinyin(firstChar, { style: "first_letter" })[0][0];
+        } catch (error) {
+          console.warn('Pinyin conversion failed for:', firstChar);
+          firstChar = '#';
+        }
       }
 
       const letter = /[A-Z]/i.test(firstChar) ? firstChar.toUpperCase() : "#";
@@ -160,7 +166,7 @@ const ContactsLayout: React.FC = () => {
   const sections = groupContacts(filteredContacts);
 
   const handleLetterPress = (letter: string) => {
-    console.log('Pressed letter:', letter); // For debugging
+    console.log('Pressed letter:', letter);
     const index = sections.findIndex((s) => s.title === letter);
     if (index !== -1 && sectionListRef.current) {
       sectionListRef.current.scrollToLocation({
@@ -227,14 +233,25 @@ const ContactsLayout: React.FC = () => {
     }
   };
 
+  // Add manual refresh function for testing
+  const handleManualRefresh = () => {
+    setHasFetched(false);
+    fetchFriends();
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>通讯录</Text>
+          {/* Add refresh button for debugging */}
+          <TouchableOpacity onPress={handleManualRefresh} style={styles.debugButton}>
+            <Text style={styles.debugButtonText}>手动刷新</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.text.primary} />
+          <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </SafeAreaView>
     );
@@ -245,6 +262,11 @@ const ContactsLayout: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>通讯录</Text>
+        
+        {/* Add refresh button for debugging */}
+        <TouchableOpacity onPress={handleManualRefresh} style={styles.debugButton}>
+          <Text style={styles.debugButtonText}>刷新</Text>
+        </TouchableOpacity>
 
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={f(14)} style={styles.searchIcon} />
@@ -262,9 +284,6 @@ const ContactsLayout: React.FC = () => {
         </View>
       </View>
 
-      {/* Action Buttons */}
-      {/* Moved into SectionList's ListHeaderComponent */}
-
       {/* SectionList */}
       <View style={styles.listContainer}>
         <SectionList
@@ -272,11 +291,12 @@ const ContactsLayout: React.FC = () => {
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
           ListEmptyComponent={
-            !isLoading && (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>暂时无好友，快添加好友吧！</Text>
-              </View>
-            )
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>暂时无好友，快添加好友吧！</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("AddFriend")} style={styles.addFriendButton}>
+                <Text style={styles.addFriendButtonText}>添加好友</Text>
+              </TouchableOpacity>
+            </View>
           }
           ListHeaderComponent={
             <View style={styles.actionButtons}>
@@ -314,8 +334,9 @@ const ContactsLayout: React.FC = () => {
             >
               <View style={styles.avatar}>
                 <Image
-                  source={{ uri: item.image || "https://postimg.cc/34y84VvN" }}
+                  source={{ uri: item.image || "https://i.postimg.cc/34y84VvN/user.png" }}
                   style={styles.avatarImage}
+                  onError={(e) => console.log('Image load error:', e.nativeEvent.error)}
                 />
               </View>
               <View style={styles.contactInfo}>
@@ -326,18 +347,20 @@ const ContactsLayout: React.FC = () => {
           )}
         />
 
-        {/* Alphabet Index - 移到 listContainer 内部 */}
-        <View style={styles.alphabetIndex}>
-          {alphabet.map((letter) => (
-            <TouchableOpacity
-              key={letter}
-              style={styles.alphabetItem}
-              onPress={() => handleLetterPress(letter)}
-            >
-              <Text style={styles.alphabetText}>{letter}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {/* Alphabet Index */}
+        {sections.length > 0 && (
+          <View style={styles.alphabetIndex}>
+            {alphabet.map((letter) => (
+              <TouchableOpacity
+                key={letter}
+                style={styles.alphabetItem}
+                onPress={() => handleLetterPress(letter)}
+              >
+                <Text style={styles.alphabetText}>{letter}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -355,6 +378,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  loadingText: {
+    marginTop: h(10),
+    fontSize: f(typography.fontSize14),
+    color: colors.text.grayLight,
+  },
+
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -365,6 +394,32 @@ const styles = StyleSheet.create({
     fontSize: f(typography.fontSize14),
     color: colors.text.grayLight,
     textAlign: 'center',
+    marginBottom: h(20),
+  },
+
+  addFriendButton: {
+    backgroundColor: colors.background.yellow,
+    paddingHorizontal: w(20),
+    paddingVertical: h(10),
+    borderRadius: borders.radius8,
+  },
+  addFriendButtonText: {
+    color: colors.text.dark,
+    fontSize: f(typography.fontSize14),
+    fontWeight: typography.fontWeight500,
+  },
+
+  debugButton: {
+    position: 'absolute',
+    right: w(10),
+    top: h(10),
+    backgroundColor: colors.background.grayPale,
+    padding: w(5),
+    borderRadius: borders.radius4,
+  },
+  debugButtonText: {
+    fontSize: f(typography.fontSize11),
+    color: colors.text.gray,
   },
 
   /** HEADER */
@@ -490,9 +545,9 @@ const styles = StyleSheet.create({
   alphabetIndex: {
     position: "absolute",
     right: w(8),
-    top: h(130), // 从 action buttons 之后开始
-    bottom: h(20), // 留一点底部空间
-    justifyContent: "center", // 自动垂直居中字母列表
+    top: h(120),
+    bottom: h(20),
+    justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
   },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator, Alert, RefreshControl } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -53,48 +53,88 @@ const FriendReqScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (userToken) {
+        console.log('Fetching friend requests with token:', userToken);
         fetchFriendRequests();
       }
     }, [userToken])
   );
 
   const fetchFriendRequests = async () => {
-    if (!userToken) return;
+    if (!userToken) {
+      console.log('No user token available');
+      setIsLoading(false);
+      setRefreshing(false);
+      return;
+    }
 
     try {
       setIsLoading(true);
+      setRefreshing(true);
+      console.log('Making API calls for friend requests...');
 
-      // Fetch all 3 statuses in parallel
+      // Fetch all 3 statuses in parallel with timeout
       const [pendingRes, acceptedRes, declinedRes] = await Promise.all([
-        getFriendRequests(userToken, 1), // Pending
-        getFriendRequests(userToken, 2), // Accepted
-        getFriendRequests(userToken, 3), // Declined
+        getFriendRequests(userToken, 1).catch(error => {
+          console.error('Error fetching pending requests:', error);
+          return null;
+        }),
+        getFriendRequests(userToken, 2).catch(error => {
+          console.error('Error fetching accepted requests:', error);
+          return null;
+        }),
+        getFriendRequests(userToken, 3).catch(error => {
+          console.error('Error fetching declined requests:', error);
+          return null;
+        }),
       ]);
 
       console.log('Pending Response:', pendingRes);
       console.log('Accepted Response:', acceptedRes);
       console.log('Declined Response:', declinedRes);
 
+      // Reset all states first
+      setReceivedPending([]);
+      setSentPending([]);
+      setReceivedAccepted([]);
+      setSentAccepted([]);
+      setReceivedDeclined([]);
+      setSentDeclined([]);
+
       // Pending (status=1)
       if (pendingRes && !pendingRes.error && pendingRes.response) {
         setReceivedPending(pendingRes.response.approve || []);
         setSentPending(pendingRes.response.request || []);
+      } else {
+        console.log('No valid pending response data');
       }
 
       // Accepted (status=2)
       if (acceptedRes && !acceptedRes.error && acceptedRes.response) {
         setReceivedAccepted(acceptedRes.response.approve || []);
         setSentAccepted(acceptedRes.response.request || []);
+      } else {
+        console.log('No valid accepted response data');
       }
 
       // Declined (status=3)
       if (declinedRes && !declinedRes.error && declinedRes.response) {
         setReceivedDeclined(declinedRes.response.approve || []);
         setSentDeclined(declinedRes.response.request || []);
+      } else {
+        console.log('No valid declined response data');
       }
+
     } catch (error) {
       console.error('Error fetching friend requests:', error);
       Alert.alert("错误", "无法获取好友请求");
+      
+      // Reset states on error
+      setReceivedPending([]);
+      setSentPending([]);
+      setReceivedAccepted([]);
+      setSentAccepted([]);
+      setReceivedDeclined([]);
+      setSentDeclined([]);
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -132,6 +172,7 @@ const FriendReqScreen: React.FC = () => {
 
   const handleReject = async (listId: string, name: string) => {
     try {
+      console.log('Rejecting friend request:', listId);
       const response = await updateFriendRequest(listId, 3); // 3 = Decline
 
       if (response && !response.error) {
@@ -149,7 +190,7 @@ const FriendReqScreen: React.FC = () => {
 
   const renderRequestItem = (req: FriendRequest, isReceived: boolean, status: 'pending' | 'accepted' | 'declined') => {
     const displayName = req.name || req.request_id || "未知用户";
-    const displayAvatar = req.image || "https://postimg.cc/34y84VvN";
+    const displayAvatar = req.image || "https://i.postimg.cc/34y84VvN/user.png";
     const userId = isReceived ? req.request_id : req.approve_id;
 
     return (
@@ -159,6 +200,7 @@ const FriendReqScreen: React.FC = () => {
             <Image
               source={{ uri: displayAvatar }}
               style={styles.avatar}
+              onError={(e) => console.log('Image load error:', e.nativeEvent.error)}
             />
           </View>
           <View>
@@ -197,6 +239,11 @@ const FriendReqScreen: React.FC = () => {
     );
   };
 
+  // Add manual refresh function
+  const handleManualRefresh = () => {
+    fetchFriendRequests();
+  };
+
   if (isLoading) {
     return (
       <LinearGradient colors={colors.background.gradientYellow} style={styles.safeArea}>
@@ -209,10 +256,13 @@ const FriendReqScreen: React.FC = () => {
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>好友请求</Text>
-            <View style={styles.placeholder} />
+            <TouchableOpacity onPress={handleManualRefresh} style={styles.debugButton}>
+              <Text style={styles.debugButtonText}>强制刷新</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.text.primary} />
+            <Text style={styles.loadingText}>加载中...</Text>
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -242,7 +292,30 @@ const FriendReqScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content}>
+        <ScrollView 
+          style={styles.content}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                setRefreshing(true);
+                fetchFriendRequests();
+              }}
+              colors={[colors.text.primary]}
+              tintColor={colors.text.primary}
+            />
+          }
+        >
+          {/* Debug Info */}
+          <View style={styles.debugInfo}>
+            <Text style={styles.debugText}>
+              数据状态: 收到待处理({receivedPending.length}) | 收到已接受({receivedAccepted.length}) | 收到已拒绝({receivedDeclined.length})
+            </Text>
+            <Text style={styles.debugText}>
+              发送待处理({sentPending.length}) | 发送已接受({sentAccepted.length}) | 发送已拒绝({sentDeclined.length})
+            </Text>
+          </View>
+
           {/* Received Pending Requests */}
           <View style={styles.friendRequestBox}>
             <Text style={styles.friendRequestTitle}>
@@ -347,6 +420,15 @@ const styles = StyleSheet.create({
     padding: 4,
     width: 32,
   },
+  debugButton: {
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    padding: 4,
+    borderRadius: 4,
+  },
+  debugButtonText: {
+    fontSize: 10,
+    color: '#666',
+  },
   headerTitle: {
     fontSize: typography.fontSize16,
     fontWeight: typography.fontWeight600,
@@ -362,8 +444,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    marginTop: 10,
+    fontSize: typography.fontSize14,
+    color: colors.text.grayLight,
+  },
   content: {
     flex: 1,
+  },
+  debugInfo: {
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    padding: 8,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 4,
+  },
+  debugText: {
+    fontSize: 10,
+    color: '#666',
+    textAlign: 'center',
   },
   friendRequestBox: {
     backgroundColor: COLORS.white,

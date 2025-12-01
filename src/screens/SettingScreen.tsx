@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
-import { useSettingsStore } from "../store/settingsStore";
+import { useSettingsStore } from "../store/useToken";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, borders, typography } from "../styles";
 
