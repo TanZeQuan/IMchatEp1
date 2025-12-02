@@ -225,6 +225,7 @@ export default function AddGroup() {
         navigation.navigate("GroupScreen", {
           groupName: groupName.trim(),
           groupId: chatId,
+          chatId: chatId,
         });
       } else {
         Alert.alert('错误', response?.message || '创建群聊失败');

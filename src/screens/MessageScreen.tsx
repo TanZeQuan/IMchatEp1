@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, borders, typography } from "../styles";
 
-import { getChatsForUser } from "../api/Message";
+import { getChatsForUser } from "../api/message";
 
 // --- TypeScript Interfaces ---
 interface ChatItemType {
@@ -82,7 +82,11 @@ const ChatItem = ({
   const handlePress = () => {
     if (isGroupChat) {
       // Navigate to GroupScreen for group chats
-      navigation.navigate("GroupScreen", { groupName: item.name, groupId: item.chat_id });
+      navigation.navigate("GroupScreen", {
+        groupName: item.name,
+        groupId: item.chat_id,
+        chatId: item.chat_id
+      });
     } else {
       // Navigate to Chat for private chats
       navigation.navigate("Chat", { chatName: item.name, chatId: item.chat_id });

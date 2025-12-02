@@ -19,6 +19,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import EmojiPicker from "rn-emoji-keyboard";
 import { Audio } from "expo-av";
 import { sendVoiceMessageToApi } from "../api/VoiceMessageApi";
+import { getChatMessages } from "../api/message";
 import VoiceMessage from '../components/VoiceMessage';
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
@@ -38,6 +39,7 @@ interface Message {
 interface RouteParams {
   groupName?: string;
   groupId?: string;
+  chatId?: string;
 }
 
 export default function GroupScreen() {
@@ -50,35 +52,26 @@ export default function GroupScreen() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      sender: "other",
-      senderName: "Alice",
-      text: "大家好！",
-      type: "text",
-    },
-    {
-      id: "2",
-      sender: "other",
-      senderName: "Bob",
-      text: "欢迎加入群聊",
-      type: "text"
-    },
-    {
-      id: "3",
-      sender: "me",
-      senderName: "我",
-      text: "谢谢大家",
-      type: "text"
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [groupMembers, setGroupMembers] = useState<any[]>([]);
+  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
+    console.log("=== GroupScreen useEffect ===");
+    console.log("params?.chatId:", params?.chatId);
+    console.log("Will fetch messages:", !!params?.chatId);
+
     setupAudio();
+    // Fetch messages if chatId is provided
+    if (params?.chatId) {
+      fetchMessages();
+    } else {
+      console.log("Skipping fetchMessages - no chatId");
+    }
     return () => {
       if (recording) {
         recording
@@ -91,6 +84,49 @@ export default function GroupScreen() {
       }
     };
   }, []);
+
+  const fetchMessages = async () => {
+    if (!params?.chatId) return;
+
+    console.log("=== GroupScreen fetchMessages ===");
+    console.log("Fetching messages for chatId:", params.chatId);
+
+    setIsLoadingMessages(true);
+    try {
+      const response = await getChatMessages(params.chatId, offset);
+      console.log("API Response:", response);
+
+      if (response.error === false && response.response) {
+        // Store group members for GroupDetails
+        const members = response.response.group || [];
+        console.log("Group members from API:", members);
+        console.log("Group members count:", members.length);
+        setGroupMembers(members);
+
+        // Convert API messages to component format
+        const apiMessages = response.response.chat || [];
+        console.log("Messages from API:", apiMessages);
+        console.log("Messages count:", apiMessages.length);
+
+        const convertedMessages: Message[] = apiMessages.map((msg: any) => ({
+          id: msg.id?.toString() || Date.now().toString(),
+          sender: msg.sender_id === params.groupId ? "me" : "other",
+          senderName: msg.sender_name || (msg.sender_id === params.groupId ? "我" : "成员"),
+          text: msg.message || msg.text,
+          type: msg.type || "text",
+          uri: msg.uri
+        }));
+
+        console.log("Converted messages:", convertedMessages);
+        setMessages(convertedMessages);
+      }
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+      Alert.alert("错误", "获取消息失败");
+    } finally {
+      setIsLoadingMessages(false);
+    }
+  };
 
   const setupAudio = async () => {
     try {
@@ -268,7 +304,13 @@ export default function GroupScreen() {
           <TouchableOpacity
             style={styles.moreButton}
             onPress={() => {
-              navigation.navigate("GroupScreenDetails");
+              console.log("=== Navigating to GroupScreenDetails ===");
+              console.log("Group members to pass:", groupMembers);
+              console.log("Chat ID to pass:", params?.chatId);
+              navigation.navigate("GroupScreenDetails", {
+                groupMembers: groupMembers,
+                chatId: params?.chatId
+              });
             }}
           >
             <Ionicons name="ellipsis-horizontal" size={24} color="#333" />

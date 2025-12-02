@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,26 +11,32 @@ import {
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../navigation/MainStack";
 import { colors, borders, typography } from "../styles";
 
 const { width } = Dimensions.get("window");
 
-// 模拟数据：群成员
-const MEMBER_DATA = [
-  { id: "1", name: "妈妈" },
-  { id: "2", name: "名字" },
-  { id: "3", name: "名字" },
-  { id: "4", name: "名字" },
-  { id: "5", name: "名字" },
-  { id: "6", name: "名字" },
-  { id: "7", name: "名字" },
-  { id: "8", name: "名字" },
-  { id: "9", name: "名字" },
-  { id: "10", name: "名字" },
-];
+interface Member {
+  id: string;
+  name: string;
+}
+
+interface GroupMember {
+  id: number;
+  chat_id: string;
+  user_id: string;
+  isadmin: number;
+  isdelete: number;
+  join_at: string;
+  modify_at: string;
+}
+
+interface RouteParams {
+  groupMembers?: GroupMember[];
+  chatId?: string;
+}
 
 interface ListItemProps {
   label: string;
@@ -108,14 +114,38 @@ const ListItem: React.FC<ListItemProps> = ({
   );
 };
 
-interface Member {
-  id: string;
-  name: string;
-}
-
 export default function GroupScreenDetails() {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+  const route = useRoute();
+  const params = route.params as RouteParams;
+
+  console.log("=== GroupScreenDetails Debug ===");
+  console.log("Route params:", params);
+  console.log("Group members from params:", params?.groupMembers);
+  console.log("Chat ID from params:", params?.chatId);
+
+  // Convert API group members to display format
+  const [memberData, setMemberData] = useState<Member[]>([]);
+
+  useEffect(() => {
+    console.log("useEffect triggered, groupMembers:", params?.groupMembers);
+
+    if (params?.groupMembers && params.groupMembers.length > 0) {
+      console.log("Converting members, count:", params.groupMembers.length);
+      // Convert GroupMember[] to Member[] format
+      const convertedMembers: Member[] = params.groupMembers.map((member) => ({
+        id: member.user_id,
+        name: member.user_id, // You may want to fetch user names separately
+      }));
+      console.log("Converted members:", convertedMembers);
+      setMemberData(convertedMembers);
+    } else {
+      console.log("No group members found, using empty array");
+      // Fallback to empty array if no members provided
+      setMemberData([]);
+    }
+  }, [params?.groupMembers]);
 
   // 渲染单个成员组件
   const renderMember = (item: Member) => (
@@ -149,7 +179,7 @@ export default function GroupScreenDetails() {
         {/* --- 群成员网格卡片 --- */}
         <View style={styles.profileCard}>
           <View style={styles.gridContainer}>
-            {MEMBER_DATA.map(renderMember)}
+            {memberData.map(renderMember)}
             {/* 添加按钮 */}
             <TouchableOpacity style={styles.gridItem}>
               <View style={[styles.actionBtn, styles.addBtn]}>
@@ -169,7 +199,7 @@ export default function GroupScreenDetails() {
             style={styles.viewMoreBtn}
             onPress={() => navigation.navigate('GroupMemberList', { groupId: '1' })}
           >
-            <Text style={styles.viewMoreText}>查看全部成员 (12)</Text>
+            <Text style={styles.viewMoreText}>查看全部成员 ({memberData.length})</Text>
             <Ionicons name="chevron-forward" size={16} color="#999" />
           </TouchableOpacity>
         </View>

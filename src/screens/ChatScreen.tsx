@@ -19,6 +19,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import EmojiPicker from "rn-emoji-keyboard";
 import { Audio } from "expo-av";
 import { sendVoiceMessageToApi } from "../api/VoiceMessageApi";
+import { getChatMessages } from "../api/message";
 import VoiceMessage from '../components/VoiceMessage';
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
@@ -40,6 +41,7 @@ interface Message {
 interface RouteParams {
   chatName?: string;
   userId?: string;
+  chatId?: string;
 }
 
 export default function ChatScreen() {
@@ -52,23 +54,19 @@ export default function ChatScreen() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      sender: "other",
-      senderName: chatPartnerName,
-      text: "你好呀 这是 DEMO 聊天",
-      type: "text",
-      timestamp: new Date()
-    },
-    { id: "2", sender: "me", senderName: "我", text: "好的 DEMO 回复", type: "text", timestamp: new Date() },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     setupAudio();
+    // Fetch messages if chatId is provided
+    if (params?.chatId) {
+      fetchMessages();
+    }
     return () => {
       if (recording) {
         recording
@@ -81,6 +79,36 @@ export default function ChatScreen() {
       }
     };
   }, []);
+
+  const fetchMessages = async () => {
+    if (!params?.chatId) return;
+
+    setIsLoadingMessages(true);
+    try {
+      const response = await getChatMessages(params.chatId, offset);
+
+      if (response.error === false && response.response) {
+        // Convert API messages to component format
+        const apiMessages = response.response.chat || [];
+        const convertedMessages: Message[] = apiMessages.map((msg: any) => ({
+          id: msg.id?.toString() || Date.now().toString(),
+          sender: msg.sender_id === params.userId ? "me" : "other",
+          senderName: msg.sender_name || (msg.sender_id === params.userId ? "我" : chatPartnerName),
+          text: msg.message || msg.text,
+          type: msg.type || "text",
+          uri: msg.uri,
+          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date()
+        }));
+
+        setMessages(convertedMessages);
+      }
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+      Alert.alert("错误", "获取消息失败");
+    } finally {
+      setIsLoadingMessages(false);
+    }
+  };
 
   const setupAudio = async () => {
     try {
