@@ -1,7 +1,16 @@
+// src/api/VoiceMessageApi.ts
 import { Alert } from 'react-native';
+import axios from "axios";
+import { API_BASE_URL } from "./config";
 
-const BASE_URL = "https://prelabial-lustrously-michaela.ngrok-free.dev/api";
+// ============================================
+// API 函数 - 语音消息
+// ============================================
 
+/**
+ * 发送语音消息到服务器
+ * Send voice message to API
+ */
 export const sendVoiceMessageToApi = async (uri: string) => {
   try {
     const formData = new FormData();
@@ -11,7 +20,7 @@ export const sendVoiceMessageToApi = async (uri: string) => {
       type: "audio/opus",
     } as any); // Type assertion for React Native FormData
 
-    const response = await fetch(`${BASE_URL}/chats/voice/test`, {
+    const response = await fetch(`${API_BASE_URL}/chats/voice/test`, {
       method: "POST",
       body: formData,
       headers: {
@@ -35,7 +44,7 @@ export const sendVoiceMessageToApi = async (uri: string) => {
       // If not JSON, get the response as text
       const responseText = await response.text();
       console.log("Backend response (not JSON):", responseText);
-      // Decide what to do with a non-JSON response. 
+      // Decide what to do with a non-JSON response.
       // For now, we'll return it as is or throw an error.
       throw new Error('Received non-JSON response from server.');
     }

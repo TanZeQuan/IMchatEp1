@@ -1,8 +1,15 @@
 // src/api/FriendApi.ts
-import axios from 'axios';
+import axios from "axios";
+import { API_BASE_URL } from "./config";
 
-const API_BASE_URL = 'https://prelabial-lustrously-michaela.ngrok-free.dev/api';
+// ============================================
+// API 函数 - 好友管理
+// ============================================
 
+/**
+ * 添加好友
+ * Add a new friend
+ */
 export const addFriend = async (request_id: string, approve_id: string, message?: string) => {
   const formData = new FormData();
   const data = {
@@ -30,6 +37,10 @@ export const addFriend = async (request_id: string, approve_id: string, message?
   }
 };
 
+/**
+ * 搜索用户
+ * Search for users
+ */
 export const searchUser = async (search: string, userId?: string) => {
   const formData = new FormData();
   const data = userId ? { search, user_id: userId } : { search };
@@ -63,6 +74,10 @@ export const searchUser = async (search: string, userId?: string) => {
   }
 };
 
+/**
+ * 获取好友请求列表
+ * Get friend requests
+ */
 export const getFriendRequests = async (userId: string, status: number = 1) => {
   const formData = new FormData();
   const data = {
@@ -92,6 +107,10 @@ export const getFriendRequests = async (userId: string, status: number = 1) => {
   }
 };
 
+/**
+ * 更新好友请求状态（通过 list_id）
+ * Update friend request by list_id
+ */
 export const updateFriendRequest = async (listId: string, status: number) => {
   const formData = new FormData();
   const data = {
@@ -118,7 +137,10 @@ export const updateFriendRequest = async (listId: string, status: number) => {
   }
 };
 
-// Update friend request using request_id and approve_id instead of list_id
+/**
+ * 更新好友请求状态（通过 request_id 和 approve_id）
+ * Update friend request using request_id and approve_id instead of list_id
+ */
 export const updateFriendRequestByUsers = async (requestId: string, approveId: string, status: number) => {
   const formData = new FormData();
   const data = {

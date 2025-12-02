@@ -1,8 +1,21 @@
 // src/api/WebSocketService.ts
 
+// ============================================
+// WebSocket 服务类
+// ============================================
+
+/**
+ * WebSocket 连接服务
+ * 管理 WebSocket 连接、消息发送和接收
+ */
 export class WebSocketService {
   private ws: WebSocket | null = null;
 
+  /**
+   * 连接 WebSocket
+   * @param url WebSocket 服务器地址
+   * @param onMessage 接收消息的回调函数
+   */
   connect(url: string, onMessage: (data: any) => void) {
     this.ws = new WebSocket(url);
 
@@ -29,6 +42,10 @@ export class WebSocketService {
     };
   }
 
+  /**
+   * 发送消息
+   * @param data 要发送的数据
+   */
   send(data: any) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
@@ -37,6 +54,9 @@ export class WebSocketService {
     }
   }
 
+  /**
+   * 断开 WebSocket 连接
+   */
   disconnect() {
     if (this.ws) {
       this.ws.close();
@@ -45,4 +65,7 @@ export class WebSocketService {
   }
 }
 
+// ============================================
+// 导出单例实例
+// ============================================
 export const wsService = new WebSocketService();

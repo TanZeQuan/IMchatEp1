@@ -23,6 +23,7 @@ import VoiceMessage from '../components/VoiceMessage';
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { MainStackParamList } from "../navigation/MainStack";
 import { colors, borders, typography } from "../styles";
+import { formatTime } from '../utils/formatTime';
 
 type ChatScreenNavProp = NativeStackNavigationProp<MainStackParamList, "Chat">;
 
@@ -33,6 +34,7 @@ interface Message {
   text?: string;
   type: "text" | "voice";
   uri?: string;
+  timestamp: Date;
 }
 
 interface RouteParams {
@@ -57,8 +59,9 @@ export default function ChatScreen() {
       senderName: chatPartnerName,
       text: "你好呀 这是 DEMO 聊天",
       type: "text",
+      timestamp: new Date()
     },
-    { id: "2", sender: "me", senderName: "我", text: "好的 DEMO 回复", type: "text" },
+    { id: "2", sender: "me", senderName: "我", text: "好的 DEMO 回复", type: "text", timestamp: new Date() },
   ]);
   const [inputText, setInputText] = useState("");
   const [showToolbar, setShowToolbar] = useState(false);
@@ -145,7 +148,7 @@ export default function ChatScreen() {
       console.log("Backend response for voice message:", responseData);
 
       // Assuming the API call was successful, add to local state
-      const newMessage: Message = { id: Date.now().toString(), sender: "me", senderName: "我", type: "voice", uri };
+      const newMessage: Message = { id: Date.now().toString(), sender: "me", senderName: "我", type: "voice", uri, timestamp: new Date() };
       setMessages(prev => [...prev, newMessage]);
     } catch (err) {
       // The error is already logged in the API function, and an Alert is shown.
@@ -162,6 +165,7 @@ export default function ChatScreen() {
       senderName: "我",
       text: inputText,
       type: "text",
+      timestamp: new Date()
     };
     setMessages((prev) => [...prev, newMessage]);
     setInputText("");
@@ -193,18 +197,21 @@ export default function ChatScreen() {
           />
         </View>
       )}
-      <View
-        style={[
-          styles.bubble,
-          item.sender === "me" ? styles.bubbleRight : styles.bubbleLeft,
-        ]}
-      >
-        <Text style={styles.senderName}>{item.senderName}</Text>
-        {item.type === "text" ? (
-          <Text style={styles.messageText}>{item.text}</Text>
-        ) : (
-          <VoiceMessage uri={item.uri!} />
-        )}
+      <View style={item.sender === 'me' ? styles.messageContentRight : styles.messageContentLeft}>
+        <View
+          style={[
+            styles.bubble,
+            item.sender === "me" ? styles.bubbleRight : styles.bubbleLeft,
+          ]}
+        >
+          <Text style={styles.senderName}>{item.senderName}</Text>
+          {item.type === "text" ? (
+            <Text style={styles.messageText}>{item.text}</Text>
+          ) : (
+            <VoiceMessage uri={item.uri!} />
+          )}
+        </View>
+        <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
       </View>
       {item.sender === "me" && (
         <View style={styles.avatar}>
@@ -524,4 +531,16 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   toolbarLabel: { fontSize: typography.fontSize12, color: colors.text.primary },
+  timestamp: {
+    fontSize: typography.fontSize12,
+    color: colors.text.gray,
+    marginHorizontal: 8,
+    marginTop: 4,
+  },
+  messageContentLeft: {
+    alignItems: 'flex-start',
+  },
+  messageContentRight: {
+    alignItems: 'flex-end',
+  },
 });

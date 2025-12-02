@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,6 +13,8 @@ import { useNavigation } from "@react-navigation/native";
 import { sendOTP, verifyOTP, resetPassword } from "../api/UserApi";
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
+import Input from "../components/Input";
+import Button from "../components/Button";
 
 const ForgetPasswordScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -90,31 +91,24 @@ const ForgetPasswordScreen: React.FC = () => {
         </View>
 
         <View style={styles.content}>
-          {/* 邮箱 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="请输入邮箱地址"
-              placeholderTextColor={colors.border.dark}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
+          <Input
+            placeholder="请输入邮箱地址"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            containerStyle={styles.inputContainer}
+          />
 
           {/* 验证码 + 按钮 */}
           <View style={styles.verificationRow}>
-            <View style={[styles.inputContainer, styles.verificationInput]}>
-              <TextInput
-                style={styles.input}
-                placeholder="请输入验证码"
-                placeholderTextColor={colors.border.dark}
-                value={verificationCode}
-                onChangeText={setVerificationCode}
-                keyboardType="number-pad"
-              />
-            </View>
+            <Input
+              placeholder="请输入验证码"
+              value={verificationCode}
+              onChangeText={setVerificationCode}
+              keyboardType="number-pad"
+              containerStyle={[styles.inputContainer, styles.verificationInput]}
+            />
 
             <TouchableOpacity
               style={[
@@ -130,54 +124,31 @@ const ForgetPasswordScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {/* 新密码 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="请输入新密码"
-              placeholderTextColor={colors.border.dark}
-              secureTextEntry={!showNewPassword}
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowNewPassword(!showNewPassword)}
-            >
-              <Ionicons
-                name={showNewPassword ? "eye-outline" : "eye-off-outline"}
-                size={responsive.f(22)}
-                color={colors.text.lightGray}
-              />
-            </TouchableOpacity>
-          </View>
+          <Input
+            placeholder="请输入新密码"
+            secureTextEntry={!showNewPassword}
+            value={newPassword}
+            onChangeText={setNewPassword}
+            icon={showNewPassword ? "eye-outline" : "eye-off-outline"}
+            iconOnPress={() => setShowNewPassword(!showNewPassword)}
+            containerStyle={styles.inputContainer}
+          />
 
-          {/* 确认密码 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="请确认密码"
-              placeholderTextColor={colors.border.dark}
-              secureTextEntry={!showConfirmPassword}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              <Ionicons
-                name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
-                size={responsive.f(22)}
-                color={colors.text.lightGray}
-              />
-            </TouchableOpacity>
-          </View>
+          <Input
+            placeholder="请确认密码"
+            secureTextEntry={!showConfirmPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            icon={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+            iconOnPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            containerStyle={styles.inputContainer}
+          />
 
-          {/* 提交按钮 */}
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>提交</Text>
-          </TouchableOpacity>
+          <Button
+            title="提交"
+            onPress={handleSubmit}
+            style={styles.submitButton}
+          />
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -204,16 +175,10 @@ const styles = StyleSheet.create({
   placeholder: { width: responsive.w(40) },
   content: { paddingHorizontal: responsive.s(20), paddingTop: responsive.h(32) },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.background.white,
-    borderRadius: responsive.w(borders.radius30),
-    paddingHorizontal: responsive.s(20),
     marginBottom: responsive.h(18),
     height: responsive.h(50),
+    // We keep this style to override the default component styles
   },
-  input: { flex: 1, fontSize: responsive.f(typography.fontSize15), color: colors.text.blackMedium },
-  eyeIcon: { padding: responsive.w(8) },
   verificationRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -236,14 +201,12 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: colors.background.yellowLight,
     borderRadius: responsive.w(borders.radius30),
-    paddingVertical: responsive.h(15),
-    alignItems: "center",
-    justifyContent: "center",
     marginTop: responsive.h(40),
     marginBottom: responsive.h(60),
     marginHorizontal: responsive.s(16),
+    shadowColor: 'transparent', // Override default shadow
+    elevation: 0, // Override default shadow
   },
-  submitButtonText: { fontSize: responsive.f(typography.fontSize16), fontWeight: typography.fontWeight600, color: colors.text.blackMedium },
 });
 
 export default ForgetPasswordScreen;

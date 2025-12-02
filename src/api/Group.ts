@@ -1,13 +1,18 @@
 // src/api/Group.ts
-import axios from 'axios';
+import axios from "axios";
+import { API_BASE_URL } from "./config";
 
-const API_BASE_URL = 'https://prelabial-lustrously-michaela.ngrok-free.dev/api';
+// ============================================
+// 类型定义 - 群组相关
+// ============================================
 
+// 群组成员
 export interface GroupMember {
   user_id: string;
   isadmin: number; // 1 = Regular member, 2 = Admin
 }
 
+// 添加群组参数
 export interface AddGroupParams {
   name: string;
   user_id: string;
@@ -15,7 +20,12 @@ export interface AddGroupParams {
   group: GroupMember[];
 }
 
+// ============================================
+// API 函数 - 群组管理
+// ============================================
+
 /**
+ * 创建群组聊天（多人）
  * Create a new group chat with multiple members
  * Automatically generates chat_id with "IMC" prefix
  * Groups can have 2+ members with one or more admins

@@ -1,9 +1,12 @@
 // src/api/UserApi.ts
 import axios from "axios";
+import { API_BASE_URL } from "./config";
 
-const BASE_URL = "https://prelabial-lustrously-michaela.ngrok-free.dev/api"; // 替换成你的后端地址
+// ============================================
+// 类型定义 - 认证相关
+// ============================================
 
-// Register payload 用手机号
+// 注册
 export interface RegisterPayload {
   name: string;     // 昵称
   phone: string;    // 手机号
@@ -11,33 +14,43 @@ export interface RegisterPayload {
   password: string; // 密码
 }
 
-// Login payload
+// 登录
 export interface LoginPayload {
   phone: string;
   password: string;
 }
 
-// 👉 1. 发送 OTP Payload
+// ============================================
+// 类型定义 - 忘记密码流程
+// ============================================
+
+// 发送 OTP
 export interface SendOTPPayload {
   email: string;
 }
 
-// 👉 2. 验证 OTP Payload
+// 验证 OTP
 export interface VerifyOTPPayload {
   email: string;
   otp: string;
 }
 
-// 👉 3. 重设密码 Payload
+// 重设密码
 export interface ResetPasswordPayload {
   password: string;
 }
 
+// ============================================
+// 类型定义 - 个人资料管理
+// ============================================
+
+// 修改邮箱
 export interface ChangeEmailPayload {
   user_id: string;
   email: string;
 }
 
+// 更新个人资料
 export interface UpdateProfilePayload {
   user_id: string;  // 必填
   name?: string;    // 可选
@@ -48,6 +61,10 @@ export interface UpdateProfilePayload {
     type?: string;
   };                // 可选
 }
+
+// ============================================
+// API 函数 - 认证相关
+// ============================================
 
 // 注册 API
 export const register = async (payload: RegisterPayload) => {
@@ -67,7 +84,7 @@ export const register = async (payload: RegisterPayload) => {
       })
     );
 
-    const res = await axios.post(`${BASE_URL}/users/new`, formData, {
+    const res = await axios.post(`${API_BASE_URL}/users/new`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -80,7 +97,6 @@ export const register = async (payload: RegisterPayload) => {
     throw error.response?.data || error;
   }
 };
-
 
 // 登录 API
 export const login = async (payload: LoginPayload) => {
@@ -95,7 +111,7 @@ export const login = async (payload: LoginPayload) => {
       })
     );
 
-    const res = await axios.post(`${BASE_URL}/login`, formData, {
+    const res = await axios.post(`${API_BASE_URL}/login`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -108,7 +124,11 @@ export const login = async (payload: LoginPayload) => {
   }
 };
 
+// ============================================
+// API 函数 - 忘记密码流程
+// ============================================
 
+// 发送 OTP
 export const sendOTP = async (payload: SendOTPPayload) => {
   try {
     const formData = new FormData();
@@ -120,7 +140,7 @@ export const sendOTP = async (payload: SendOTPPayload) => {
       })
     );
 
-    const res = await axios.post(`${BASE_URL}/forget/otp/send`, formData, {
+    const res = await axios.post(`${API_BASE_URL}/forget/otp/send`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -133,10 +153,7 @@ export const sendOTP = async (payload: SendOTPPayload) => {
   }
 };
 
-
-// =============================
-// 2) 验证 OTP
-// =============================
+// 验证 OTP
 export const verifyOTP = async (payload: VerifyOTPPayload) => {
   try {
     const formData = new FormData();
@@ -146,7 +163,7 @@ export const verifyOTP = async (payload: VerifyOTPPayload) => {
       otp: payload.otp,
     }));
 
-    const res = await axios.post(`${BASE_URL}/forget/otp/verify`, payload);
+    const res = await axios.post(`${API_BASE_URL}/forget/otp/verify`, payload);
     return res.data;
   } catch (error: any) {
     console.error("Verify OTP error:", error.response?.data || error.message);
@@ -154,12 +171,10 @@ export const verifyOTP = async (payload: VerifyOTPPayload) => {
   }
 };
 
-// =============================
-// 3) 重设密码
-// =============================
+// 重设密码
 export const resetPassword = async (payload: ResetPasswordPayload) => {
   try {
-    const res = await axios.post(`${BASE_URL}/forget/password/reset`, payload);
+    const res = await axios.post(`${API_BASE_URL}/forget/password/reset`, payload);
     return res.data;
   } catch (error: any) {
     console.error("Reset Password error:", error.response?.data || error.message);
@@ -167,6 +182,11 @@ export const resetPassword = async (payload: ResetPasswordPayload) => {
   }
 };
 
+// ============================================
+// API 函数 - 个人资料管理
+// ============================================
+
+// 修改邮箱
 export const changeEmail = async (payload: ChangeEmailPayload) => {
   try {
     const formData = new FormData();
@@ -175,7 +195,7 @@ export const changeEmail = async (payload: ChangeEmailPayload) => {
       email: payload.email,
     }));
 
-    const res = await axios.post(`${BASE_URL}/users/email/change`, formData, {
+    const res = await axios.post(`${API_BASE_URL}/users/email/change`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
@@ -186,7 +206,7 @@ export const changeEmail = async (payload: ChangeEmailPayload) => {
   }
 };
 
-
+// 更新个人资料
 export const updateProfile = async (payload: any) => {
   try {
     const formData = new FormData();
@@ -209,7 +229,7 @@ export const updateProfile = async (payload: any) => {
     }
 
     const res = await fetch(
-      "https://prelabial-lustrously-michaela.ngrok-free.dev/api/users/info/update",
+      `${API_BASE_URL}/users/info/update`,
       {
         method: "POST",
         body: formData,
@@ -225,6 +245,3 @@ export const updateProfile = async (payload: any) => {
     throw error;
   }
 };
-
-
-

@@ -10,6 +10,7 @@ import { updateProfile } from '../api/UserApi';
 import { colors, borders, typography } from '../styles';
 import responsive from '../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
+import Avatar from '../components/Avatar';
 
 interface MenuItem {
   icon: keyof typeof Ionicons.glyphMap;
@@ -192,18 +193,11 @@ const ProfileMenu: React.FC<Props> = ({ setUserToken }) => {
           {/* Profile Card */}
           <View style={styles.profileCard}>
             <View style={styles.profileLeft}>
-              <TouchableOpacity style={styles.avatarContainer} onPress={handleAvatarPress}>
-                {avatarUri ? (
-                  <Image source={{ uri: avatarUri }} style={styles.avatar} />
-                ) : (
-                  <View style={styles.avatarPlaceholder}>
-                    <Ionicons name="person" size={28} color={colors.text.white} />
-                  </View>
-                )}
-                <View style={styles.cameraOverlay}>
-                  <Ionicons name="camera" size={10} color={colors.text.white} />
-                </View>
-              </TouchableOpacity>
+              <Avatar
+                uri={avatarUri}
+                onPress={handleAvatarPress}
+                showEditButton={true}
+              />
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{userName}</Text>
                 <Text style={styles.profileId}>账号ID：{userId}</Text>
@@ -267,37 +261,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     alignItems: 'center', 
     flex: 1 
-  },
-  avatarContainer: {
-    position: 'relative',
-    width: responsive.w(60),
-    height: responsive.w(60),
-  },
-  avatar: { 
-    width: responsive.w(60), 
-    height: responsive.w(60), 
-    borderRadius: responsive.w(10),
-  },
-  avatarPlaceholder: { 
-    width: responsive.w(60), 
-    height: responsive.w(60), 
-    backgroundColor: colors.text.dark, 
-    borderRadius: responsive.w(10), 
-    justifyContent: 'center', 
-    alignItems: 'center' 
-  },
-  cameraOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: responsive.w(18),
-    height: responsive.w(18),
-    borderRadius: responsive.w(9),
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#fff',
   },
   profileInfo: { 
     marginLeft: responsive.w(12), 

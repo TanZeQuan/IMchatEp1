@@ -1,0 +1,8 @@
+// src/api/config.ts
+
+// ============================================
+// API 配置
+// ============================================
+
+// TODO: Please replace this with your actual API server address.
+export const API_BASE_URL = 'https://prelabial-lustrously-michaela.ngrok-free.dev/api'; // User-provided API server address

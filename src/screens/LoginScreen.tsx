@@ -21,6 +21,8 @@ import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
 import { AuthStackParamList } from "../navigation/AuthStack";
 import { login } from "../api/UserApi";
+import Button from "../components/Button";
+import Input from "../components/Input";
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -105,42 +107,24 @@ const LoginScreen = ({ setUserToken }: { setUserToken: (token: string) => void }
 
           <Text style={styles.title}>登录</Text>
 
-          {/* Phone input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="请输入手机号"
-              value={phone}
-              onChangeText={setPhone}
-              autoCapitalize="none"
-              editable={!isLoading}
-              placeholderTextColor="#999"
-              keyboardType="phone-pad"
-            />
-          </View>
+          <Input
+            placeholder="请输入手机号"
+            value={phone}
+            onChangeText={setPhone}
+            autoCapitalize="none"
+            editable={!isLoading}
+            keyboardType="phone-pad"
+          />
 
-          {/* Password input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="请输入密码"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!isPasswordVisible}
-              editable={!isLoading}
-              placeholderTextColor="#999"
-            />
-            <TouchableOpacity
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            >
-              <Ionicons
-                name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
-                size={responsive.f(22)}
-                color="#888"
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-          </View>
+          <Input
+            placeholder="请输入密码"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
+            editable={!isLoading}
+            icon={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+            iconOnPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          />
 
           <View style={styles.linksContainer}>
             <TouchableOpacity onPress={() => navigation.navigate("Register")}>
@@ -153,23 +137,12 @@ const LoginScreen = ({ setUserToken }: { setUserToken: (token: string) => void }
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
+          <Button
+            title="登录"
             onPress={handleLogin}
             disabled={isButtonDisabled}
-            style={[
-              styles.loginButtonWrapper,
-              isButtonDisabled && styles.disabledButton,
-            ]}
-          >
-            <LinearGradient
-              colors={colors.background.gradientWhite}
-              style={styles.loginButtonGradient}
-            >
-              <Text style={styles.loginButtonText}>
-                {isLoading ? "登录中..." : "登录"}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            isLoading={isLoading}
+          />
 
           <View style={styles.agreementContainer}>
             <TouchableOpacity
@@ -246,28 +219,6 @@ const styles = StyleSheet.create({
     marginBottom: responsive.h(30),
     color: colors.text.primary,
   },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    height: responsive.h(55),
-    backgroundColor: colors.background.white,
-    borderRadius: responsive.w(borders.radius30),
-    marginBottom: responsive.h(20),
-    paddingHorizontal: responsive.s(20),
-    shadowColor: colors.shadow.blue,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  inputField: {
-    flex: 1,
-    fontSize: responsive.f(typography.fontSize16),
-    color: colors.text.blackMedium,
-    height: "100%",
-  },
-  icon: { marginLeft: responsive.w(10) },
   linksContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -279,33 +230,6 @@ const styles = StyleSheet.create({
     color: colors.text.veryDarkGray,
     fontSize: responsive.f(typography.fontSize14),
   },
-  loginButtonWrapper: {
-    width: "100%",
-    height: responsive.h(55),
-    borderRadius: responsive.w(borders.radius30),
-    shadowColor: colors.shadow.blue,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-    marginTop: responsive.h(10),
-    overflow: "hidden",
-  },
-  loginButtonGradient: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: responsive.w(borders.radius30),
-    borderWidth: borders.width1,
-    borderColor: colors.border.white,
-  },
-  loginButtonText: {
-    color: colors.text.blackMedium,
-    fontSize: responsive.f(typography.fontSize16),
-    fontWeight: typography.fontWeightBold,
-  },
-  disabledButton: { opacity: 0.6 },
   agreementContainer: {
     flexDirection: "row",
     alignItems: "center",

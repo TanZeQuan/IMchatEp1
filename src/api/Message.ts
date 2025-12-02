@@ -1,13 +1,16 @@
-// src/api/message.ts
-import { API_BASE_URL } from "../config";
-
+import axios from "axios";
+import { API_BASE_URL } from "./config";
+/**
+ * 获取用户的聊天列表
+ * Get chats for a specific user
+ */
 export const getChatsForUser = async (userId: string) => {
     const formData = new FormData();
     formData.append("data", JSON.stringify({
         user_id: userId
     }));
 
-    const url = `${API_BASE_URL}/api/chats/read`;
+    const url = `${API_BASE_URL}/chats/read`;
     console.log(`Fetching chats for user ${userId} from ${url}`); // Added logging
 
     try {

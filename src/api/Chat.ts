@@ -1,9 +1,15 @@
 // src/api/Chat.ts
-import axios from 'axios';
+import axios from "axios";
+import { API_BASE_URL } from "./config";
 
-const API_BASE_URL = 'https://prelabial-lustrously-michaela.ngrok-free.dev/api';
+// ============================================
+// API 函数 - 私聊管理
+// ============================================
 
-// Create a new private chat (one-on-one conversation)
+/**
+ * 创建私聊（一对一对话）
+ * Create a new private chat (one-on-one conversation)
+ */
 export const createPrivateChat = async (
   userId: string,
   chatWith: string,

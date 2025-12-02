@@ -8,7 +8,6 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -19,6 +18,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import responsive from "../utils/responsive";
 import { colors, borders, typography } from "../styles";
+import Button from "../components/Button";
+import Input from "../components/Input";
 
 type RegisterPayload = {
   name: string;
@@ -122,97 +123,54 @@ const RegisterScreen = () => {
 
           <Text style={styles.title}>注册</Text>
 
-          {/* 昵称 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="请输入昵称"
-              value={nickname}
-              onChangeText={setNickname}
-              autoCapitalize="none"
-              editable={!isLoading}
-              placeholderTextColor={colors.text.lightGray}
-            />
-          </View>
+          <Input
+            placeholder="请输入昵称"
+            value={nickname}
+            onChangeText={setNickname}
+            autoCapitalize="none"
+            editable={!isLoading}
+          />
 
-          {/* 手机号 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="请输入手机号"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-              autoCapitalize="none"
-              editable={!isLoading}
-              placeholderTextColor={colors.text.lightGray}
-            />
-          </View>
+          <Input
+            placeholder="请输入手机号"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            autoCapitalize="none"
+            editable={!isLoading}
+          />
 
-          {/* 邮箱 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="请输入邮箱"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-              placeholderTextColor={colors.text.lightGray}
-            />
-          </View>
+          <Input
+            placeholder="请输入邮箱"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!isLoading}
+          />
 
-          {/* 密码 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="请输入密码"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!isPasswordVisible}
-              editable={!isLoading}
-              placeholderTextColor={colors.text.lightGray}
-            />
-            <TouchableOpacity
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            >
-              <Ionicons
-                name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
-                size={responsive.f(22)}
-                color={colors.text.grayMedium}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-          </View>
+          <Input
+            placeholder="请输入密码"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
+            editable={!isLoading}
+            icon={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+            iconOnPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          />
 
-          {/* 确认密码 */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="请再次输入密码"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!isConfirmPasswordVisible}
-              editable={!isLoading}
-              placeholderTextColor={colors.text.lightGray}
-            />
-            <TouchableOpacity
-              onPress={() =>
-                setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-              }
-            >
-              <Ionicons
-                name={
-                  isConfirmPasswordVisible ? "eye-off-outline" : "eye-outline"
-                }
-                size={responsive.f(22)}
-                color={colors.text.grayMedium}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-          </View>
+          <Input
+            placeholder="请再次输入密码"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!isConfirmPasswordVisible}
+            editable={!isLoading}
+            icon={isConfirmPasswordVisible ? "eye-off-outline" : "eye-outline"}
+            iconOnPress={() =>
+              setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+            }
+          />
 
           {/* 已有账户 */}
           <View style={styles.linksContainer}>
@@ -222,21 +180,13 @@ const RegisterScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* 注册按钮 */}
-          <TouchableOpacity
+          <Button
+            title="注册"
             onPress={handleRegister}
             disabled={isButtonDisabled}
-            style={[styles.loginButtonWrapper, isButtonDisabled && styles.disabledButton]}
-          >
-            <LinearGradient
-              colors={colors.background.gradientWhite}
-              style={styles.loginButtonGradient}
-            >
-              <Text style={styles.loginButtonText}>
-                {isLoading ? "注册中..." : "注册"}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            isLoading={isLoading}
+            style={{ marginTop: -10 }}
+          />
 
           {/* 同意协议 */}
           <View style={styles.agreementContainer}>
@@ -306,23 +256,6 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "30deg" }],
   },
   title: { fontSize: responsive.f(typography.fontSize28), fontWeight: typography.fontWeightBold, marginBottom: responsive.h(30), color: colors.text.blackMedium },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    height: responsive.h(55),
-    backgroundColor: colors.background.white,
-    borderRadius: responsive.w(borders.radius30),
-    marginBottom: responsive.h(20),
-    paddingHorizontal: responsive.s(20),
-    shadowColor: colors.shadow.blue,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  inputField: { flex: 1, fontSize: responsive.f(typography.fontSize16), color: colors.text.blackMedium, height: "100%" },
-  icon: { marginLeft: responsive.w(10) },
   linksContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -331,29 +264,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsive.s(15),
   },
   linkText: { color: colors.text.veryDarkGray, fontSize: responsive.f(typography.fontSize14) },
-  loginButtonWrapper: {
-    width: "100%",
-    height: responsive.h(55),
-    borderRadius: responsive.w(borders.radius30),
-    shadowColor: colors.shadow.blue,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-    marginTop: responsive.h(-10),
-    overflow: "hidden",
-  },
-  loginButtonGradient: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: responsive.w(borders.radius30),
-    borderWidth: borders.width1,
-    borderColor: colors.border.white,
-  },
-  loginButtonText: { color: colors.text.blackMedium, fontSize: responsive.f(typography.fontSize16), fontWeight: typography.fontWeightBold },
-  disabledButton: { opacity: 0.6 },
   agreementContainer: {
     flexDirection: "row",
     alignItems: "center",
